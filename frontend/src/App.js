@@ -9,6 +9,9 @@ import NewTicket from './pages/NewTicket'
 import Register from './pages/Register'
 import Tickets from './pages/Tickets'
 import Ticket from './pages/Ticket'
+import ViewInventory from "./pages/inventory"; 
+
+
 
 function App () {
   return (
@@ -29,6 +32,7 @@ function App () {
             <Route path='/ticket/:ticketId' element={<PrivateRoute />}>
               <Route path='/ticket/:ticketId' element={<Ticket />} />
             </Route>
+            <Route path='/inventory' element={<ViewInventory />} /> 
           </Routes>
         </div>
       </Router>

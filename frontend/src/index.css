@@ -31,7 +31,7 @@ li {
 h1,
 h2,
 h3 {
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
@@ -76,8 +76,8 @@ h3 {
 }
 
 .heading {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 600;
   margin-bottom: 50px;
   padding: 0 20px;
 }
@@ -227,7 +227,7 @@ h3 {
 }
 
 .status {
-  background-color: #333;
+  background-color: #6b6a6a;
   color: #fff;
   width: 100px;
   padding: 0 20px;
@@ -267,12 +267,19 @@ h3 {
 }
 
 .ticket-page .btn {
-  margin-bottom: 30px;
+  margin-bottom: 3-px;
 }
 
 .ticket-page .btn-block {
   width: 100%;
   margin-top: 30px;
+}
+
+.ticket-buttons {
+  display:flex;
+  flex-direction: column; 
+  align-items: center;
+  gap: 10px;
 }
 
 .ticket-desc {
@@ -380,7 +387,7 @@ footer {
 @keyframes spin {
   0% {
     transform: rotate(0deg);
-  }
+  }F
   100% {
     transform: rotate(360deg);
   }
