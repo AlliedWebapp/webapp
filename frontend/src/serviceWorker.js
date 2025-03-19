@@ -37,14 +37,24 @@ export function register(config) {
 
 async function checkBackendConnection() {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/health`);
+    const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
     if (response.ok) {
       console.log("✅ Successfully connected to the backend:", API_BASE_URL);
     } else {
       console.warn("⚠ Backend connection issue:", response.status, response.statusText);
     }
   } catch (error) {
-    console.error("❌ Failed to connect to backend:", error);
+    if (error.name === "TypeError") {
+      console.error("❌ Network error or CORS issue. Backend might not be reachable.");
+    } else {
+      console.error("❌ Failed to connect to backend:", error);
+    }
   }
 }
 
