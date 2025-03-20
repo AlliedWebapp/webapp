@@ -33,7 +33,7 @@
     "backend/api/**/*.js": {
       "maxDuration": 60,
       "environment": {
-        "MONGO_URI": "@MONGO_URI"
+        "MONGODB_URI": "@MONGO_URI"
       }
     }
   },
