@@ -31,7 +31,13 @@
   ],
   "functions": {
     "backend/api/**/*.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "environment": {
+        "MONGO_URI": "@MONGO_URI"
+      }
     }
+  },
+  "env": {
+    "NODE_ENV": "development"
   }
 }
