@@ -31,13 +31,11 @@
   ],
   "functions": {
     "backend/api/**/*.js": {
-      "maxDuration": 60,
-      "environment": {
-        "MONGODB_URI": "@MONGO_URI"
-      }
+      "maxDuration": 60
     }
   },
   "env": {
-    "NODE_ENV": "development"
+    "NODE_ENV": "development",
+    "MONGODB_URI": "@MONGO_URI"
   }
 }
