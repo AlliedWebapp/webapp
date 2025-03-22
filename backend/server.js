@@ -7,8 +7,11 @@ const connectDB = require('./config/db');
 const path = require('path');
 const mongoose = require('mongoose');
 const spareRoutes = require('./routes/spareRoutes');
-
 const PORT = process.env.PORT || 5000;
+const userRoutes = require("./routes/userRoutes");
+const ticketRoutes = require("./routes/ticketRoutes");
+const noteRoutes = require("./routes/noteRoutes");
+
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
 // ✅ Import Mongoose Models
@@ -65,11 +68,22 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use("/api/users", userRoutes);
+app.use(cors({ origin: "http://localhost:3000" })); // Change to your frontend URL
+
+
+// API Routes
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api/spares", spareRoutes);
+app.use("/api/users", userRoutes);
 
 // CORS Configuration
 const corsOptions = {
     origin: ['https://alliedwebapp.vercel.app', 'https://backend-services-theta.vercel.app'],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -106,6 +120,38 @@ app.get('/', (req, res) => {
         }
     });
 });
+
+// Define the API route for fetching inventory data
+app.get('/api/inventory', async (req, res) => {
+    try {
+        const collection = db.collection("Jogini"); // Use correct collection name
+        const inventory = await collection.find({ Month: "MAY" }).toArray();
+        res.json(inventory);
+    } catch (error) {
+        console.error("Error fetching inventory:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.get("/api/:collection", async (req, res) => {
+    const { collection } = req.params;
+
+    try {
+        const validCollections = ["Jogini", "Shong", "solding", "SDLLPsalun", "Kuwarsi"];
+        if (!validCollections.includes(collection)) {
+            return res.status(400).json({ error: "Invalid collection name" });
+        }
+
+        const dbCollection = db.collection(collection);
+        const inventory = await dbCollection.find({}).toArray(); // Fetch all documents
+
+        res.json(inventory);
+    } catch (error) {
+        console.error("Error fetching inventory:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 // 404 handler - must be after all valid routes
 app.use('*', (req, res) => {

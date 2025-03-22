@@ -41,7 +41,25 @@ function NewTicket() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    dispatch(createTicket({ projectname, description }));
+    
+    // Validate required fields
+    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    // Create ticket with all fields
+    dispatch(createTicket({
+      projectname,
+      sitelocation,
+      projectlocation,
+      fault,
+      issue,
+      description,
+      date,
+      spare,
+      rating
+    }));
   };
 
   if (isLoading) return <Spinner />;
@@ -54,159 +72,153 @@ function NewTicket() {
         <p>Fill the details</p>
       </section>
 
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="projectname">Project Name</label>
-          <select
-              name="projectname"
-              id="projectname"
-              value={projectname}
-              onChange={(e) => setprojectname(e.target.value)}
-            >
-              <option value="Shong">Shong</option>
-              <option value="Solding">Solding</option>
-              <option value="Jogini-II">Jogini-II</option>
-              <option value="JHP Kuwarsi-II">JHP Kuwarsai</option>
-              <option value="SDLLP Salun">SDLLP Salun</option>
-            </select>
-        </div>
-      </section>
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="sitelocation">Site Location</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={sitelocation}
-              name="Site Location"
-              id="sitelocation"
-              onChange={(e) => setsitelocation(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="projectlocation">Project Location</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={projectlocation}
-              name="Project Location"
-              id="projectlocation"
-              onChange={(e) => setprojectlocation(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="fault">Fault</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={fault}
-              name="Fault"
-              id="fault"
-              onChange={(e) => setfault(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-      
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="issue">Issue</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={issue}
-              name="Issue"
-              id="issue"
-              onChange={(e) => setissue(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="description">Description</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={description}
-              name="Description"
-              id="description"
-              onChange={(e) => setdescription(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="date">Date to attend</label>
-          <input
-              type="date"
-              className="form-control"
-              placeholder=""
-              value={date}
-              name="Date to attend"
-              id="date"
-              onChange={(e) => setdate(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></input>
-        </div>
-      </section>
-
-
-
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="spare">Spare Needed</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={spare}
-              name="Spare Needed"
-              id="spare"
-              onChange={(e) => setspare(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-      <section className="form">
-        <div className="form-group">
-          <label htmlFor="rating">DG Rating</label>
-          <textarea
-              className="form-control"
-              placeholder=""
-              value={rating}
-              name="DG Rating"
-              id="rating"
-              onChange={(e) => setrating(e.target.value)}
-              style={{ width: "100%", height: "50px", resize: "none" }} 
-            ></textarea>
-        </div>
-      </section>
-
-
-
-
-  
-        <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit}>
+        <section className="form">
           <div className="form-group">
-            <button className="btn btn-block">Submit</button>
+            <label htmlFor="projectname">Project Name</label>
+            <select
+                name="projectname"
+                id="projectname"
+                value={projectname}
+                onChange={(e) => setprojectname(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select from the options below
+                </option>
+                <option value="Shong">Shong</option>
+                <option value="Solding">Solding</option>
+                <option value="Jogini-II">Jogini-II</option>
+                <option value="JHP Kuwarsi-II">JHP Kuwarsai</option>
+                <option value="SDLLP Salun">SDLLP Salun</option>
+              </select>
           </div>
-        </form>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="sitelocation">Site Location</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={sitelocation}
+                name="Site Location"
+                id="sitelocation"
+                onChange={(e) => setsitelocation(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="projectlocation">Project Location</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={projectlocation}
+                name="Project Location"
+                id="projectlocation"
+                onChange={(e) => setprojectlocation(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="fault">Fault</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={fault}
+                name="Fault"
+                id="fault"
+                onChange={(e) => setfault(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="issue">Issue</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={issue}
+                name="Issue"
+                id="issue"
+                onChange={(e) => setissue(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="description">Description</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={description}
+                name="Description"
+                id="description"
+                onChange={(e) => setdescription(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="date">Date to attend</label>
+            <input
+                type="date"
+                className="form-control"
+                placeholder=""
+                value={date}
+                name="Date to attend"
+                id="date"
+                onChange={(e) => setdate(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></input>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="spare">Spare Needed</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={spare}
+                name="Spare Needed"
+                id="spare"
+                onChange={(e) => setspare(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <section className="form">
+          <div className="form-group">
+            <label htmlFor="rating">DG Rating</label>
+            <textarea
+                className="form-control"
+                placeholder=""
+                value={rating}
+                name="DG Rating"
+                id="rating"
+                onChange={(e) => setrating(e.target.value)}
+                style={{ width: "100%", height: "50px", resize: "none" }} 
+              ></textarea>
+          </div>
+        </section>
+
+        <div className="form-group">
+          <button className="btn btn-block">Submit</button>
+        </div>
+      </form>
     </>
   );
 }
