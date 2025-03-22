@@ -10,6 +10,5 @@ export const PrivateRoute = () => {
   }
 
   return loggedIn ? <Outlet /> : <Navigate to="/login" />;
-
-  return <div></div>;
+return <div></div>;
 };
