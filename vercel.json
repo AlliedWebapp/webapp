@@ -29,11 +29,6 @@
       "dest": "/frontend/build/$1"
     }
   ],
-  "functions": {
-    "backend/api/**/*.js": {
-      "maxDuration": 60
-    }
-  },
   "env": {
     "NODE_ENV": "development",
     "MONGODB_URI": "@MONGO_URI"
