@@ -1,34 +1,45 @@
+// 📌 Import Dependencies
 const express = require('express'); // CommonJS module syntax
 const colors = require('colors');
 const dotenv = require('dotenv').config();
-const cors = require('cors'); // ✅ Import CORS
-const { errorHandler } = require('./middleware/errorMiddleware');
-const connectDB = require('./config/db');
+const cors = require('cors'); 
 const path = require('path');
 const mongoose = require('mongoose');
+
+// 📌 Import Local Modules
+const { errorHandler } = require('./middleware/errorMiddleware');
+const connectDB = require('./config/db');
 const spareRoutes = require('./routes/spareRoutes');
-const PORT = process.env.PORT || 5000;
 const userRoutes = require("./routes/userRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 
-require("dotenv").config({ path: path.resolve(__dirname, ".env") });
-
-// ✅ Import Mongoose Models
+// 📌 Import Mongoose Models
 const solding = require("./models/soldingModel");
 const Shong = require("./models/ShongModel");
 const Jogini = require("./models/JoginiModel");
 const SDLLPsalun = require("./models/SDLLPsalunModel");
 const Kuwarsi = require("./models/KuwarsiModel");
 
+// 📌 Load Environment Variables
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+const PORT = process.env.PORT || 5000;
 console.log("MongoDB URI:", process.env.MONGODB_URI);
 
-// ✅ Connect to database
+// ✅ Initialize Express App
+const app = express();
+
+// 📌 Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cors({ origin: "http://localhost:3000" })); // Change to your frontend URL
+app.use(express.static(path.join(__dirname, "/frontend")));  
+
+// ✅ Connect to Database
 connectDB().then(() => {
     console.log("✅ Database Connection Initialized");
     console.log("🗂️ Using Database:", mongoose.connection.name);
 
-    // List collections after successful connection
     mongoose.connection.db.listCollections().toArray()
         .then(collections => {
             console.log("🗂️ Available Collections:", collections.map(col => col.name));
@@ -36,15 +47,9 @@ connectDB().then(() => {
         .catch(err => console.error("❌ Error Fetching Collections:", err));
 });
 
-mongoose.connection.once("open", () => {
-    console.log("✅ MongoDB connection established!");
-});
-
-mongoose.connection.on("error", (err) => {
-    console.error("❌ MongoDB connection error:", err);
-});
-
-// MongoDB Connection Event Logging
+// 📌 MongoDB Event Handlers
+mongoose.connection.once("open", () => console.log("✅ MongoDB connection established!"));
+mongoose.connection.on("error", (err) => console.error("❌ MongoDB connection error:", err));
 mongoose.connection.on('connected', () => {
     console.log('✅ MongoDB Connected successfully');
     console.log({
@@ -54,31 +59,7 @@ mongoose.connection.on('connected', () => {
     });
 });
 
-mongoose.connection.on('error', (err) => {
-    console.error('❌ MongoDB Connection Error:', {
-        error: err,
-        message: err.message,
-        code: err.code,
-        connectionString: 'MongoDB URI is ' + (process.env.MONGODB_URI ? 'set' : 'not set')
-    });
-});
-
-const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use("/api/users", userRoutes);
-app.use(cors({ origin: "http://localhost:3000" })); // Change to your frontend URL
-
-
-// API Routes
-app.use("/api/tickets", ticketRoutes);
-app.use("/api/notes", noteRoutes);
-app.use("/api/spares", spareRoutes);
-app.use("/api/users", userRoutes);
-
-// CORS Configuration
+// 📌 CORS Configuration
 const corsOptions = {
     origin: ['https://alliedwebapp.vercel.app', 'https://backend-services-theta.vercel.app'],
     credentials: true,
@@ -88,7 +69,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Detailed request logging middleware
+// 📌 Request Logging Middleware
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}]`);
     console.log(`📍 Route accessed: ${req.method} ${req.url}`);
@@ -98,30 +79,18 @@ app.use((req, res, next) => {
     next();
 });
 
-// Mount routes - IMPORTANT: Order matters!
+// 📌 API Routes
+app.use("/api/users", userRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api/spares", spareRoutes);
 app.use('/api', spareRoutes);  // This will handle all /api routes
 
-// Test route
-app.get('/test', (req, res) => {
-    res.json({ message: 'Server is working' });
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 
-// Root route
-app.get('/', (req, res) => {
-    res.json({
-        message: 'Welcome to the Support Desk API',
-        environment: process.env.NODE_ENV,
-        endpoints: {
-            jogini: '/api/jogini',
-            solding: '/api/solding',
-            shong: '/api/shong',
-            sdllpsalun: '/api/sdllpsalun',
-            kuwarsi: '/api/kuwarsi'
-        }
-    });
-});
-
-// Define the API route for fetching inventory data
+// 📌 Inventory API Routes
 app.get('/api/inventory', async (req, res) => {
     try {
         const collection = db.collection("Jogini"); // Use correct collection name
@@ -152,8 +121,27 @@ app.get("/api/:collection", async (req, res) => {
     }
 });
 
+// 📌 Default Root Route
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Welcome to the Support Desk API',
+        environment: process.env.NODE_ENV,
+        endpoints: {
+            jogini: '/api/jogini',
+            solding: '/api/solding',
+            shong: '/api/shong',
+            sdllpsalun: '/api/sdllpsalun',
+            kuwarsi: '/api/kuwarsi'
+        }
+    });
+});
 
-// 404 handler - must be after all valid routes
+// 📌 Test Route
+app.get('/test', (req, res) => {
+    res.json({ message: 'Server is working' });
+});
+
+// 📌 404 Handler
 app.use('*', (req, res) => {
     res.status(404).json({ 
         message: 'Route not found',
@@ -168,7 +156,7 @@ app.use('*', (req, res) => {
     });
 });
 
-// Error handling with full details
+// 📌 Error Handling Middleware
 app.use((err, req, res, next) => {
     console.error('🔴 Error:', err);
     res.status(err.status || 500).json({
@@ -182,9 +170,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-/**
- * ✅ Start Server
- */
+// 📌 Start Server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });
