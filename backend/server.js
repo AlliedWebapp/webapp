@@ -61,7 +61,7 @@ mongoose.connection.on('connected', () => {
 
 // 📌 CORS Configuration
 const corsOptions = {
-    origin: ['https://alliedwebapp.vercel.app', 'https://backend-services-theta.vercel.app'],
+    origin: ["http://localhost:3000", "https://alliedwebapp.vercel.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
