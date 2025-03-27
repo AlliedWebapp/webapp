@@ -532,3 +532,32 @@ tr:hover {
     width: auto; /* Ensure table adapts to screen size */
   }
 }
+
+
+
+/* Styling for the Plus and Minus Buttons */
+.spares-btn {
+  font-size: 10px; /* Adjust icon size */
+  font-weight: bold;
+  width: 30px; /* Button width */
+  height: 30px; /* Button height */
+  border: none;
+  background-color: #eeeded; 
+  color: white;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  margin: 5px; /* Space between buttons */
+}
+
+.spares-btn:hover {
+  background-color: #69abf1; /* Darker blue on hover */
+}
+
+/* Minus Button Specific Styling */
+.spares-btn.minus {
+  background-color: #eeeded; 
+}
+.spares-btn.minus:hover {
+  background-color: #ee5060; 
+}

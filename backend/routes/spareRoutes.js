@@ -6,7 +6,8 @@ const {
     getAllShong,
     getAllJogini,
     getAllSDLLPsalun,
-    getAllKuwarsi
+    getAllKuwarsi,
+    updatesparesCount
 } = require("../controllers/sparesController");
 
 // Debug route to test API
@@ -24,6 +25,10 @@ router.get("/debug", (req, res) => {
         }
     });
 });
+
+// Update spares count
+router.put("/update-spares", updatesparesCount);
+
 
 // Data routes
 router.get("/jogini", getAllJogini);

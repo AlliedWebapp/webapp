@@ -21,6 +21,7 @@ const Inventory = () => {
             "Opening Stock",
             "Monthly Consumption",
             "Closing Stock",
+            "SpareCount",
           ],
           dbFields: [
             "Spare Discription",
@@ -29,6 +30,7 @@ const Inventory = () => {
             "OPENING STOCK ( NOS )",
             "Monthly Consumption ( NOS )",
             "CLOSING STOCK ( NOS )",
+            "spareCount"
           ],
         };
         case "Shong":
@@ -44,6 +46,7 @@ const Inventory = () => {
               "In Stock",
               "Remarks",
               "Types",
+              "SpareCount",
             ],
             dbFields: [
               "Description of Material",
@@ -55,6 +58,7 @@ const Inventory = () => {
               "In Stock",
               "Remarks",
               "Types",
+              "spareCount"
             ],
           };
         
@@ -70,6 +74,7 @@ const Inventory = () => {
             "Rate",
             "In Stock",
             "Types",
+            "SpareCount",
           ],
           dbFields: [
             "Description of Material",
@@ -80,6 +85,7 @@ const Inventory = () => {
             "Rate",
             "In Stock",
             "TYPES",
+            "spareCount"
           ],
         };
       case "SDLLPsalun":
@@ -96,6 +102,7 @@ const Inventory = () => {
             "Specification",
             "Manufacture",
             "Types",
+            "SpareCount",
           ],
           dbFields: [
             "NAME OF MATERIALS",
@@ -108,6 +115,7 @@ const Inventory = () => {
             "SPECIFICATION",
             "MAKE.MANUFACTURE",
             "Types",
+            "spareCount"
           ],
         };
       case "Kuwarsi":
@@ -124,6 +132,7 @@ const Inventory = () => {
             "Specification",
             "Manufacture",
             "Remarks",
+            "SpareCount",
           ],
           dbFields: [
             "NAME OF MATERIALS",
@@ -136,6 +145,7 @@ const Inventory = () => {
             "SPECIFICATION",
             "MAKE.MANUFACTURE",
             "REMARKS",
+            "spareCount"
           ],
         };
       default:
@@ -176,6 +186,38 @@ const Inventory = () => {
     }
   }, [selectedCollection, fetchInventory]);
 
+   // Function to update spares count
+   const updatesparesCount = async (id, increment) => {
+    try {
+      setInventory((prevInventory) =>
+        prevInventory.map((item) => {
+          if (item._id === id) {
+            const newCount = item.spareCount + increment;
+            if (newCount < 0) return item; // Prevent count from going below 0
+          }
+          return item;
+        })
+      );
+
+      const response = await axios.put("http://localhost:5000/api/spares/update-spares", {
+        collectionName: selectedCollection,
+        id,
+        increment,
+      });
+
+      if (response.data.success) {
+        setInventory((prevInventory) =>
+          prevInventory.map((item) =>
+            item._id === id ? { ...item, spareCount: Math.max(0, item.spareCount + increment) } : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating spares count:", error);
+    }
+  };
+
+
   return (
     <div>
       <h2>View Inventory</h2>
@@ -202,10 +244,16 @@ const Inventory = () => {
                 inventory.map((item, index) => (
                   <tr key={index}>
                     {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
-                      let value = field.includes(".") ? field.split(".").reduce((obj, key) => obj?.[key], item) : item?.[field] ?? "N/A";
+                      let value = field.includes(".")
+                        ? field.split(".").reduce((obj, key) => obj?.[key], item)
+                        : item?.[field] ?? "N/A";
                       if (Array.isArray(value)) value = value.join(", ");
                       return <td key={idx}>{value ?? "N/A"}</td>;
                     })}
+                   <td className="spares-btn-container">
+                         <button className="spares-btn" onClick={() => updatesparesCount(item._id, 1)}>➕</button>
+                        <button className="spares-btn minus" onClick={() => updatesparesCount(item._id, -1)}>➖</button>
+                  </td>
                   </tr>
                 ))
               ) : (

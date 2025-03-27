@@ -14,6 +14,7 @@ const soldingSchema = new mongoose.Schema({
   inStock: { type: Number, required: true }, // "In Stock"
   remarks: { type: String, default: "" }, // "Remarks"
   types: { type: String, default: "" }, // "TYPES"
+  sparesCount: { type: Number, default: 0 }
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
 
 const solding = mongoose.model("solding", soldingSchema, "solding");

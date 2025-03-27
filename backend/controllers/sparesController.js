@@ -3,7 +3,7 @@ const Shong = require("../models/ShongModel");
 const solding = require("../models/soldingModel");
 const SDLLPsalun = require("../models/SDLLPsalunModel");
 const Kuwarsi = require("../models/KuwarsiModel");
-
+const mongoose = require("mongoose");
 const getSpareInventory = async (req, res) => {
     try {
         res.status(200).json({ message: 'Spare inventory endpoint' });
@@ -136,11 +136,49 @@ const getAllKuwarsi = async (req, res) => {
     }
 };
 
+// Function to update SparesCount
+const updatesparesCount = async (req, res) => {
+    try {
+        const { collectionName, id, increment } = req.body;
+
+        const collections = {
+            jogini: Jogini,
+            shong: Shong,
+            solding: solding,
+            sdllpsalun: SDLLPsalun,
+            kuwarsi: Kuwarsi
+        };
+
+        const Model = collections[collectionName.toLowerCase()];
+        if (!Model) {
+            return res.status(400).json({ message: "Invalid collection name" });
+        }
+
+        // Find the document and update SparesCount
+        const updatedDoc = await Model.findByIdAndUpdate(
+            id,
+            { $inc: { sparesCount: increment } },
+            { new: true }
+        );
+
+        if (!updatedDoc) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+
+        res.json({ success: true, updatedDoc });
+    } catch (error) {
+        console.error("Error updating SparesCount:", error);
+        res.status(500).json({ message: "Server error", error });
+    }
+};
+
+
 module.exports = {
     getSpareInventory,
     getAllSolding,
     getAllShong,
     getAllJogini,
     getAllSDLLPsalun,
-    getAllKuwarsi
+    getAllKuwarsi, 
+    updatesparesCount
 };
