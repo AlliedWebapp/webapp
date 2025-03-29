@@ -61,7 +61,7 @@ mongoose.connection.on('connected', () => {
 
 // 📌 CORS Configuration
 const corsOptions = {
-    origin: ["http://localhost:3000", "http://3.110.48.39:5000"],
+    origin: ["*"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],

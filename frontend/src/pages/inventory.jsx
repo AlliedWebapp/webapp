@@ -64,7 +64,7 @@ const Inventory = () => {
       }
 
       // Fetch the inventory data
-      const apiUrl = `http://localhost:5000/api/${selectedCollection}`;
+      const apiUrl=`http://localhost:5000/api/${selectedCollection}`;
       console.log(`Fetching inventory from: ${apiUrl}`);
 
       const response = await axios.get(apiUrl, {
