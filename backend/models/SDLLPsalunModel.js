@@ -14,7 +14,7 @@ const sdllpSalunSchema = new mongoose.Schema({
     manufacture: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
   },
   types: { type: String, default: "" }, // "Types"
-  sparesCount: { type: Number, default: 0 }
+  spareCount: { type: Number, default: 0 }
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
 
 const SDLLPsalun = mongoose.model("SDLLPsalun", sdllpSalunSchema, "SDLLPsalun"); 

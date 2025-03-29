@@ -8,24 +8,14 @@ import Spinner from "../components/Spinner";
 
 function Login() {
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "admin@gmail.com",
+    password: "qwerty",
   });
 
-  const { email, password } = formData; // destructuring
+  const { email, password } = formData;
 
-  /**
-   * useDispatch() returns a reference to the dispatch function
-   * from the Redux store. You may use it to dispatch actions
-   * as needed.
-   */
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  /**
-   * useSelector() allows you to extract data from the Redux store state,
-   * using a selector function.
-   */
 
   const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
@@ -36,7 +26,6 @@ function Login() {
       toast.error(message);
     }
 
-    // Redirect when logged in
     if (isSuccess || user) {
       navigate("/");
     }
@@ -53,13 +42,7 @@ function Login() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-
-    const userData = {
-      email,
-      password,
-    };
-
-    dispatch(login(userData));
+    dispatch(login({ email, password }));
   };
 
   if (isLoading) {
@@ -79,7 +62,7 @@ function Login() {
         <form onSubmit={onSubmit}>
           <div className="form-group">
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
               value={email}

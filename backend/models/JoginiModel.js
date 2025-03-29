@@ -13,7 +13,7 @@ const joginiSchema = new mongoose.Schema({
     closingStock: { type: Number, default: 0 },
     msl: { type: Number, default: 0 },
     sign: { type: String, trim: true },
-    sparesCount: { type: Number, default: 0 } // ✅ Added SparesCount field
+    spareCount: { type: Number, default: 0 } // ✅ Added Spareount field
 }, { timestamps: true, collection: "Jogini" });
 
 const Jogini = mongoose.model("Jogini", joginiSchema);

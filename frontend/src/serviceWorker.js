@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://backend-services-theta.vercel.app";
+const API_BASE_URL= `http://3.110.48.39:5000`
+
 
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||

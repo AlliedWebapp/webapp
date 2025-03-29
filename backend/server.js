@@ -32,7 +32,7 @@ const app = express();
 // 📌 Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors({ origin: "http://localhost:3000" })); // Change to your frontend URL
+app.use(cors({ origin: "*" })); // Change to your frontend URL
 app.use(express.static(path.join(__dirname, "/frontend")));  
 
 // ✅ Connect to Database

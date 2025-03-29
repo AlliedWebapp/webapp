@@ -2,158 +2,54 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 const Inventory = () => {
-  const [selectedCollection, setSelectedCollection] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState(() => {
+    return localStorage.getItem("selectedCollection") || "";
+  });
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [headers, setHeaders] = useState([]);
   const [error, setError] = useState(null);
 
-  // Function to get collection details using switch case
-  const getCollectionDetails = (collection) => {
-    switch (collection) {
-      case "Jogini":
-        return {
-          name: "Jogini",
-          headers: [
-            "Spare Description",
-            "Vendor",
-            "Month",
-            "Opening Stock",
-            "Monthly Consumption",
-            "Closing Stock",
-            "SpareCount",
-          ],
-          dbFields: [
-            "Spare Discription",
-            "Make.Vendor",
-            "Month",
-            "OPENING STOCK ( NOS )",
-            "Monthly Consumption ( NOS )",
-            "CLOSING STOCK ( NOS )",
-            "spareCount"
-          ],
-        };
-        case "Shong":
-          return {
-            name: "Shong",
-            headers: [
-              "Description of Material",
-              "Make",
-              "Vendor",
-              "Specification",
-              "Place",
-              "Rate",
-              "In Stock",
-              "Remarks",
-              "Types",
-              "SpareCount",
-            ],
-            dbFields: [
-              "Description of Material",
-              "Make",
-              "Vendor",
-              "Code.Specification",
-              "Place",
-              "Rate",
-              "In Stock",
-              "Remarks",
-              "Types",
-              "spareCount"
-            ],
-          };
-        
-         case "solding":
-            return {
-          name: "solding",
-          headers: [
-            "Description of Material",
-            "Make",
-            "Vendor",
-            "Specification",
-            "Place",
-            "Rate",
-            "In Stock",
-            "Types",
-            "SpareCount",
-          ],
-          dbFields: [
-            "Description of Material",
-            "Make",
-            "Vendor",
-            "Code.Specification",
-            "Place",
-            "Rate",
-            "In Stock",
-            "TYPES",
-            "spareCount"
-          ],
-        };
-      case "SDLLPsalun":
-        return {
-          name: "SDLLP Salun",
-          headers: [
-            "Name of Materials",
-            "Opening Balance",
-            "Received during the month",
-            "Total",
-            "Issue during the month",
-            "Issue during the year ",
-            "Closing Balance",
-            "Specification",
-            "Manufacture",
-            "Types",
-            "SpareCount",
-          ],
-          dbFields: [
-            "NAME OF MATERIALS",
-            "OPENING BALANCE",
-            "RECEIVED DURING THE MONTH",
-            "TOTAL",
-            "ISSUE DURING THE MONTH",
-            "ISSUE DURING THE YEAR (from 1st Jan 2025)",
-            "CLOSING BALANCE",
-            "SPECIFICATION",
-            "MAKE.MANUFACTURE",
-            "Types",
-            "spareCount"
-          ],
-        };
-      case "Kuwarsi":
-        return {
-          name: "Kuwarsi",
-          headers: [
-            "Name of Materials",
-            "Opening balance",
-            "Received during the month",
-            "Total",
-            "Issue during the month",
-            "Issue during the year",
-            "Closing balance",
-            "Specification",
-            "Manufacture",
-            "Remarks",
-            "SpareCount",
-          ],
-          dbFields: [
-            "NAME OF MATERIALS",
-            "OPENING BALANCE",
-            "RECEIVED DURING THE MONTH",
-            "TOTAL",
-            "ISSUE DURING THE MONTH",
-            "ISSUE DURING THE YEAR ( from 1 jan 2025)",
-            "CLOSING BALANCE",
-            "SPECIFICATION",
-            "MAKE.MANUFACTURE",
-            "REMARKS",
-            "spareCount"
-          ],
-        };
-      default:
-        return { name: "", headers: [], dbFields: [] };
+  // Sync state with localStorage on selection change
+  useEffect(() => {
+    if (selectedCollection) {
+      localStorage.setItem("selectedCollection", selectedCollection);
     }
+  }, [selectedCollection]);
+
+  // Function to get collection details
+  const getCollectionDetails = (collection) => {
+    const collections = {
+      Jogini: {
+        name: "Jogini",
+        headers: ["Spare Description", "Vendor", "Month", "Opening Stock", "Monthly Consumption", "Closing Stock", "SpareCount"],
+        dbFields: ["Spare Discription", "Make.Vendor", "Month", "OPENING STOCK ( NOS )", "Monthly Consumption ( NOS )", "CLOSING STOCK ( NOS )", "spareCount"],
+      },
+      Shong: {
+        name: "Shong",
+        headers: ["Description of Material", "Make", "Vendor", "Specification", "Place", "Rate", "In Stock", "Remarks", "Types", "SpareCount"],
+        dbFields: ["Description of Material", "Make", "Vendor", "Code.Specification", "Place", "Rate", "In Stock", "Remarks", "Types", "spareCount"],
+      },
+      solding: {
+        name: "solding",
+        headers: ["Description of Material", "Make", "Vendor", "Specification", "Place", "Rate", "In Stock", "Types", "SpareCount"],
+        dbFields: ["Description of Material", "Make", "Vendor", "Code.Specification", "Place", "Rate", "In Stock", "TYPES", "spareCount"],
+      },
+      SDLLPsalun: {
+        name: "SDLLP Salun",
+        headers: ["Name of Materials", "Opening Balance", "Received during the month", "Total", "Issue during the month", "Issue during the year ", "Closing Balance", "Specification", "Manufacture", "Types", "SpareCount"],
+        dbFields: ["NAME OF MATERIALS", "OPENING BALANCE", "RECEIVED DURING THE MONTH", "TOTAL", "ISSUE DURING THE MONTH", "ISSUE DURING THE YEAR (from 1st Jan 2025)", "CLOSING BALANCE", "SPECIFICATION", "MAKE.MANUFACTURE", "Types", "spareCount"],
+      },
+      Kuwarsi: {
+        name: "Kuwarsi",
+        headers: ["Name of Materials", "Opening balance", "Received during the month", "Total", "Issue during the month", "Issue during the year", "Closing balance", "Specification", "Manufacture", "Remarks", "SpareCount"],
+        dbFields: ["NAME OF MATERIALS", "OPENING BALANCE", "RECEIVED DURING THE MONTH", "TOTAL", "ISSUE DURING THE MONTH", "ISSUE DURING THE YEAR ( from 1 jan 2025)", "CLOSING BALANCE", "SPECIFICATION", "MAKE.MANUFACTURE", "REMARKS", "spareCount"],
+      },
+    };
+    return collections[collection] || { name: "", headers: [], dbFields: [] };
   };
 
-  // Fetch Inventory Data using axios
+  // Fetch Inventory Data
   const fetchInventory = useCallback(async () => {
     if (!selectedCollection) return;
 
@@ -161,11 +57,21 @@ const Inventory = () => {
     setError(null);
 
     try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.token) {
+        console.error("No user token found. Please log in.");
+        return;
+      }
+
+      // Fetch the inventory data
       const apiUrl = `http://localhost:5000/api/${selectedCollection}`;
       console.log(`Fetching inventory from: ${apiUrl}`);
 
-      // Use axios to fetch data
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
       console.log("Fetched Inventory Data:", response.data);
 
       const collectionDetails = getCollectionDetails(selectedCollection);
@@ -180,49 +86,55 @@ const Inventory = () => {
     }
   }, [selectedCollection]);
 
+  // Fetch inventory when collection changes
   useEffect(() => {
     if (selectedCollection) {
       fetchInventory();
     }
   }, [selectedCollection, fetchInventory]);
 
-   // Function to update spares count
-   const updatesparesCount = async (id, increment) => {
-    try {
-      setInventory((prevInventory) =>
-        prevInventory.map((item) => {
-          if (item._id === id) {
-            const newCount = item.spareCount + increment;
-            if (newCount < 0) return item; // Prevent count from going below 0
-          }
-          return item;
-        })
-      );
+  const handleCollectionChange = useCallback((e) => {
+    const collection = e.target.value;
+    setSelectedCollection(collection);
+    localStorage.setItem("selectedCollection", collection);
+  }, []);
 
-      const response = await axios.put("http://localhost:5000/api/spares/update-spares", {
+  const updatespareCount = async (id, increment) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.token) {
+        console.error("No user token found. Please log in.");
+        return;
+      }
+
+      const response = await axios.put("http://localhost:5000/api/spares/update-spare", {
         collectionName: selectedCollection,
         id,
         increment,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
       });
 
       if (response.data.success) {
-        setInventory((prevInventory) =>
-          prevInventory.map((item) =>
-            item._id === id ? { ...item, spareCount: Math.max(0, item.spareCount + increment) } : item
-          )
-        );
+        // Refresh the inventory to show updated counts
+        fetchInventory();
       }
     } catch (error) {
       console.error("Error updating spares count:", error);
+      if (error.response?.status === 401) {
+        // Handle unauthorized error (token expired or invalid)
+        console.error("Please log in again");
+      }
     }
   };
-
 
   return (
     <div>
       <h2>View Inventory</h2>
       <label>Select Project: </label>
-      <select onChange={(e) => setSelectedCollection(e.target.value)} value={selectedCollection}>
+      <select onChange={handleCollectionChange} value={selectedCollection}>
         <option value="">Select a Project</option>
         {["Jogini", "Shong", "solding", "SDLLPsalun", "Kuwarsi"].map((key) => (
           <option key={key} value={key}>{getCollectionDetails(key).name}</option>
@@ -250,10 +162,20 @@ const Inventory = () => {
                       if (Array.isArray(value)) value = value.join(", ");
                       return <td key={idx}>{value ?? "N/A"}</td>;
                     })}
-                   <td className="spares-btn-container">
-                         <button className="spares-btn" onClick={() => updatesparesCount(item._id, 1)}>➕</button>
-                        <button className="spares-btn minus" onClick={() => updatesparesCount(item._id, -1)}>➖</button>
-                  </td>
+                    <td className="spares-btn-container">
+                      <button 
+                        className="spares-btn" 
+                        onClick={() => updatespareCount(item._id, 1)}
+                      >
+                        ➕
+                      </button>
+                      <button 
+                        className="spares-btn minus" 
+                        onClick={() => updatespareCount(item._id, -1)}
+                      >
+                        ➖
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (

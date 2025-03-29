@@ -14,7 +14,7 @@ const shongSchema = new mongoose.Schema({
   inStock: { type: String, required: true }, // "In Stock"
   remarks: { type: String, default: "" }, // "Remarks"
   types: { type: String, default: "" }, // "Types"
-  sparesCount: { type: Number, default: 0 }
+  spareCount: { type: Number, default: 0 }
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
 
 const Shong = mongoose.model("Shong", shongSchema, "Shong");
