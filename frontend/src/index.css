@@ -31,7 +31,7 @@ li {
 h1,
 h2,
 h3 {
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
@@ -76,8 +76,8 @@ h3 {
 }
 
 .heading {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 600;
   margin-bottom: 50px;
   padding: 0 20px;
 }
@@ -227,7 +227,7 @@ h3 {
 }
 
 .status {
-  background-color: #333;
+  background-color: #6b6a6a;
   color: #fff;
   width: 100px;
   padding: 0 20px;
@@ -267,12 +267,19 @@ h3 {
 }
 
 .ticket-page .btn {
-  margin-bottom: 30px;
+  margin-bottom: 3-px;
 }
 
 .ticket-page .btn-block {
   width: 100%;
   margin-top: 30px;
+}
+
+.ticket-buttons {
+  display:flex;
+  flex-direction: column; 
+  align-items: center;
+  gap: 10px;
 }
 
 .ticket-desc {
@@ -380,7 +387,7 @@ footer {
 @keyframes spin {
   0% {
     transform: rotate(0deg);
-  }
+  }F
   100% {
     transform: rotate(360deg);
   }
@@ -403,4 +410,154 @@ footer {
   .heading p {
     font-size: 1.5rem;
   }
+}
+
+/* General styles for the inventory page */
+.inventory-page {
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 3rem;
+  font-weight: 600;
+  color: #080000;
+  margin-bottom: 20px;
+}
+
+label {
+  font-size: 1.3rem;
+  margin-right: 12px;
+}
+
+/* Select dropdown style */
+select {
+  padding: 11px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #000408;
+}
+
+/* Loading and error message styles */
+.loading {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #01050a;
+}
+
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: red;
+  margin-top: 20px;
+}
+
+/* Table container to handle horizontal scrolling */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  padding: 0 20px; /* Adds left and right padding to the container */
+  margin-left: 20px;
+  margin-right: 20px; /* Adds left margin to the table */
+  box-sizing: border-box; /* Ensures padding is considered in width */
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-right: 0px;
+  box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
+}
+
+th{ padding: 10px 15px;
+  text-align: center;
+  border: 1px solid #fdfdfd;
+  margin-right: 10px;}
+
+td {
+  padding: 10px 15px;
+  text-align: center;
+  border: 1px solid #fdfdfd;
+  margin-right: 10px;
+}
+
+
+th {
+  background-color: #e5e4e4;
+  font-weight: 700;
+  color: #000000;
+}
+
+td {
+  background-color: #fff;
+  font-size: 15px;
+  color: #0c0202;
+}
+
+td:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #6e6767;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+  table {
+    font-size: 14px;
+  }
+
+  select {
+    width: 100%;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .table-container {
+    margin-left: 0; /* Remove left margin on smaller screens */
+  }
+
+  table {
+    width: auto; /* Ensure table adapts to screen size */
+  }
+}
+
+
+
+/* Styling for the Plus and Minus Buttons */
+.spares-btn {
+  font-size: 10px; /* Adjust icon size */
+  font-weight: bold;
+  width: 30px; /* Button width */
+  height: 30px; /* Button height */
+  border: none;
+  background-color: #eeeded; 
+  color: white;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  margin: 5px; /* Space between buttons */
+}
+
+.spares-btn:hover {
+  background-color: #69abf1; /* Darker blue on hover */
+}
+
+/* Minus Button Specific Styling */
+.spares-btn.minus {
+  background-color: #eeeded; 
+}
+.spares-btn.minus:hover {
+  background-color: #ee5060; 
 }

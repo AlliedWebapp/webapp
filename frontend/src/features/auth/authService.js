@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const API_URL = '/api/users'
+const API_URL = process.env.NODE_ENV === 'development' 
+  ? "http://localhost:5000/api/users"  // Use local backend in dev mode
+  : "http://3.110.48.39:5000/api/users";// ✅ Use EC2 Public IP
+
 
 // Register user
 const register = async userData => {

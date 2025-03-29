@@ -55,14 +55,24 @@ const getTicket = asyncHandler(async (req, res) => {
 })
 
 // @desc    Create new ticket
-// @route   POST /api/ticket
+// @route   POST /api/tickets
 // @access  Private
 const createTicket = asyncHandler(async (req, res) => {
-  const { product, description } = req.body
+  const { 
+    projectname, 
+    sitelocation, 
+    projectlocation, 
+    fault, 
+    issue, 
+    description, 
+    date, 
+    spare, 
+    rating 
+  } = req.body
 
-  if (!product || !description) {
-    res.status(400) // Bad request
-    throw new Error('Please provide a product and description')
+  if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
+    res.status(400)
+    throw new Error('Please provide all required fields')
   }
 
   // Get user using the id and JWT
@@ -74,8 +84,15 @@ const createTicket = asyncHandler(async (req, res) => {
   }
 
   const ticket = await Ticket.create({
-    product,
+    projectname,
+    sitelocation,
+    projectlocation,
+    fault,
+    issue,
     description,
+    date,
+    spare,
+    rating,
     user: req.user.id,
     status: 'new'
   })

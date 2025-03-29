@@ -7,22 +7,42 @@ const ticketSchema = mongoose.Schema(
       required: true,
       ref: 'User'
     },
-    product: {
+    projectname: {
       type: String,
-      required: [true, 'Please select a product'],
-      enum: [
-        'iPhone',
-        'iPad',
-        'MacBook',
-        'Macbook Pro',
-        'iMac',
-        'iPod',
-        'iPod touch'
-      ]
+      required: [true, 'Please select a project'],
+      enum: ['Shong', 'Solding', 'Jogini-II', 'JHP Kuwarsi-II', 'SDLLP Salun']
+    },
+    sitelocation: {
+      type: String,
+      required: [true, 'Please enter site location']
+    },
+    projectlocation: {
+      type: String,
+      required: [true, 'Please enter project location']
+    },
+    fault: {
+      type: String,
+      required: [true, 'Please enter fault details']
+    },
+    issue: {
+      type: String,
+      required: [true, 'Please enter issue details']
     },
     description: {
       type: String,
-      required: [true, 'Please enter a decription of the issue']
+      required: [true, 'Please enter a description']
+    },
+    date: {
+      type: Date,
+      required: [true, 'Please select a date']
+    },
+    spare: {
+      type: String,
+      required: [true, 'Please enter spare details']
+    },
+    rating: {
+      type: String,
+      required: [true, 'Please enter DG rating']
     },
     status: {
       type: String,

@@ -9,8 +9,9 @@ import NewTicket from './pages/NewTicket'
 import Register from './pages/Register'
 import Tickets from './pages/Tickets'
 import Ticket from './pages/Ticket'
+import Inventory from './pages/inventory'  // Updated import name to match component
 
-function App () {
+function App() {
   return (
     <>
       <Router>
@@ -28,6 +29,9 @@ function App () {
             </Route>
             <Route path='/ticket/:ticketId' element={<PrivateRoute />}>
               <Route path='/ticket/:ticketId' element={<Ticket />} />
+            </Route>
+            <Route path='/inventory' element={<PrivateRoute />}>  {/* Added PrivateRoute protection */}
+              <Route path='/inventory' element={<Inventory />} />
             </Route>
           </Routes>
         </div>
