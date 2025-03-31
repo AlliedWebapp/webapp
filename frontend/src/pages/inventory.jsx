@@ -63,10 +63,8 @@ const Inventory = () => {
         return;
       }
 
-      // Fetch the inventory data
-      const apiUrl = process.env.NODE_ENV === 'production'
-        ? `http://localhost:5000/api/${selectedCollection}`
-        : `https://backend-services-theta.vercel.app/api/${selectedCollection}`;
+      // Use the environment variable for production URL
+      const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/api/${selectedCollection}`;
       console.log(`Fetching inventory from: ${apiUrl}`);
 
       const response = await axios.get(apiUrl, {
@@ -110,7 +108,7 @@ const Inventory = () => {
         return;
       }
 
-      const response = await axios.put("http://localhost:5000/api/spares/update-spare", {
+      const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/spares/update-spare`, {
         collectionName: selectedCollection,
         id,
         increment,
