@@ -6,7 +6,7 @@ export const fetchCollection = createAsyncThunk(
   'collection/fetchCollection',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/collection'); // Update with your actual API
+      const response = await axios.get('/api/:collection'); // Update with your actual API
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -19,7 +19,7 @@ export const updateCollectionItem = createAsyncThunk(
   'collection/updateCollectionItem',
   async ({ id, updatedData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/collection/${id}`, updatedData);
+      const response = await axios.put(`/api/:collection/${id}`, updatedData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

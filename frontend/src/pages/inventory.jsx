@@ -64,12 +64,15 @@ const Inventory = () => {
       }
 
       // Fetch the inventory data
-      const apiUrl=`http://localhost:5000/api/${selectedCollection}`;
+      const apiUrl = process.env.NODE_ENV === 'production'
+        ? `http://localhost:5000/api/${selectedCollection}`
+        : `https://backend-services-theta.vercel.app/api/${selectedCollection}`;
       console.log(`Fetching inventory from: ${apiUrl}`);
 
       const response = await axios.get(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${user.token}`
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json'
         }
       });
       console.log("Fetched Inventory Data:", response.data);

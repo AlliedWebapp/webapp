@@ -1,7 +1,8 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "http://localhost:5000/",
+  "homepage": ".",
+  // "proxy":"https://backend-services-theta.vercel.app",(only for localhost)
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.0",

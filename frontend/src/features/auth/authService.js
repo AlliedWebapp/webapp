@@ -1,35 +1,35 @@
 import axios from 'axios'
 
-const API_URL = process.env.NODE_ENV === 'development' 
-  ? "http://localhost:5000/api/users"  // Use local backend in dev mode
-  : "http://3.110.48.39:5000/api/users";// ✅ Use EC2 Public IP
-
+const API_URL = process.env.REACT_APP_API_URL;
 
 // Register user
 const register = async userData => {
-  // userData is an object with an email and password i.e {name: 'Hina', email: 'hina@*****.com', password: '******'}
-  const response = await axios.post(API_URL, userData)
+  const response = await axios.post(`${API_URL}/register`, userData, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 
   if (response.data) {
-    // localStorage can only hold strings
-    localStorage.setItem('user', JSON.stringify(response.data))
+    localStorage.setItem('user', JSON.stringify(response.data));
   }
 
-  return response.data
+  return response.data;
 }
 
 // Login user
 const login = async userData => {
-  // userData is an object with an email and password i.e {email: 'arif@*****.com', password: '******'}
-  const response = await axios.post(API_URL + '/login', userData)
+  const response = await axios.post(`${API_URL}/login`, userData, {
+    headers: {
+      'Content-Type':'application/json'
+    }
+  });
 
   if (response.data) {
-    // localStorage can only hold strings
-    // Save the user data to localStorage in a key called 'user'
-    localStorage.setItem('user', JSON.stringify(response.data))
+    localStorage.setItem('user', JSON.stringify(response.data));
   }
 
-  return response.data
+  return response.data;
 }
 
 // Logout user
@@ -41,4 +41,4 @@ const authService = {
   login
 }
 
-export default authService
+export default authService;

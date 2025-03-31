@@ -1,37 +1,45 @@
-const jwt = require('jsonwebtoken')
-const asyncHandler = require('express-async-handler')
-const User = require('../models/userModel')
+const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
+const User = require("../models/userModel");
 
 const protect = asyncHandler(async (req, res, next) => {
-  let token
+    let token;
 
-  // console.log(req.headers.authorization)
-  // Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWM3NTc4MzBjODJmYjc2ZWY0ZDMxNyIsImlhdCI6MTY0NjAzMjM2MSwiZXhwIjoxNjQ4NjI0MzYxfQ.ISQuHgbha-Q4kvn8GDUEwTONK0gn_QH86E6SQKQTg78
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1]
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
-      // Get user from token
-      req.user = await User.findById(decoded.id).select('-password')
-      // console.log(`token: ${token} decoded: ${decoded} user: ${req.user}`)
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        try {
+            token = req.headers.authorization.split(" ")[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = await User.findById(decoded.id).select("-password");
 
-      next() // Continue to next middleware
-    } catch (error) {
-      console.log(error)
-      res.status(401)
-      throw new Error('Not authorized to access this route')
+            if (!req.user) {
+                return res.status(401).json({ message: "User not found" });
+            }
+
+            next();
+        } catch (error) {
+            console.error("Token verification failed:", error.message);
+            return res.status(401).json({ message: "Invalid or expired token" });
+        }
+    } else {
+        return res.status(401).json({ message: "Not authorized, token missing" });
     }
-  }
+});
 
-  if (!token) {
-    res.status(401)
-    throw new Error('Not authorized to access this route')
-  }
-})
+const optionalAuth = asyncHandler(async (req, res, next) => {
+    let token;
 
-module.exports = { protect }
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        try {
+            token = req.headers.authorization.split(" ")[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = await User.findById(decoded.id).select("-password");
+        } catch (error) {
+            console.warn("Optional authentication failed, proceeding without user.");
+        }
+    }
+
+    next();
+});
+
+// ✅ Export after defining functions
+module.exports = { protect, optionalAuth };

@@ -12,21 +12,22 @@
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/server.js"
-    },
-    {
-      "src": "^/static/(.*)",
-      "dest": "/frontend/build/static/$1"
-    },
-    {
-      "src": "^/[^.]+$",
-      "dest": "/frontend/build/index.html"
-    },
+    // Backend API route (serverless functions)
     {
       "src": "/(.*)",
-      "dest": "/frontend/build/$1"
+      "dest": "/backend/server.js"
+    },
+
+    // Static assets route (JS, CSS, images, etc.)
+    {
+      "src": "/static/(.*)",
+      "dest": "/frontend/build/static/$1"
+    },
+
+    // Redirect all other routes to frontend's index.html (for SPA)
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/build/index.html"
     }
   ]
 }

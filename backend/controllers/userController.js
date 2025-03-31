@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler'); // Middleware for async error handling
-const jwt = require('jsonwebtoken'); // JWT for authentication
 const bcrypt = require('bcryptjs'); // Password hashing library
-
+const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
 // @desc    Register a new user
@@ -45,7 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id),
+      token: generateToken(user._id)
     });
   } else {
     console.error("❌ User registration failed");
@@ -84,7 +83,7 @@ const loginUser = asyncHandler(async (req, res) => {
     _id: user._id,
     name: user.name,
     email: user.email,
-    token: generateToken(user._id),
+    token: generateToken(user._id)
   });
 });
 
@@ -92,21 +91,18 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/me
 // @access  Private
 const getMe = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized, please log in" });
+  }
+
   console.log("👤 Fetching profile for:", req.user.email);
-
-  const user = {
-    id: req.user._id,
-    email: req.user.email,
-    name: req.user.name,
-  };
-
-  res.status(200).json(user);
+  res.status(200).json(req.user);
 });
 
-// Generate JWT Token
+// Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d', // Token expiration
+    expiresIn: '30d',
   });
 };
 
