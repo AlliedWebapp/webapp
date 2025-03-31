@@ -1,10 +1,10 @@
-import axios from 'axios'
+import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Register user
-const register = async userData => {
-  const response = await axios.post(`${API_URL}/register`, userData, {
+const register = async (userData) => {
+  const response = await axios.post(`${API_URL}/api/users/register`, userData, {  // Updated to include /api/users/register
     headers: {
       'Content-Type': 'application/json'
     }
@@ -18,8 +18,8 @@ const register = async userData => {
 }
 
 // Login user
-const login = async userData => {
-  const response = await axios.post(`${API_URL}/login`, userData, {
+const login = async (userData) => {
+  const response = await axios.post(`${API_URL}/api/users/login`, userData, {  // Updated to include /api/users/login
     headers: {
       'Content-Type':'application/json'
     }
@@ -33,7 +33,7 @@ const login = async userData => {
 }
 
 // Logout user
-const logout = () => localStorage.removeItem('user')
+const logout = () => localStorage.removeItem('user');
 
 const authService = {
   register,
