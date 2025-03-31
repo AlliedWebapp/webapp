@@ -12,19 +12,16 @@
     }
   ],
   "routes": [
-    // Backend API route (serverless functions)
     {
       "src": "/(.*)",
       "dest": "/backend/server.js"
     },
 
-    // Static assets route (JS, CSS, images, etc.)
     {
       "src": "/static/(.*)",
       "dest": "/frontend/build/static/$1"
     },
 
-    // Redirect all other routes to frontend's index.html (for SPA)
     {
       "src": "/(.*)",
       "dest": "/frontend/build/index.html"
