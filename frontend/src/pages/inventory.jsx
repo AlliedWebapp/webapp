@@ -108,7 +108,7 @@ const Inventory = () => {
         return;
       }
 
-      const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/spares/update-spare`, {
+      const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/update-spare/${id}`, {
         collectionName: selectedCollection,
         id,
         increment,
