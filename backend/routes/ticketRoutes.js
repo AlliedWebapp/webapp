@@ -16,11 +16,11 @@ router.use("/:ticketId/notes", noteRouter);
 
 // Ticket Routes (Protected)
 router.route("/")
-  .get(protect, getTickets)   // Get all tickets
-  .post(protect, createTicket); // Create a new ticket
+  .get(protect, getTickets)   // Get all tickets with route /api/tickets
+  .post(protect, createTicket); // Create a new ticket  /api/tickets
 
 router.route("/:id")
-  .get(protect, getTicket)   // Get a single ticket
+  .get(protect, getTicket)   // Get a single ticket /api/tickets/:id
   .put(protect, updateTicket) // Update ticket details
   .delete(protect, deleteTicket); // Delete a ticket
 
