@@ -108,20 +108,15 @@ const Inventory = () => {
         return;
       }
 
-      const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/update-spare/${id}`, {
+      axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/update-spare/${id}`, {
         collectionName: selectedCollection,
-        id,
-        increment,
+        increment,  // ✅ No need to send id in body if it's in URL
       }, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`
-        }
+        headers: { 'Authorization': `Bearer ${user.token}` }
       });
-
-      if (response.data.success) {
-        // Refresh the inventory to show updated counts
-        fetchInventory();
-      }
+      
+      fetchInventory();
+      
     } catch (error) {
       console.error("Error updating spares count:", error);
       if (error.response?.status === 401) {
