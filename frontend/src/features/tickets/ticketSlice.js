@@ -84,7 +84,9 @@ export const getTicket = createAsyncThunk(
     try {
       // Token is required for authentication
       const token = thunkAPI.getState().auth.user.token
-      return await ticketService.getTicket(ticketId, token)
+      const ticket = await ticketService.getTicket(ticketId, token);
+      console.log("Ticket fetched successfully:", ticket);
+      return ticket;
     } catch (error) {
       const message =
         (error.response &&
