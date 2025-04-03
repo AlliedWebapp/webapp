@@ -119,9 +119,13 @@ const Inventory = () => {
       });
 
       if (response.data.success) {
-        // Refresh the inventory to show updated counts
-        fetchInventory();
-      }
+          // ✅ Instead of fetching the whole inventory, update only the affected item
+          setInventory((prevInventory) =>
+            prevInventory.map((item) =>
+              item._id === id ? { ...item, spareCount: response.data.spareCount } : item
+            )
+          );
+        }
     } catch (error) {
       console.error("Error updating spares count:", error);
       if (error.response?.status === 401) {
