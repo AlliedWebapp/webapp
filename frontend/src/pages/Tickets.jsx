@@ -1,3 +1,4 @@
+// for page to view all tickets
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";

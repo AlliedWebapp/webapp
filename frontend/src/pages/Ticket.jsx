@@ -1,3 +1,5 @@
+//for individual ticket when click read button
+
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
 import { getTicket, closeTicket } from "../features/tickets/ticketSlice";
@@ -66,10 +68,18 @@ function Ticket() {
   if (isError) {
     return <h3>Something went wrong</h3>;
   }
+  if (isLoading) return <Spinner />;
+if (!ticket || Object.keys(ticket).length === 0) {
+    return <h3>No ticket found</h3>;
+}
+
 
   // Close ticket
   const onTicketClose = () => {
-    dispatch(closeTicket(ticketId));
+    dispatch(closeTicket(ticketId)).then(() => {
+      toast.success("Ticket Closed");
+      navigate("/tickets");
+    });    
     toast.success("Ticket Closed");
     navigate("/tickets");
   };
