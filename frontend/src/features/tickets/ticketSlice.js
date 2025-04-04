@@ -3,7 +3,7 @@ import ticketService from './ticketService'
 
 const initialState = {
   tickets: [],
-  ticket: {},
+  ticket: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -130,6 +130,8 @@ export const ticketSlice = createSlice({
   initialState,
   reducers: {
     reset: (state) => {
+      state.tickets = [];
+      state.ticket = null;
       state.isLoading = false;
       state.isSuccess = false;
       state.isError = false;
@@ -166,21 +168,22 @@ export const ticketSlice = createSlice({
       .addCase(getTicket.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
-        state.ticket = null;
+        state.isSuccess = false;
+        state.message = '';
       })
       .addCase(getTicket.fulfilled, (state, action) => {
-        console.log('Received payload:', action.payload);
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
         state.ticket = action.payload;
+        console.log('Ticket data in store:', action.payload);
       })
       .addCase(getTicket.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
-        state.message = action.payload;
         state.ticket = null;
+        state.message = action.payload;
       })
       .addCase(closeTicket.fulfilled, (state, action) => {
         state.isLoading = false

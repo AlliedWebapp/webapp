@@ -34,12 +34,6 @@ const customStyles = {
 Modal.setAppElement("#root");
 
 function Ticket() {
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
 
@@ -56,18 +50,14 @@ function Ticket() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTicket = async () => {
+    const fetchData = async () => {
       try {
         console.log('Fetching ticket with ID:', ticketId);
         const result = await dispatch(getTicket(ticketId)).unwrap();
-        console.log('Ticket data received:', result);
-        
-        // Log the entire Redux state
-        const state = store.getState();
-        console.log('Current Redux State:', state);
+        console.log('Ticket fetch result:', result);
         
         if (result) {
-          await dispatch(getNotes(ticketId)).unwrap();
+          await dispatch(getNotes(ticketId));
         }
       } catch (error) {
         console.error('Error fetching ticket:', error);
@@ -75,24 +65,18 @@ function Ticket() {
       }
     };
 
-    fetchTicket();
+    fetchData();
+
+    // Cleanup function
+    return () => {
+      dispatch(notesReset());
+    };
   }, [ticketId, dispatch]);
 
-  // Debug logs
-  console.log('Component State:', {
-    ticket,
-    isLoading,
-    isError,
-    message
-  });
+  console.log('Current ticket state:', ticket);
 
   if (isLoading) {
-    return (
-      <div className="loading-container">
-        <Spinner />
-        <p>Loading ticket details...</p>
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (isError) {
@@ -106,22 +90,16 @@ function Ticket() {
     );
   }
 
-  // Ensure we have ticket data
-  if (!ticket || !ticket._id) {
-    console.log('No ticket data available:', ticket);
+  if (!ticket) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
-        <p>The ticket you're looking for doesn't exist or has been deleted</p>
         <button onClick={() => navigate('/tickets')} className="btn">
           Back to Tickets
         </button>
       </div>
     );
   }
-
-  // Debug log before rendering
-  console.log('About to render ticket:', ticket);
 
   // Close ticket
   const onTicketClose = () => {
@@ -163,55 +141,62 @@ function Ticket() {
     <div className="ticket-page">
       <header className="ticket-header">
         <BackButton url="/tickets" />
-        <h2>Ticket Overview</h2>
+        <h2>Ticket Details</h2>
+        
         <div className="ticket-info">
-          <p><strong>Ticket ID:</strong> {ticket._id}</p>
-          <p>
-            <strong>Status:</strong>{" "}
-            <span className={`status status-${ticket.status}`}>
-              {ticket.status}
-            </span>
-          </p>
-          <p>
-            <strong>Date Submitted:</strong>{" "}
-            {ticket.createdAt
-              ? new Date(ticket.createdAt).toLocaleString("en-US", options)
-              : "N/A"}
-          </p>
+          <div className="info-row">
+            <p><strong>ID:</strong> {ticket._id}</p>
+            <p>
+              <strong>Status:</strong>
+              <span className={`status status-${ticket.status}`}>
+                {ticket.status}
+              </span>
+            </p>
+          </div>
+          
+          <div className="info-row">
+            <p><strong>Created:</strong> {new Date(ticket.createdAt).toLocaleString()}</p>
+            <p><strong>Project:</strong> {ticket.projectname}</p>
+          </div>
         </div>
 
-        <div className="project-details">
-          <h2>Project Details</h2>
-          <p><strong>Project Name:</strong> {ticket.projectname || "N/A"}</p>
-          <p><strong>Site Location:</strong> {ticket.sitelocation || "N/A"}</p>
-          <p><strong>Project Location:</strong> {ticket.projectlocation || "N/A"}</p>
+        <div className="ticket-details">
+          <h3>Issue Details</h3>
+          <p><strong>Fault Type:</strong> {ticket.fault}</p>
+          <p><strong>Issue Description:</strong> {ticket.issue}</p>
+          <p><strong>Site Location:</strong> {ticket.sitelocation}</p>
+          <p><strong>Project Location:</strong> {ticket.projectlocation}</p>
+          <p><strong>Date of Fault:</strong> {ticket.date && new Date(ticket.date).toLocaleDateString()}</p>
+          <p><strong>Spare Required:</strong> {ticket.spare}</p>
+          <p><strong>Rating:</strong> {ticket.rating}</p>
         </div>
 
-        <div className="technical-info">
-          <h2>Technical Information</h2>
-          <p><strong>Fault:</strong> {ticket.fault || "N/A"}</p>
-          <p><strong>Issue:</strong> {ticket.issue || "N/A"}</p>
-          <p><strong>Date of Fault:</strong> {ticket.date
-            ? new Date(ticket.date).toLocaleDateString("en-US", options)
-            : "N/A"}
-          </p>
-          <p><strong>Spare Required:</strong> {ticket.spare || "N/A"}</p>
-          <p><strong>Rating:</strong> {ticket.rating || "N/A"}</p>
+        <div className="ticket-description">
+          <h3>Full Description</h3>
+          <p>{ticket.description}</p>
         </div>
 
-        <hr />
-        <div className="description">
-          <h2>Description of Issue</h2>
-          <p>{ticket.description || "No description provided"}</p>
+        <div className="ticket-notes">
+          <h3>Notes</h3>
+          {ticket.status !== "close" && (
+            <button onClick={openModal} className="btn">
+              <FaPlus /> Add Note
+            </button>
+          )}
+
+          {notes && notes.length > 0 ? (
+            notes.map((note) => <NoteItem key={note._id} note={note} />)
+          ) : (
+            <p>No notes yet</p>
+          )}
         </div>
-        <h2>Notes</h2>
+
+        {ticket.status !== "close" && (
+          <button onClick={onTicketClose} className="btn btn-block btn-danger">
+            Close Ticket
+          </button>
+        )}
       </header>
-
-      {ticket.status !== "close" && (
-        <button onClick={openModal} className="btn">
-          <FaPlus /> Add Note
-        </button>
-      )}
 
       <Modal
         isOpen={modalIsOpen}
@@ -220,43 +205,23 @@ function Ticket() {
         contentLabel="Add Note"
       >
         <h2>Add Note</h2>
-        <button className="btn-close" onClick={closeModal}>
-          X
-        </button>
+        <button className="btn-close" onClick={closeModal}>X</button>
         <form onSubmit={onNoteSubmit}>
           <div className="form-group">
             <textarea
               name="noteText"
               id="noteText"
               className="form-control"
-              placeholder="Enter your note here..."
+              placeholder="Add your note here..."
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
-              maxLength={500}
             ></textarea>
-            <small className="text-muted">
-              {noteText.length}/500 characters
-            </small>
           </div>
           <div className="form-group">
-            <button className="btn" type="submit">
-              Submit
-            </button>
+            <button type="submit" className="btn">Submit</button>
           </div>
         </form>
       </Modal>
-
-      {notes && notes.length > 0 ? (
-        notes.map((note) => <NoteItem key={note._id} note={note} />)
-      ) : (
-        <p className="no-notes">No notes yet</p>
-      )}
-
-      {ticket.status !== "close" && (
-        <button onClick={onTicketClose} className="btn btn-block btn-danger">
-          Close Ticket
-        </button>
-      )}
     </div>
   );
 }
