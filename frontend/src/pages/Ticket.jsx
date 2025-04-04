@@ -60,7 +60,8 @@ function Ticket() {
           toast.error(message);
         }
         console.log('Fetching ticket with ID:', ticketId);
-        await dispatch(getTicket(ticketId));
+        const result = await dispatch(getTicket(ticketId));
+        console.log('Ticket fetch result:', result);
         await dispatch(getNotes(ticketId));
       } catch (error) {
         console.error('Error in useEffect:', error);
@@ -171,7 +172,7 @@ function Ticket() {
         </form>
       </Modal>
 
-      {notes.map((note) => (
+      {notes && notes.map((note) => (
         <NoteItem key={note._id} note={note} />
       ))}
 

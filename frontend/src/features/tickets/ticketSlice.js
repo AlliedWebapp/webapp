@@ -166,7 +166,8 @@ export const ticketSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.ticket = action.payload;
-        console.log("Ticket state updated:", state.ticket); // Debug log
+        console.log('Ticket state updated:', state.ticket);
+        return state;
       })
       .addCase(getTicket.rejected, (state, action) => {
         state.isLoading = false

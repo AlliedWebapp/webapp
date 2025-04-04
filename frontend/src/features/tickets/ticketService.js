@@ -44,7 +44,13 @@ const getTicket = async (ticketId, token) => {
     console.log('Request config:', config);
     const response = await axios.get(API_URL + ticketId, config);
     console.log('Response data:', response.data);
-    return response.data;
+    
+    // Ensure we're returning the data in the expected format
+    if (response.data && typeof response.data === 'object') {
+      return response.data;
+    } else {
+      throw new Error('Invalid response format');
+    }
   } catch (error) {
     console.error('Error fetching ticket:', error);
     console.error('Error response:', error.response);
