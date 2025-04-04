@@ -130,6 +130,7 @@ export const ticketSlice = createSlice({
   initialState,
   reducers: {
     reset: (state) => {
+      // Don't reset tickets array to maintain list state
       state.ticket = null;
       state.isLoading = false;
       state.isSuccess = false;
@@ -140,55 +141,71 @@ export const ticketSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(createTicket.pending, state => {
-        state.isLoading = true
+        state.isLoading = true;
+        state.isError = false;
       })
       .addCase(createTicket.fulfilled, state => {
-        state.isLoading = false
-        state.isSuccess = true
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
       })
       .addCase(createTicket.rejected, (state, action) => {
-        state.isLoading = false
-        state.isError = true
-        state.message = action.payload
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       })
       .addCase(getTickets.pending, state => {
-        state.isLoading = true
+        state.isLoading = true;
+        state.isError = false;
       })
       .addCase(getTickets.fulfilled, (state, action) => {
-        state.isLoading = false
-        state.isSuccess = true
-        state.tickets = action.payload
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.isError = false;
+        state.tickets = action.payload;
       })
       .addCase(getTickets.rejected, (state, action) => {
-        state.isLoading = false
-        state.isError = true
-        state.message = action.payload
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       })
       .addCase(getTicket.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
-        state.isSuccess = false;
         state.message = '';
       })
       .addCase(getTicket.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
-        state.isSuccess = true;
         state.ticket = action.payload;
-        console.log('Ticket data in store:', action.payload);
       })
       .addCase(getTicket.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.isSuccess = false;
         state.ticket = null;
         state.message = action.payload;
       })
+      .addCase(closeTicket.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(closeTicket.fulfilled, (state, action) => {
-        state.isLoading = false
-        state.tickets.map(ticket =>
-          ticket._id === action.payload._id ? (ticket.status = 'close') : ticket
-        )
+        state.isLoading = false;
+        state.isSuccess = true;
+        // Update the current ticket
+        if (state.ticket && state.ticket._id === action.payload._id) {
+          state.ticket = action.payload;
+        }
+        // Update the ticket in the tickets array if it exists
+        if (state.tickets && Array.isArray(state.tickets)) {
+          state.tickets = state.tickets.map(ticket =>
+            ticket._id === action.payload._id ? action.payload : ticket
+          );
+        }
+      })
+      .addCase(closeTicket.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       })
   }
 })

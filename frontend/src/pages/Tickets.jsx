@@ -14,8 +14,11 @@ function Tickets() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getTickets());
-  }, [dispatch]);
+    // Only fetch tickets if we don't have them already
+    if (!tickets.length) {
+      dispatch(getTickets());
+    }
+  }, [dispatch, tickets]);
 
   if (isLoading) return <Spinner />;
 

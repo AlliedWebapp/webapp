@@ -143,7 +143,7 @@ h3 {
   margin: 0 0 5px 3px;
 }
 
-/* Button styles and variations */
+/* Button styles */
 .btn {
   padding: 10px 20px;
   border: 1px solid #000;
@@ -155,14 +155,9 @@ h3 {
   cursor: pointer;
   text-align: center;
   appearance: button;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
-}
-
-.btn:last-child {
-  margin-right: 0;
 }
 
 .btn svg {
@@ -220,6 +215,14 @@ h3 {
 
 .ticket-info {
   font-size: 1.3rem;
+}
+
+/* Ticket buttons spacing */
+.ticket-buttons {
+  display: flex;
+  gap: 8px;  /* Small gap between buttons */
+  justify-content: center;
+  align-items: center;
 }
 
 /* Ticket list and grid layout */
