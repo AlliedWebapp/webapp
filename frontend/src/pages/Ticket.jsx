@@ -156,56 +156,42 @@ function Ticket() {
   return (
     <div className="ticket-page">
       <header className="ticket-header">
-  {/* Back button to navigate to ticket list */}
   <BackButton url="/tickets" />
 
-  {/* Ticket ID and Status */}
-  <h2>
-    Ticket ID: {ticket._id}
+  <h2>Ticket Overview</h2>
+  <p><strong>Ticket ID:</strong> {ticket._id}</p>
+  <p>
+    <strong>Status:</strong>{" "}
     <span className={`status status-${ticket.status}`}>{ticket.status}</span>
-  </h2>
-
-  {/* Ticket creation date */}
-  <h3>
-    Date Submitted:{" "}
+  </p>
+  <p>
+    <strong>Date Submitted:</strong>{" "}
     {ticket.createdAt
       ? new Date(ticket.createdAt).toLocaleString("en-US", options)
       : "N/A"}
-  </h3>
+  </p>
 
-  {/* Project-related information */}
-  <h3>Project Name: {ticket.projectname || "N/A"}</h3>
-  <h3>Site Location: {ticket.sitelocation || "N/A"}</h3>
-  <h3>Project Location: {ticket.projectlocation || "N/A"}</h3>
+  <h2>Project Details</h2>
+  <p><strong>Project Name:</strong> {ticket.projectname || "N/A"}</p>
+  <p><strong>Site Location:</strong> {ticket.sitelocation || "N/A"}</p>
+  <p><strong>Project Location:</strong> {ticket.projectlocation || "N/A"}</p>
 
-  {/* Technical issue details */}
-  <h3>Fault: {ticket.fault || "N/A"}</h3>
-  <h3>Issue: {ticket.issue || "N/A"}</h3>
-
-  {/* Fault report date (separate from createdAt) */}
-  <h3>
-    Date of Fault:{" "}
+  <h2>Technical Information</h2>
+  <p><strong>Fault:</strong> {ticket.fault || "N/A"}</p>
+  <p><strong>Issue:</strong> {ticket.issue || "N/A"}</p>
+  <p><strong>Date of Fault:</strong> 
     {ticket.date
       ? new Date(ticket.date).toLocaleDateString("en-US", options)
       : "N/A"}
-  </h3>
-
-  {/* Spare part and rating info */}
-  <h3>Spare Required: {ticket.spare || "N/A"}</h3>
-  <h3>Rating: {ticket.rating || "N/A"}</h3>
-
-  {/* Divider */}
+  </p>
+  <p><strong>Spare Required:</strong> {ticket.spare || "N/A"}</p>
+  <p><strong>Rating:</strong> {ticket.rating || "N/A"}</p>
   <hr />
-
-  {/* Description section */}
-  <div className="ticket-desc">
-    <h3>Description of Issue</h3>
-    <p>{ticket.description || "No description provided"}</p>
-  </div>
-
-  {/* Notes section heading */}
+  <h2>Description of Issue</h2>
+  <p>{ticket.description || "No description provided"}</p>
   <h2>Notes</h2>
 </header>
+
 
 
       {ticket.status !== "close" && (
