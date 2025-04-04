@@ -3,22 +3,28 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
-import { getTickets } from "../features/tickets/ticketSlice";
+import { getTickets, reset } from "../features/tickets/ticketSlice";
 import TicketItem from "../components/TicketItem";
 
 function Tickets() {
-  const { tickets, isLoading } = useSelector(
+  const { tickets, isLoading, isSuccess } = useSelector(
     (state) => state.tickets
   );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Only fetch tickets if we don't have them already
-    if (!tickets.length) {
-      dispatch(getTickets());
-    }
-  }, [dispatch, tickets]);
+    // Unmounting
+    return () => {
+      if (isSuccess) {
+        dispatch(reset());
+      }
+    };
+  }, [dispatch, isSuccess]);
+
+  useEffect(() => {
+    dispatch(getTickets());
+  }, [dispatch]);
 
   if (isLoading) return <Spinner />;
 

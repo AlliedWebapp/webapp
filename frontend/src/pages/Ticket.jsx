@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
-import { getTicket, closeTicket, getTickets } from "../features/tickets/ticketSlice";
+import { getTicket, closeTicket } from "../features/tickets/ticketSlice";
 import {
   getNotes,
   createNote,
@@ -52,56 +52,20 @@ function Ticket() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Fetching ticket:', ticketId);
         await dispatch(getTicket(ticketId));
         await dispatch(getNotes(ticketId));
       } catch (error) {
+        console.error('Error fetching data:', error);
         toast.error('Could not fetch ticket details');
       }
     };
 
     fetchData();
-
-    // Only reset notes when unmounting
     return () => {
       dispatch(notesReset());
     };
   }, [ticketId, dispatch]);
-
-  // Close ticket
-  const onTicketClose = async () => {
-    try {
-      await dispatch(closeTicket(ticketId)).unwrap();
-      toast.success("Ticket Closed");
-      // Fetch updated tickets list before navigating
-      await dispatch(getTickets());
-      navigate("/tickets");
-    } catch (error) {
-      toast.error("Failed to close ticket");
-    }
-  };
-
-  // Open/Close Modal
-  const openModal = () => setModalIsOpen(true);
-  const closeModal = () => setModalIsOpen(false);
-
-  // Create Note Submit
-  const onNoteSubmit = async (e) => {
-    e.preventDefault();
-    if (!noteText.trim()) {
-      toast.error("Please enter a note");
-      return;
-    }
-    try {
-      await dispatch(createNote({ noteText, ticketId })).unwrap();
-      setNoteText("");
-      closeModal();
-      toast.success("Note added successfully");
-      // Refresh notes after adding
-      dispatch(getNotes(ticketId));
-    } catch (error) {
-      toast.error(error || "Failed to add note");
-    }
-  };
 
   if (isLoading || notesIsLoading) {
     return <Spinner />;
@@ -110,7 +74,7 @@ function Ticket() {
   if (isError) {
     return (
       <div className="error-container">
-        <h3>Something went wrong</h3>
+        <h3>Error: {message}</h3>
         <button onClick={() => navigate('/tickets')} className="btn">
           Back to Tickets
         </button>
@@ -128,6 +92,42 @@ function Ticket() {
       </div>
     );
   }
+
+  // Close ticket
+  const onTicketClose = () => {
+    dispatch(closeTicket(ticketId))
+      .unwrap()
+      .then(() => {
+        toast.success("Ticket Closed");
+        navigate("/tickets");
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to close ticket");
+      });
+  };
+
+  // Open/Close Modal
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
+
+  // Create Note Submit
+  const onNoteSubmit = (e) => {
+    e.preventDefault();
+    if (!noteText.trim()) {
+      toast.error("Please enter a note");
+      return;
+    }
+    dispatch(createNote({ ticketId, noteText }))
+      .unwrap()
+      .then(() => {
+        toast.success("Note added successfully");
+        setNoteText("");
+        closeModal();
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to add note");
+      });
+  };
 
   return (
     <div className="ticket-page">
@@ -176,13 +176,13 @@ function Ticket() {
 
         <div className="ticket-notes">
           <h3>Notes</h3>
-          {ticket.status !== "closed" && (
+          {ticket.status !== "close" && (
             <button onClick={openModal} className="btn">
               <FaPlus /> Add Note
             </button>
           )}
 
-          {notes && notes.length > 0 ? (
+          {Array.isArray(notes) && notes.length > 0 ? (
             <div className="notes-list">
               {notes.map((note) => (
                 <NoteItem key={note._id} note={note} />
@@ -193,7 +193,7 @@ function Ticket() {
           )}
         </div>
 
-        {ticket.status !== "closed" && (
+        {ticket.status !== "close" && (
           <button onClick={onTicketClose} className="btn btn-block btn-danger">
             Close Ticket
           </button>
