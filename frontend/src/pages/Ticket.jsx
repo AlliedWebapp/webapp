@@ -56,35 +56,42 @@ function Ticket() {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        if (isError) {
-          toast.error(message);
-        }
         console.log('Fetching ticket with ID:', ticketId);
-        const result = await dispatch(getTicket(ticketId));
-        console.log('Ticket fetch result:', result);
+        await dispatch(getTicket(ticketId));
         await dispatch(getNotes(ticketId));
       } catch (error) {
         console.error('Error in useEffect:', error);
-        toast.error('Failed to fetch ticket data');
+        toast.error(error.message || 'Failed to fetch ticket data');
       }
     };
 
     fetchTicket();
-  }, [isError, message, ticketId, dispatch]);
+  }, [ticketId, dispatch]);
 
-  if (isLoading || notesIsLoading) {
-    console.log('Loading state:', { isLoading, notesIsLoading });
+  if (isLoading) {
     return <Spinner />;
   }
 
   if (isError) {
-    console.error('Error state:', { isError, message });
-    return <h3>Something went wrong: {message}</h3>;
+    return (
+      <div className="error-container">
+        <h3>Error: {message}</h3>
+        <button onClick={() => navigate('/tickets')} className="btn">
+          Back to Tickets
+        </button>
+      </div>
+    );
   }
 
-  if (!ticket || Object.keys(ticket).length === 0) {
-    console.log('No ticket data:', ticket);
-    return <h3>No ticket found</h3>;
+  if (!ticket) {
+    return (
+      <div className="error-container">
+        <h3>No ticket found</h3>
+        <button onClick={() => navigate('/tickets')} className="btn">
+          Back to Tickets
+        </button>
+      </div>
+    );
   }
 
   console.log('Rendering ticket with data:', ticket);

@@ -159,20 +159,22 @@ export const ticketSlice = createSlice({
         state.isError = true
         state.message = action.payload
       })
-      .addCase(getTicket.pending, state => {
-        state.isLoading = true
+      .addCase(getTicket.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.message = '';
       })
       .addCase(getTicket.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.ticket = action.payload;
         console.log('Ticket state updated:', state.ticket);
-        return state;
       })
       .addCase(getTicket.rejected, (state, action) => {
-        state.isLoading = false
-        state.isError = true
-        state.message = action.payload
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload || 'Failed to fetch ticket';
+        state.ticket = null;
       })
       .addCase(closeTicket.fulfilled, (state, action) => {
         state.isLoading = false
