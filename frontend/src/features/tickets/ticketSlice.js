@@ -130,7 +130,6 @@ export const ticketSlice = createSlice({
   initialState,
   reducers: {
     reset: (state) => {
-      state.tickets = [];
       state.ticket = null;
       state.isLoading = false;
       state.isSuccess = false;
