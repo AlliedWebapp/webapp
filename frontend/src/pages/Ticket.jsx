@@ -101,7 +101,7 @@ function Ticket() {
   }
   
 
-  if (!ticket || Object.keys(ticket).length === 0) {
+  if (!isLoading && (!ticket || Object.keys(ticket).length === 0)) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
@@ -112,7 +112,7 @@ function Ticket() {
       </div>
     );
   }
-
+  
   console.log('Rendering ticket with data:', ticket);
 
   // Close ticket
