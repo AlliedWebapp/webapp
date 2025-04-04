@@ -91,17 +91,15 @@ function Ticket() {
     );
   }
 
-  if (isError) {
+  if (isLoading || !ticket || Object.keys(ticket).length === 0) {
     return (
-      <div className="error-container">
-        <h3>Error: {message}</h3>
-        <p>Please try again later</p>
-        <button onClick={() => navigate('/tickets')} className="btn">
-          Back to Tickets
-        </button>
+      <div className="loading-container">
+        <Spinner />
+        <p>Loading ticket details...</p>
       </div>
     );
   }
+  
 
   if (!ticket || !ticket._id) {
     return (
