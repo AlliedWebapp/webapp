@@ -6,8 +6,7 @@ const API_URL = '/api/tickets/'
 const getNotes = async (ticketId, token) => {
   const config = {
     headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`
     }
   }
 
@@ -17,11 +16,10 @@ const getNotes = async (ticketId, token) => {
 }
 
 // Create ticket note
-const createNote = async ({ noteText, ticketId }, token) => {
+const createNote = async (noteText, ticketId, token) => {
   const config = {
     headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`
     }
   }
 

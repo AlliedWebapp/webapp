@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
-import { getTicket, closeTicket, getTickets } from "../features/tickets/ticketSlice";
+import { getTicket, closeTicket } from "../features/tickets/ticketSlice";
 import {
   getNotes,
   createNote,
@@ -85,22 +85,20 @@ function Ticket() {
   const closeModal = () => setModalIsOpen(false);
 
   // Create Note Submit
-  const onNoteSubmit = async (e) => {
+  const onNoteSubmit = (e) => {
     e.preventDefault();
     if (!noteText.trim()) {
       toast.error("Please enter a note");
       return;
     }
-    try {
-      await dispatch(createNote({ noteText, ticketId })).unwrap();
-      setNoteText("");
-      closeModal();
-      toast.success("Note added successfully");
-      // Refresh notes after adding
-      dispatch(getNotes(ticketId));
-    } catch (error) {
-      toast.error(error || "Failed to add note");
-    }
+    dispatch(createNote({ ticketId, noteText }))
+      .unwrap()
+      .then(() => {
+        setNoteText("");
+        closeModal();
+        toast.success("Note added successfully");
+      })
+      .catch(toast.error);
   };
 
   if (isLoading || notesIsLoading) {

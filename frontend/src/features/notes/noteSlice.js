@@ -45,7 +45,7 @@ export const getNotes = createAsyncThunk(
   }
 )
 
-// Create ticket note
+// Creata ticket note
 /**
  * createAsyncThunk: A function that accepts a Redux action type string and
  * a callback function that should return a promise.
@@ -59,21 +59,27 @@ export const getNotes = createAsyncThunk(
 export const createNote = createAsyncThunk(
   'notes/create',
   async ({ noteText, ticketId }, thunkAPI) => {
+    /**
+     * thunkAPI: an object containing all of the parameters
+     * that are normally passed to a Redux thunk function,
+     * as well as additional options: https://redux-toolkit.js.org/api/createAsyncThunk
+     */
     try {
-      const token = thunkAPI.getState().auth.user.token;
-      return await noteService.createNote({ noteText, ticketId }, token);
+      // Token is required for authentication
+      const token = thunkAPI.getState().auth.user.token
+      return await noteService.createNote(noteText, ticketId, token)
     } catch (error) {
       const message =
         (error.response &&
           error.response.data &&
           error.response.data.message) ||
         error.message ||
-        error.toString();
+        error.toString()
 
-      return thunkAPI.rejectWithValue(message);
+      return thunkAPI.rejectWithValue(message)
     }
   }
-);
+)
 
 export const noteSlice = createSlice({
   name: 'note',
