@@ -15,6 +15,8 @@ import { toast } from "react-toastify";
 import NoteItem from "../components/NoteItem";
 import Modal from "react-modal";
 import { FaPlus } from "react-icons/fa";
+import { store } from '../app/store';
+
 
 const customStyles = {
   content: {
@@ -54,20 +56,32 @@ function Ticket() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+  
     const fetchTicket = async () => {
       try {
         console.log('Fetching ticket with ID:', ticketId);
-        const result = await dispatch(getTicket(ticketId));
+        const result = await dispatch(getTicket(ticketId)).unwrap();
         console.log('Ticket fetch result:', result);
-        await dispatch(getNotes(ticketId));
+  
+        if (isMounted) {
+          await dispatch(getNotes(ticketId)).unwrap();
+        }
+  
+        console.log('Redux state after fetch:', store.getState());
       } catch (error) {
         console.error('Error fetching ticket:', error);
-        toast.error('Could not fetch ticket details');
+        toast.error(error.message || 'Could not fetch ticket details');
       }
     };
-
+  
     fetchTicket();
+  
+    return () => {
+      isMounted = false;
+    };
   }, [ticketId, dispatch]);
+  
 
   // Single loading check
   if (isLoading) {
