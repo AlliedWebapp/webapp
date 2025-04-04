@@ -101,7 +101,7 @@ function Ticket() {
   }
   
 
-  if (!ticket || !ticket._id) {
+  if (!ticket || Object.keys(ticket).length === 0) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
