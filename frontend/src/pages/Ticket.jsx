@@ -152,36 +152,61 @@ function Ticket() {
         toast.error(error.message || "Failed to add note");
       });
   };
-//for read ticket 
+//for read ticket headers 
   return (
     <div className="ticket-page">
       <header className="ticket-header">
-        <BackButton url="/tickets" />
-        <h2>
-          Ticket ID: {ticket._id}
-          <span className={`status status-${ticket.status}`}>
-            {ticket.status}
-          </span>
-        </h2>
-        <h3>
-          Date Submitted:{" "}
-          {new Date(ticket.createdAt).toLocaleString("en-US", options)}
-        </h3>
-        <h3>Project Name: {ticket.projectname}</h3>
-        <h3>Site Location: {ticket.sitelocation}</h3>
-        <h3>Project Location: {ticket.projectlocation}</h3>
-        <h3>Fault: {ticket.fault}</h3>
-        <h3>Issue: {ticket.issue}</h3>
-        <h3>Spare: {ticket.spare}</h3>
-        <h3>Rating: {ticket.rating}</h3>
+  {/* Back button to navigate to ticket list */}
+  <BackButton url="/tickets" />
 
-        <hr />
-        <div className="ticket-desc">
-          <h3>Description of Issue</h3>
-          <p>{ticket.description}</p>
-        </div>
-        <h2>Notes</h2>
-      </header>
+  {/* Ticket ID and Status */}
+  <h2>
+    Ticket ID: {ticket._id}
+    <span className={`status status-${ticket.status}`}>{ticket.status}</span>
+  </h2>
+
+  {/* Ticket creation date */}
+  <h3>
+    Date Submitted:{" "}
+    {ticket.createdAt
+      ? new Date(ticket.createdAt).toLocaleString("en-US", options)
+      : "N/A"}
+  </h3>
+
+  {/* Project-related information */}
+  <h3>Project Name: {ticket.projectname || "N/A"}</h3>
+  <h3>Site Location: {ticket.sitelocation || "N/A"}</h3>
+  <h3>Project Location: {ticket.projectlocation || "N/A"}</h3>
+
+  {/* Technical issue details */}
+  <h3>Fault: {ticket.fault || "N/A"}</h3>
+  <h3>Issue: {ticket.issue || "N/A"}</h3>
+
+  {/* Fault report date (separate from createdAt) */}
+  <h3>
+    Date of Fault:{" "}
+    {ticket.date
+      ? new Date(ticket.date).toLocaleDateString("en-US", options)
+      : "N/A"}
+  </h3>
+
+  {/* Spare part and rating info */}
+  <h3>Spare Required: {ticket.spare || "N/A"}</h3>
+  <h3>Rating: {ticket.rating || "N/A"}</h3>
+
+  {/* Divider */}
+  <hr />
+
+  {/* Description section */}
+  <div className="ticket-desc">
+    <h3>Description of Issue</h3>
+    <p>{ticket.description || "No description provided"}</p>
+  </div>
+
+  {/* Notes section heading */}
+  <h2>Notes</h2>
+</header>
+
 
       {ticket.status !== "close" && (
         <button onClick={openModal} className="btn">
