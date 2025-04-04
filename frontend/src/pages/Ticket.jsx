@@ -36,6 +36,7 @@ Modal.setAppElement("#root");
 function Ticket() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [ticketData, setTicketData] = useState(null);
 
   const { ticket, isLoading, isError, message } = useSelector(
     (state) => state.tickets
@@ -52,28 +53,33 @@ function Ticket() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Fetching ticket with ID:', ticketId);
-        const result = await dispatch(getTicket(ticketId)).unwrap();
-        console.log('Ticket fetch result:', result);
+        console.log('Starting to fetch ticket:', ticketId);
+        const actionResult = await dispatch(getTicket(ticketId)).unwrap();
+        console.log('Fetch result:', actionResult);
         
-        if (result) {
+        if (actionResult) {
+          setTicketData(actionResult);
           await dispatch(getNotes(ticketId));
         }
       } catch (error) {
-        console.error('Error fetching ticket:', error);
+        console.error('Error fetching data:', error);
         toast.error('Could not fetch ticket details');
       }
     };
 
     fetchData();
-
-    // Cleanup function
     return () => {
       dispatch(notesReset());
     };
   }, [ticketId, dispatch]);
 
-  console.log('Current ticket state:', ticket);
+  // Debug logs
+  console.log('Component render state:', {
+    ticketData,
+    reduxTicket: ticket,
+    isLoading,
+    isError
+  });
 
   if (isLoading) {
     return <Spinner />;
@@ -90,7 +96,10 @@ function Ticket() {
     );
   }
 
-  if (!ticket) {
+  // Use local state for rendering if available, otherwise fall back to Redux state
+  const displayTicket = ticketData || ticket;
+
+  if (!displayTicket) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
@@ -145,40 +154,46 @@ function Ticket() {
         
         <div className="ticket-info">
           <div className="info-row">
-            <p><strong>ID:</strong> {ticket._id}</p>
+            <p><strong>ID:</strong> {displayTicket._id}</p>
             <p>
               <strong>Status:</strong>
-              <span className={`status status-${ticket.status}`}>
-                {ticket.status}
+              <span className={`status status-${displayTicket.status}`}>
+                {displayTicket.status}
               </span>
             </p>
           </div>
           
           <div className="info-row">
-            <p><strong>Created:</strong> {new Date(ticket.createdAt).toLocaleString()}</p>
-            <p><strong>Project:</strong> {ticket.projectname}</p>
+            <p>
+              <strong>Created:</strong>{" "}
+              {displayTicket.createdAt && new Date(displayTicket.createdAt).toLocaleString()}
+            </p>
+            <p><strong>Project:</strong> {displayTicket.projectname}</p>
           </div>
         </div>
 
         <div className="ticket-details">
           <h3>Issue Details</h3>
-          <p><strong>Fault Type:</strong> {ticket.fault}</p>
-          <p><strong>Issue Description:</strong> {ticket.issue}</p>
-          <p><strong>Site Location:</strong> {ticket.sitelocation}</p>
-          <p><strong>Project Location:</strong> {ticket.projectlocation}</p>
-          <p><strong>Date of Fault:</strong> {ticket.date && new Date(ticket.date).toLocaleDateString()}</p>
-          <p><strong>Spare Required:</strong> {ticket.spare}</p>
-          <p><strong>Rating:</strong> {ticket.rating}</p>
+          <p><strong>Fault Type:</strong> {displayTicket.fault}</p>
+          <p><strong>Issue Description:</strong> {displayTicket.issue}</p>
+          <p><strong>Site Location:</strong> {displayTicket.sitelocation}</p>
+          <p><strong>Project Location:</strong> {displayTicket.projectlocation}</p>
+          <p>
+            <strong>Date of Fault:</strong>{" "}
+            {displayTicket.date && new Date(displayTicket.date).toLocaleDateString()}
+          </p>
+          <p><strong>Spare Required:</strong> {displayTicket.spare}</p>
+          <p><strong>Rating:</strong> {displayTicket.rating}</p>
         </div>
 
         <div className="ticket-description">
           <h3>Full Description</h3>
-          <p>{ticket.description}</p>
+          <p>{displayTicket.description}</p>
         </div>
 
         <div className="ticket-notes">
           <h3>Notes</h3>
-          {ticket.status !== "close" && (
+          {displayTicket.status !== "close" && (
             <button onClick={openModal} className="btn">
               <FaPlus /> Add Note
             </button>
@@ -191,7 +206,7 @@ function Ticket() {
           )}
         </div>
 
-        {ticket.status !== "close" && (
+        {displayTicket.status !== "close" && (
           <button onClick={onTicketClose} className="btn btn-block btn-danger">
             Close Ticket
           </button>

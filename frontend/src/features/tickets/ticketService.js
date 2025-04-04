@@ -31,26 +31,26 @@ const getTickets = async token => {
 
 // Get user ticket
 const getTicket = async (ticketId, token) => {
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-  };
-
   try {
-    console.log('Making API call to:', API_URL + ticketId);
-    const response = await axios.get(API_URL + ticketId, config);
-    console.log('API Response:', response.data);
-    
-    if (!response.data) {
-      throw new Error('No data received from server');
-    }
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
 
-    return response.data;
+    console.log('Making request to:', API_URL + ticketId);
+    const response = await axios.get(API_URL + ticketId, config);
+    console.log('Raw API Response:', response);
+    
+    if (response.status === 200 && response.data) {
+      console.log('Processed ticket data:', response.data);
+      return response.data;
+    } else {
+      throw new Error('Invalid response from server');
+    }
   } catch (error) {
-    console.error('API Error:', error.response || error);
+    console.error('Error in getTicket:', error);
     throw error;
   }
 };
