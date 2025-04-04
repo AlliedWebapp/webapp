@@ -25,6 +25,16 @@ console.log("📦 MONGODB_URI:", process.env.MONGODB_URI ? "Loaded ✅" : "Missi
 // ✅ Initialize Express App
 const app = express();
 
+// ✅ CORS Configuration
+app.use(cors({
+    origin:["https://alliedwebapp.vercel.app", "https://backend-services-theta.vercel.app"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+// Optional but helpful
+app.options('*', cors());
+
 // 📌 Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,14 +49,6 @@ app.use((req, res, next) => {
     console.log('-------------------');
     next();
 });
-
-// ✅ CORS Configuration
-app.use(cors({
-    origin:["https://alliedwebapp.vercel.app", "https://backend-services-theta.vercel.app"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
 
 // 📌 Connect to MongoDB
 connectDB();
