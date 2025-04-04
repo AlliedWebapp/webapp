@@ -82,23 +82,22 @@ export const getTicket = createAsyncThunk(
      * as well as additional options: https://redux-toolkit.js.org/api/createAsyncThunk
      */
     try {
-      // Token is required for authentication
-      const token = thunkAPI.getState().auth.user.token
-      const ticket = await ticketService.getTicket(ticketId, token);
-      console.log("Ticket fetched successfully:", ticket);
-      return ticket;
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await ticketService.getTicket(ticketId, token);
+      console.log("API Response:", response);
+      return response;
     } catch (error) {
       const message =
         (error.response &&
           error.response.data &&
           error.response.data.message) ||
         error.message ||
-        error.toString()
+        error.toString();
 
-      return thunkAPI.rejectWithValue(message)
+      return thunkAPI.rejectWithValue(message);
     }
   }
-)
+);
 
 // Close ticket
 export const closeTicket = createAsyncThunk(
@@ -130,7 +129,12 @@ export const ticketSlice = createSlice({
   name: 'ticket',
   initialState,
   reducers: {
-    reset: state => initialState
+    reset: (state) => {
+      state.isLoading = false;
+      state.isSuccess = false;
+      state.isError = false;
+      state.message = '';
+    }
   },
   extraReducers: builder => {
     builder
@@ -161,19 +165,18 @@ export const ticketSlice = createSlice({
       })
       .addCase(getTicket.pending, (state) => {
         state.isLoading = true;
-        state.isError = false;
-        state.message = '';
+        state.ticket = null;
       })
       .addCase(getTicket.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.ticket = action.payload;
-        console.log('Ticket state updated:', state.ticket);
+        console.log("Updated ticket state:", state.ticket);
       })
       .addCase(getTicket.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.message = action.payload || 'Failed to fetch ticket';
+        state.message = action.payload;
         state.ticket = null;
       })
       .addCase(closeTicket.fulfilled, (state, action) => {

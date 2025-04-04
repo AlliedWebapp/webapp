@@ -54,34 +54,22 @@ function Ticket() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let isMounted = true;
-
     const fetchTicket = async () => {
       try {
-        if (isMounted) {
-          console.log('Fetching ticket with ID:', ticketId);
-          const ticketResult = await dispatch(getTicket(ticketId)).unwrap();
-          console.log('Ticket fetched:', ticketResult);
-          
-          if (isMounted) {
-            await dispatch(getNotes(ticketId)).unwrap();
-          }
-        }
+        console.log('Fetching ticket with ID:', ticketId);
+        const result = await dispatch(getTicket(ticketId));
+        console.log('Ticket fetch result:', result);
+        await dispatch(getNotes(ticketId));
       } catch (error) {
-        console.error('Error in useEffect:', error);
-        if (isMounted) {
-          toast.error(error.message || 'Failed to fetch ticket data');
-        }
+        console.error('Error fetching ticket:', error);
+        toast.error('Could not fetch ticket details');
       }
     };
 
     fetchTicket();
-
-    return () => {
-      isMounted = false;
-    };
   }, [ticketId, dispatch]);
 
+  // Single loading check
   if (isLoading) {
     return (
       <div className="loading-container">
@@ -91,17 +79,8 @@ function Ticket() {
     );
   }
 
-  if (isLoading || !ticket || Object.keys(ticket).length === 0) {
-    return (
-      <div className="loading-container">
-        <Spinner />
-        <p>Loading ticket details...</p>
-      </div>
-    );
-  }
-  
-
-  if (!isLoading && (!ticket || Object.keys(ticket).length === 0)) {
+  // Check for ticket data
+  if (!ticket || !ticket._id) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
@@ -112,7 +91,7 @@ function Ticket() {
       </div>
     );
   }
-  
+
   console.log('Rendering ticket with data:', ticket);
 
   // Close ticket

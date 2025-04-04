@@ -37,27 +37,23 @@ const getTicket = async (ticketId, token) => {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
-  }
+  };
 
   try {
-    console.log(`Making request to: ${API_URL + ticketId}`);
+    console.log('Making API call to:', API_URL + ticketId);
     const response = await axios.get(API_URL + ticketId, config);
+    console.log('API Response:', response.data);
     
     if (!response.data) {
       throw new Error('No data received from server');
     }
-    
-    console.log('Response data:', response.data);
+
     return response.data;
   } catch (error) {
-    console.error('Error fetching ticket:', error);
-    if (error.response) {
-      console.error('Error response:', error.response.data);
-      throw new Error(error.response.data.message || 'Failed to fetch ticket');
-    }
+    console.error('API Error:', error.response || error);
     throw error;
   }
-}
+};
 
 // Close ticket
 const closeTicket = async (ticketId, token) => {
