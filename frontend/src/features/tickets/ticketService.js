@@ -33,13 +33,23 @@ const getTickets = async token => {
 const getTicket = async (ticketId, token) => {
   const config = {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    withCredentials: true
   }
 
-  const response = await axios.get(API_URL + ticketId, config)
-
-  return response.data
+  try {
+    console.log(`Making request to: ${API_URL + ticketId}`);
+    console.log('Request config:', config);
+    const response = await axios.get(API_URL + ticketId, config);
+    console.log('Response data:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching ticket:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
 }
 
 // Close ticket

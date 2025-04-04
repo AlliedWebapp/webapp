@@ -54,27 +54,39 @@ function Ticket() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
+    const fetchTicket = async () => {
+      try {
+        if (isError) {
+          toast.error(message);
+        }
+        console.log('Fetching ticket with ID:', ticketId);
+        await dispatch(getTicket(ticketId));
+        await dispatch(getNotes(ticketId));
+      } catch (error) {
+        console.error('Error in useEffect:', error);
+        toast.error('Failed to fetch ticket data');
+      }
+    };
 
-    dispatch(getTicket(ticketId));
-    dispatch(getNotes(ticketId));
-    // eslint-disable-next-line
-  }, [isError, message, ticketId]);
+    fetchTicket();
+  }, [isError, message, ticketId, dispatch]);
 
-  if (isLoading || notesIsLoading) return <Spinner />;
+  if (isLoading || notesIsLoading) {
+    console.log('Loading state:', { isLoading, notesIsLoading });
+    return <Spinner />;
+  }
 
   if (isError) {
-    return <h3>Something went wrong</h3>;
+    console.error('Error state:', { isError, message });
+    return <h3>Something went wrong: {message}</h3>;
   }
 
   if (!ticket || Object.keys(ticket).length === 0) {
-    console.log("Ticket data:", ticket); // Debug log
+    console.log('No ticket data:', ticket);
     return <h3>No ticket found</h3>;
   }
 
-  console.log("Rendering ticket with data:", ticket); // Debug log
+  console.log('Rendering ticket with data:', ticket);
 
   // Close ticket
   const onTicketClose = () => {
