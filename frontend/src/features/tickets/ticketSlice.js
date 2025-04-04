@@ -185,11 +185,27 @@ export const ticketSlice = createSlice({
         state.ticket = null;
         state.message = action.payload;
       })
+      .addCase(closeTicket.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(closeTicket.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.tickets = state.tickets.map(ticket =>
-          ticket._id === action.payload._id ? action.payload : ticket
-        );
+        state.isSuccess = true;
+        // Update the current ticket
+        if (state.ticket && state.ticket._id === action.payload._id) {
+          state.ticket = action.payload;
+        }
+        // Update the ticket in the tickets array if it exists
+        if (state.tickets && Array.isArray(state.tickets)) {
+          state.tickets = state.tickets.map(ticket =>
+            ticket._id === action.payload._id ? action.payload : ticket
+          );
+        }
+      })
+      .addCase(closeTicket.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       })
   }
 })

@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
-import { getTicket, closeTicket } from "../features/tickets/ticketSlice";
+import { getTicket, closeTicket, getTickets } from "../features/tickets/ticketSlice";
 import {
   getNotes,
   createNote,
@@ -68,14 +68,16 @@ function Ticket() {
   }, [ticketId, dispatch]);
 
   // Close ticket
-  const onTicketClose = () => {
-    dispatch(closeTicket(ticketId))
-      .unwrap()
-      .then(() => {
-        toast.success("Ticket Closed");
-        navigate("/tickets");
-      })
-      .catch(toast.error);
+  const onTicketClose = async () => {
+    try {
+      await dispatch(closeTicket(ticketId)).unwrap();
+      toast.success("Ticket Closed");
+      // Fetch updated tickets list before navigating
+      await dispatch(getTickets());
+      navigate("/tickets");
+    } catch (error) {
+      toast.error("Failed to close ticket");
+    }
   };
 
   // Open/Close Modal
@@ -83,20 +85,22 @@ function Ticket() {
   const closeModal = () => setModalIsOpen(false);
 
   // Create Note Submit
-  const onNoteSubmit = (e) => {
+  const onNoteSubmit = async (e) => {
     e.preventDefault();
     if (!noteText.trim()) {
       toast.error("Please enter a note");
       return;
     }
-    dispatch(createNote({ ticketId, noteText }))
-      .unwrap()
-      .then(() => {
-        setNoteText("");
-        closeModal();
-        toast.success("Note added successfully");
-      })
-      .catch(toast.error);
+    try {
+      await dispatch(createNote({ noteText, ticketId })).unwrap();
+      setNoteText("");
+      closeModal();
+      toast.success("Note added successfully");
+      // Refresh notes after adding
+      dispatch(getNotes(ticketId));
+    } catch (error) {
+      toast.error(error || "Failed to add note");
+    }
   };
 
   if (isLoading || notesIsLoading) {
