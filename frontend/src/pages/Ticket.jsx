@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
-import { getTicket, closeTicket } from "../features/tickets/ticketSlice";
+import { getTicket, closeTicket, getTickets } from "../features/tickets/ticketSlice";
 import {
   getNotes,
   createNote,
