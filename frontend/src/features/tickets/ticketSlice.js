@@ -163,9 +163,10 @@ export const ticketSlice = createSlice({
         state.isLoading = true
       })
       .addCase(getTicket.fulfilled, (state, action) => {
-        state.isLoading = false
-        state.isSuccess = true
+        state.isLoading = false;
+        state.isSuccess = true;
         state.ticket = action.payload;
+        console.log("Ticket state updated:", state.ticket); // Debug log
       })
       .addCase(getTicket.rejected, (state, action) => {
         state.isLoading = false

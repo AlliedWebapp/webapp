@@ -68,11 +68,13 @@ function Ticket() {
   if (isError) {
     return <h3>Something went wrong</h3>;
   }
-  if (isLoading) return <Spinner />;
-if (!ticket || Object.keys(ticket).length === 0) {
-    return <h3>No ticket found</h3>;
-}
 
+  if (!ticket || Object.keys(ticket).length === 0) {
+    console.log("Ticket data:", ticket); // Debug log
+    return <h3>No ticket found</h3>;
+  }
+
+  console.log("Rendering ticket with data:", ticket); // Debug log
 
   // Close ticket
   const onTicketClose = () => {
