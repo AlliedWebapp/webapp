@@ -36,7 +36,6 @@ Modal.setAppElement("#root");
 function Ticket() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
-  const [ticketData, setTicketData] = useState(null);
 
   const { ticket, isLoading, isError, message } = useSelector(
     (state) => state.tickets
@@ -53,14 +52,9 @@ function Ticket() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Starting to fetch ticket:', ticketId);
-        const actionResult = await dispatch(getTicket(ticketId)).unwrap();
-        console.log('Fetch result:', actionResult);
-        
-        if (actionResult) {
-          setTicketData(actionResult);
-          await dispatch(getNotes(ticketId));
-        }
+        console.log('Fetching ticket:', ticketId);
+        await dispatch(getTicket(ticketId));
+        await dispatch(getNotes(ticketId));
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Could not fetch ticket details');
@@ -73,15 +67,7 @@ function Ticket() {
     };
   }, [ticketId, dispatch]);
 
-  // Debug logs
-  console.log('Component render state:', {
-    ticketData,
-    reduxTicket: ticket,
-    isLoading,
-    isError
-  });
-
-  if (isLoading) {
+  if (isLoading || notesIsLoading) {
     return <Spinner />;
   }
 
@@ -96,10 +82,7 @@ function Ticket() {
     );
   }
 
-  // Use local state for rendering if available, otherwise fall back to Redux state
-  const displayTicket = ticketData || ticket;
-
-  if (!displayTicket) {
+  if (!ticket) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
@@ -154,11 +137,11 @@ function Ticket() {
         
         <div className="ticket-info">
           <div className="info-row">
-            <p><strong>ID:</strong> {displayTicket._id}</p>
+            <p><strong>ID:</strong> {ticket._id}</p>
             <p>
               <strong>Status:</strong>
-              <span className={`status status-${displayTicket.status}`}>
-                {displayTicket.status}
+              <span className={`status status-${ticket.status}`}>
+                {ticket.status}
               </span>
             </p>
           </div>
@@ -166,47 +149,51 @@ function Ticket() {
           <div className="info-row">
             <p>
               <strong>Created:</strong>{" "}
-              {displayTicket.createdAt && new Date(displayTicket.createdAt).toLocaleString()}
+              {new Date(ticket.createdAt).toLocaleString()}
             </p>
-            <p><strong>Project:</strong> {displayTicket.projectname}</p>
+            <p><strong>Project:</strong> {ticket.projectname}</p>
           </div>
         </div>
 
         <div className="ticket-details">
           <h3>Issue Details</h3>
-          <p><strong>Fault Type:</strong> {displayTicket.fault}</p>
-          <p><strong>Issue Description:</strong> {displayTicket.issue}</p>
-          <p><strong>Site Location:</strong> {displayTicket.sitelocation}</p>
-          <p><strong>Project Location:</strong> {displayTicket.projectlocation}</p>
+          <p><strong>Fault Type:</strong> {ticket.fault}</p>
+          <p><strong>Issue Description:</strong> {ticket.issue}</p>
+          <p><strong>Site Location:</strong> {ticket.sitelocation}</p>
+          <p><strong>Project Location:</strong> {ticket.projectlocation}</p>
           <p>
             <strong>Date of Fault:</strong>{" "}
-            {displayTicket.date && new Date(displayTicket.date).toLocaleDateString()}
+            {ticket.date && new Date(ticket.date).toLocaleDateString()}
           </p>
-          <p><strong>Spare Required:</strong> {displayTicket.spare}</p>
-          <p><strong>Rating:</strong> {displayTicket.rating}</p>
+          <p><strong>Spare Required:</strong> {ticket.spare}</p>
+          <p><strong>Rating:</strong> {ticket.rating}</p>
         </div>
 
         <div className="ticket-description">
           <h3>Full Description</h3>
-          <p>{displayTicket.description}</p>
+          <p>{ticket.description}</p>
         </div>
 
         <div className="ticket-notes">
           <h3>Notes</h3>
-          {displayTicket.status !== "close" && (
+          {ticket.status !== "close" && (
             <button onClick={openModal} className="btn">
               <FaPlus /> Add Note
             </button>
           )}
 
-          {notes && notes.length > 0 ? (
-            notes.map((note) => <NoteItem key={note._id} note={note} />)
+          {Array.isArray(notes) && notes.length > 0 ? (
+            <div className="notes-list">
+              {notes.map((note) => (
+                <NoteItem key={note._id} note={note} />
+              ))}
+            </div>
           ) : (
-            <p>No notes yet</p>
+            <p className="no-notes">No notes yet</p>
           )}
         </div>
 
-        {displayTicket.status !== "close" && (
+        {ticket.status !== "close" && (
           <button onClick={onTicketClose} className="btn btn-block btn-danger">
             Close Ticket
           </button>
