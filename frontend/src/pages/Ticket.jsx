@@ -68,16 +68,14 @@ function Ticket() {
   }, [ticketId, dispatch]);
 
   // Close ticket
-  const onTicketClose = async () => {
-    try {
-      await dispatch(closeTicket(ticketId)).unwrap();
-      toast.success("Ticket Closed");
-      // Fetch updated tickets list before navigating
-      await dispatch(getTickets());
-      navigate("/tickets");
-    } catch (error) {
-      toast.error("Failed to close ticket");
-    }
+  const onTicketClose = () => {
+    dispatch(closeTicket(ticketId))
+      .unwrap()
+      .then(() => {
+        toast.success("Ticket Closed");
+        navigate("/tickets");
+      })
+      .catch(toast.error);
   };
 
   // Open/Close Modal
