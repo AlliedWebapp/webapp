@@ -1,11 +1,14 @@
+/* Import Google Fonts - Poppins for modern look */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
+/* Reset default styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Global styles and typography */
 body {
   font-family: 'Poppins', sans-serif;
   height: 100vh;
@@ -35,6 +38,7 @@ h3 {
   margin-bottom: 10px;
 }
 
+/* Main container and layout */
 .container {
   width: 100%;
   max-width: 960px;
@@ -43,6 +47,7 @@ h3 {
   text-align: center;
 }
 
+/* Header navigation styles */
 .header {
   display: flex;
   justify-content: space-between;
@@ -86,6 +91,7 @@ h3 {
   color: #828282;
 }
 
+/* Dashboard boxes layout */
 .boxes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -110,6 +116,7 @@ h3 {
   color: #777;
 }
 
+/* Form elements and inputs */
 .form {
   width: 70%;
   margin: 0 auto;
@@ -136,6 +143,7 @@ h3 {
   margin: 0 0 5px 3px;
 }
 
+/* Button styles and variations */
 .btn {
   padding: 10px 20px;
   border: 1px solid #000;
@@ -185,6 +193,7 @@ h3 {
   transform: scale(0.98);
 }
 
+/* Ticket creation confirmation styles */
 .ticket-created {
   border: 1px solid #e6e6e6;
   border-radius: 5px;
@@ -208,6 +217,7 @@ h3 {
   font-size: 1.3rem;
 }
 
+/* Ticket list and grid layout */
 .ticket,
 .ticket-headings {
   display: grid;
@@ -226,8 +236,9 @@ h3 {
   font-weight: 700;
 }
 
+/* Status indicators for tickets */
 .status {
-  background-color: #333;
+  background-color: #740d0d;
   color: #fff;
   width: 100px;
   padding: 0 20px;
@@ -237,6 +248,7 @@ h3 {
   text-align: center;
 }
 
+/* Different status colors */
 .status-new {
   background-color: green;
   color: #fff;
@@ -250,54 +262,128 @@ h3 {
 }
 
 .status-closed {
-  background-color: darkred;
+  background-color: #dc3545;
   color: #fff;
   border-radius: 10px;
 }
 
-/* Ticket Page Styles */
+/* Individual ticket page styles - Main container */
 .ticket-page {
   position: relative;
   text-align: left;
-  padding: 20px;
+  padding: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  min-height: calc(100vh - 100px);
+  border-radius: 15px;
 }
 
-.ticket-page h2 {
+/* Ticket header section with title and status */
+.ticket-header {
+  background: #ffffff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+  border-left: 5px solid #2563eb;
+}
+
+.ticket-header h2 {
+  color: #1e293b;
+  font-size: 24px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
-.ticket-page .btn {
-  margin-bottom: 20px;
-}
-
-.ticket-desc {
+/* Ticket information section */
+.ticket-info {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
   margin: 20px 0;
-  font-size: 17px;
-  background-color: #f4f4f4;
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
+/* Info row styling for ticket details */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 4px solid #3b82f6;
+  transition: all 0.3s ease;
+}
+
+.info-row:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-row p {
+  margin: 0;
+  font-size: 15px;
+  color: #4b5563;
+}
+
+.info-row strong {
+  color: #1e293b;
+  margin-right: 10px;
+  font-weight: 600;
+}
+
+/* Ticket description section */
+.ticket-desc {
+  margin: 25px 0;
+  font-size: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  line-height: 1.8;
+  color: #4b5563;
+}
+
+/* Notes section styling */
 .note {
-  border: 1px solid #e6e6e6;
-  border-radius: 5px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   text-align: left;
   padding: 20px;
   margin-bottom: 20px;
   position: relative;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.note:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .note-head {
-  background: #f4f4f4;
-  padding: 5px 20px;
+  background: #f8f9fa;
+  padding: 12px 20px;
+  border-radius: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  font-weight: 500;
+  color: #374151;
 }
 
 .note-date {
@@ -305,32 +391,254 @@ h3 {
   top: 15px;
   right: 20px;
   font-size: 14px;
+  color: #6b7280;
 }
 
-.delete-note {
-  color: red;
-  cursor: pointer;
-  position: absolute;
-  bottom: 10px;
-  right: 20px;
+/* Status badges styling */
+.status {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.7px;
 }
 
+.status-new {
+  background: #22c55e;
+  color: white;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+}
+
+.status-open {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.status-closed {
+  background: #dc2626;
+  color: white;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+/* Close and action buttons */
 .btn-close {
   background: none;
   border: none;
-  color: #000;
+  color: #dc2626;
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 12px;
+  right: 12px;
   font-size: 16px;
   cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
 }
 
 .btn-close:hover {
-  color: red;
-  transform: scale(0.98);
+  background-color: #fee2e2;
+  color: #dc2626;
+  transform: scale(1.1);
 }
 
+/* Responsive adjustments for ticket page */
+@media (max-width: 768px) {
+  .ticket-page {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  .ticket-header {
+    padding: 20px;
+  }
+
+  .ticket-header h2 {
+    font-size: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .info-row p {
+    width: 100%;
+  }
+
+  .note {
+    padding: 15px;
+  }
+
+  .note-head {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .status {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+/* General styles for the inventory page */
+.inventory-page {
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 3rem;
+  font-weight: 600;
+  color: #080000;
+  margin-bottom: 20px;
+}
+
+label {
+  font-size: 1.3rem;
+  margin-right: 12px;
+}
+
+/* Select dropdown style */
+select {
+  padding: 11px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #000408;
+}
+
+/* Loading and error message styles */
+.loading {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #01050a;
+}
+
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: red;
+  margin-top: 20px;
+}
+
+/* Table container to handle horizontal scrolling */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  padding: 0 20px; /* Adds left and right padding to the container */
+  margin-left: 20px;
+  margin-right: 20px; /* Adds left margin to the table */
+  box-sizing: border-box; /* Ensures padding is considered in width */
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-right: 0px;
+  box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
+}
+
+th{ padding: 10px 15px;
+  text-align: center;
+  border: 1px solid #fdfdfd;
+  margin-right: 10px;}
+
+td {
+  padding: 10px 15px;
+  text-align: center;
+  border: 1px solid #fdfdfd;
+  margin-right: 10px;
+}
+
+
+th {
+  background-color: #e5e4e4;
+  font-weight: 700;
+  color: #000000;
+}
+
+td {
+  background-color: #fff;
+  font-size: 15px;
+  color: #0c0202;
+}
+
+td:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #6e6767;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+  table {
+    font-size: 14px;
+  }
+
+  select {
+    width: 100%;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .table-container {
+    margin-left: 0; /* Remove left margin on smaller screens */
+  }
+
+  table {
+    width: auto; /* Ensure table adapts to screen size */
+  }
+}
+
+
+
+/* Styling for the Plus and Minus Buttons */
+.spares-btn {
+  font-size: 10px; /* Adjust icon size */
+  font-weight: bold;
+  width: 30px; /* Button width */
+  height: 30px; /* Button height */
+  border: none;
+  background-color: #eeeded; 
+  color: white;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  margin: 5px; /* Space between buttons */
+}
+
+.spares-btn:hover {
+  background-color: #69abf1; /* Darker blue on hover */
+}
+
+/* Minus Button Specific Styling */
+.spares-btn.minus {
+  background-color: #eeeded; 
+}
+.spares-btn.minus:hover {
+  background-color: #ee5060; 
+}
+
+/* Responsive design adjustments */
 @media (max-width: 600px) {
   .ticket {
     grid-template-columns: repeat(3, 1fr);
