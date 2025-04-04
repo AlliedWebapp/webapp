@@ -54,28 +54,48 @@ function Ticket() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchTicket = async () => {
       try {
-        console.log('Fetching ticket with ID:', ticketId);
-        await dispatch(getTicket(ticketId));
-        await dispatch(getNotes(ticketId));
+        if (isMounted) {
+          console.log('Fetching ticket with ID:', ticketId);
+          const ticketResult = await dispatch(getTicket(ticketId)).unwrap();
+          console.log('Ticket fetched:', ticketResult);
+          
+          if (isMounted) {
+            await dispatch(getNotes(ticketId)).unwrap();
+          }
+        }
       } catch (error) {
         console.error('Error in useEffect:', error);
-        toast.error(error.message || 'Failed to fetch ticket data');
+        if (isMounted) {
+          toast.error(error.message || 'Failed to fetch ticket data');
+        }
       }
     };
 
     fetchTicket();
+
+    return () => {
+      isMounted = false;
+    };
   }, [ticketId, dispatch]);
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <div className="loading-container">
+        <Spinner />
+        <p>Loading ticket details...</p>
+      </div>
+    );
   }
 
   if (isError) {
     return (
       <div className="error-container">
         <h3>Error: {message}</h3>
+        <p>Please try again later</p>
         <button onClick={() => navigate('/tickets')} className="btn">
           Back to Tickets
         </button>
@@ -87,6 +107,7 @@ function Ticket() {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
+        <p>The ticket you're looking for doesn't exist or has been deleted</p>
         <button onClick={() => navigate('/tickets')} className="btn">
           Back to Tickets
         </button>
@@ -98,29 +119,40 @@ function Ticket() {
 
   // Close ticket
   const onTicketClose = () => {
-    dispatch(closeTicket(ticketId)).then(() => {
-      toast.success("Ticket Closed");
-      navigate("/tickets");
-    });    
-    toast.success("Ticket Closed");
-    navigate("/tickets");
+    dispatch(closeTicket(ticketId))
+      .unwrap()
+      .then(() => {
+        toast.success("Ticket Closed");
+        navigate("/tickets");
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to close ticket");
+      });
   };
 
   // Open/Close Modal
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
 
   // Create Note Submit
   const onNoteSubmit = (e) => {
     e.preventDefault();
-    dispatch(createNote({ ticketId, noteText }));
-    closeModal();
+    if (!noteText.trim()) {
+      toast.error("Please enter a note");
+      return;
+    }
+    dispatch(createNote({ ticketId, noteText }))
+      .unwrap()
+      .then(() => {
+        toast.success("Note added successfully");
+        setNoteText("");
+        closeModal();
+      })
+      .catch((error) => {
+        toast.error(error.message || "Failed to add note");
+      });
   };
-
+//for read ticket 
   return (
     <div className="ticket-page">
       <header className="ticket-header">
@@ -135,7 +167,14 @@ function Ticket() {
           Date Submitted:{" "}
           {new Date(ticket.createdAt).toLocaleString("en-US", options)}
         </h3>
-        <h3>Product: {ticket.product}</h3>
+        <h3>Project Name: {ticket.projectname}</h3>
+        <h3>Site Location: {ticket.sitelocation}</h3>
+        <h3>Project Location: {ticket.projectlocation}</h3>
+        <h3>Fault: {ticket.fault}</h3>
+        <h3>Issue: {ticket.issue}</h3>
+        <h3>Spare: {ticket.spare}</h3>
+        <h3>Rating: {ticket.rating}</h3>
+
         <hr />
         <div className="ticket-desc">
           <h3>Description of Issue</h3>
@@ -166,10 +205,14 @@ function Ticket() {
               name="noteText"
               id="noteText"
               className="form-control"
-              placeholder="Note Text"
+              placeholder="Enter your note here..."
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
+              maxLength={500}
             ></textarea>
+            <small className="text-muted">
+              {noteText.length}/500 characters
+            </small>
           </div>
           <div className="form-group">
             <button className="btn" type="submit">
@@ -179,9 +222,11 @@ function Ticket() {
         </form>
       </Modal>
 
-      {notes && notes.map((note) => (
-        <NoteItem key={note._id} note={note} />
-      ))}
+      {notes && notes.length > 0 ? (
+        notes.map((note) => <NoteItem key={note._id} note={note} />)
+      ) : (
+        <p className="no-notes">No notes yet</p>
+      )}
 
       {ticket.status !== "close" && (
         <button onClick={onTicketClose} className="btn btn-block btn-danger">
