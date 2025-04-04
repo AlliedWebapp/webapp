@@ -103,7 +103,7 @@ function Ticket() {
     );
   }
 
-  if (!ticket) {
+  if (!ticket || !ticket._id) {
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
