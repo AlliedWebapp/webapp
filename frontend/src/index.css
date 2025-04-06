@@ -521,17 +521,19 @@ select:focus {
 
 /* Table container to handle horizontal scrolling */
 .table-container {
-  width: 100%;
-  overflow-x: auto; /* Enables horizontal scrolling */
-  padding: 0 20px; /* Adds left and right padding to the container */
-  margin-left: 20px;
-  margin-right: 20px; /* Adds left margin to the table */
-  box-sizing: border-box; /* Ensures padding is considered in width */
+  overflow-x: auto;
+  padding: 0 10px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  max-width: 100%;
 }
+/* Ensures padding is considered in width */
+
 
 /* Table styles */
 table {
   width: 100%;
+  min-width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   margin-right: 0px;
@@ -541,13 +543,14 @@ table {
 th{ padding: 10px 15px;
   text-align: center;
   border: 1px solid #fdfdfd;
-  margin-right: 10px;}
+  white-space: nowrap;
+  }
 
 td {
   padding: 10px 15px;
   text-align: center;
   border: 1px solid #fdfdfd;
-  margin-right: 10px;
+  white-space: nowrap;
 }
 
 
