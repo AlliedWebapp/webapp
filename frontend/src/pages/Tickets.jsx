@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
@@ -6,29 +6,26 @@ import { getTickets, reset } from "../features/tickets/ticketSlice";
 import TicketItem from "../components/TicketItem";
 
 function Tickets() {
+  const dispatch = useDispatch();
   const { tickets, isLoading, isError, message } = useSelector(
     (state) => state.tickets
   );
-
-  const dispatch = useDispatch();
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    dispatch(getTickets());
+    dispatch(getTickets()).then(() => setHasFetched(true));
 
     return () => {
-      // Delay reset to avoid wiping state before rendering
-      setTimeout(() => {
-        dispatch(reset());
-      }, 500); // adjust delay if needed
+      dispatch(reset());
     };
   }, [dispatch]);
 
-  if (isLoading) return <Spinner />;
+  if (isLoading || !hasFetched) return <Spinner />;
 
   if (isError) {
     return (
       <div>
-        <p>Error: {message}</p>
+        <h3 className="text-red-500">Error: {message}</h3>
         <BackButton url="/" />
       </div>
     );
@@ -45,7 +42,7 @@ function Tickets() {
           <div>Status</div>
           <div></div>
         </div>
-        {tickets.length > 0 ? (
+        {tickets && tickets.length > 0 ? (
           tickets.map((ticket) => (
             <TicketItem key={ticket._id} ticket={ticket} />
           ))
