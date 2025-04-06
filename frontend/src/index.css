@@ -542,8 +542,8 @@ th, td {
   text-align: center;
   border: 1px solid #fdfdfd;
   white-space: normal;
-  word-break: normal;
-  overflow-wrap: break-word;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
   text-overflow: ellipsis;
   font-size: 14px;
   line-height: 1.4;
