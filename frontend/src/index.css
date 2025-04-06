@@ -521,20 +521,17 @@ select:focus {
 
 /* Table container to handle horizontal scrolling */
 .table-container {
-  width: 95%;
+  width: 90%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-  display: flex;
-  justify-content: center;
 }
 
 /* Table styles */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  margin: 0 auto;
+  margin: 20px auto;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
   table-layout: auto;
 }
