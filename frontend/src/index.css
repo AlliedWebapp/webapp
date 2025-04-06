@@ -543,6 +543,7 @@ th, td {
   border: 1px solid #fdfdfd;
   white-space: normal;
   word-wrap: break-word;
+  word-break: keep-all;
   font-size: 14px;
   line-height: 1.4;
 }
