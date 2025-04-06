@@ -521,11 +521,10 @@ select:focus {
 
 /* Table container to handle horizontal scrolling */
 .table-container {
-  width: 98%; /* Slightly less than full width */
+  width: 100%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-  overflow-x: auto; /* Allows scrolling if absolutely necessary */
 }
 
 /* Table styles */
@@ -534,16 +533,17 @@ table {
   border-collapse: collapse;
   margin: 20px auto;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
-  table-layout: auto; /* Changed back to auto for better content fitting */
+  table-layout: fixed; /* Changed to fixed for better control */
 }
 
 th, td {
-  padding: 8px 5px; /* Reduced padding to fit more content */
+  padding: 6px 4px; /* Further reduced padding */
   text-align: center;
   border: 1px solid #fdfdfd;
   white-space: normal;
   word-wrap: break-word;
-  font-size: 14px; /* Slightly smaller font size */
+  font-size: 13px; /* Smaller font size */
+  width: auto; /* Allow columns to adjust based on content */
 }
 
 th {
