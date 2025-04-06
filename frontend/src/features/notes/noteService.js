@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = '/api/notes/'
+const API_URL = '/api/tickets/';
 
 // Get ticket notes
 const getNotes = async (ticketId, token) => {
@@ -11,7 +11,7 @@ const getNotes = async (ticketId, token) => {
     }
   }
 
-  const response = await axios.get(`${API_URL}/${ticketId}`, config); // GET /api/notes/:ticketId
+  const response = await axios.get(`${API_URL}${ticketId}/notes`, config); // GET /api/notes/:ticketId
 
   return response.data;
 }
@@ -26,11 +26,8 @@ const createNote = async ({ noteText, ticketId }, token) => {
   }
 
   const response = await axios.post(
-    API_URL, // POST to /api/notes
-    {
-      ticketId: ticketId,  // 👈 ticketId goes in body, not URL
-      text: noteText,
-    },
+    `${API_URL}${ticketId}/notes`, // ✅ POST to /api/tickets/:ticketId/notes
+    { text: noteText }, // ✅ Body matches expected format
     config
   );
   return response.data
