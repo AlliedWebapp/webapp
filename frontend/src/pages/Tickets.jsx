@@ -12,15 +12,10 @@ function Tickets() {
   );
 
   const dispatch = useDispatch();
-
   useEffect(() => {
-    // Unmounting
-    return () => {
-      if (isSuccess) {
-        dispatch(reset());
-      }
-    };
-  }, [dispatch, isSuccess]);
+    dispatch(getTickets());
+  }, [dispatch]);
+  
 
   useEffect(() => {
     dispatch(getTickets());
