@@ -22,12 +22,12 @@ function Tickets() {
 
   return (
     <>
-      <BackButton url="/" />
+      <BackButton url="/tickets" />
       <h1>Tickets</h1>
       <div className="tickets">
         <div className="ticket-headings">
           <div>Date</div>
-          <div>Projectt</div>
+          <div>Project</div>
           <div>Status</div>
           <div></div>
         </div>
