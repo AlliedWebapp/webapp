@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
-import { getTickets, reset } from "../features/tickets/ticketSlice";
+import { getTickets } from "../features/tickets/ticketSlice";
 import TicketItem from "../components/TicketItem";
 
 function Tickets() {
@@ -13,14 +13,11 @@ function Tickets() {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getTickets());
-  }, [dispatch]);
+    if (!tickets || tickets.length === 0) {
+      dispatch(getTickets());
+    }
+  }, [dispatch, tickets]);
   
-
-  useEffect(() => {
-    dispatch(getTickets());
-  }, [dispatch]);
-
   if (isLoading) return <Spinner />;
 
   return (
@@ -30,7 +27,7 @@ function Tickets() {
       <div className="tickets">
         <div className="ticket-headings">
           <div>Date</div>
-          <div>Product</div>
+          <div>Projectt</div>
           <div>Status</div>
           <div></div>
         </div>
