@@ -1,39 +1,54 @@
-// for page to view all tickets
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
-import { getTickets } from "../features/tickets/ticketSlice";
+import { getTickets, reset } from "../features/tickets/ticketSlice";
 import TicketItem from "../components/TicketItem";
 
 function Tickets() {
-  const { tickets, isLoading, isSuccess } = useSelector(
+  const { tickets, isLoading, isError, message } = useSelector(
     (state) => state.tickets
   );
 
   const dispatch = useDispatch();
+
   useEffect(() => {
-    if (!tickets || tickets.length === 0) {
-      dispatch(getTickets());
-    }
-  }, [dispatch, tickets]);
-  
+    dispatch(getTickets());
+
+    return () => {
+      dispatch(reset());
+    };
+  }, [dispatch]);
+
   if (isLoading) return <Spinner />;
+
+  if (isError) {
+    return (
+      <div>
+        <p>Error: {message}</p>
+        <BackButton url="/" />
+      </div>
+    );
+  }
 
   return (
     <>
-      <BackButton url="/tickets" />
+      <BackButton url="/" />
       <h1>Tickets</h1>
       <div className="tickets">
         <div className="ticket-headings">
           <div>Date</div>
-          <div>Project</div>
+          <div>Product</div>
           <div>Status</div>
           <div></div>
         </div>
-        {tickets.map((ticket) => (
-          <TicketItem key={ticket._id} ticket={ticket} />
-        ))}
+        {tickets.length > 0 ? (
+          tickets.map((ticket) => (
+            <TicketItem key={ticket._id} ticket={ticket} />
+          ))
+        ) : (
+          <p>No tickets found.</p>
+        )}
       </div>
     </>
   );
