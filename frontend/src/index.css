@@ -521,12 +521,11 @@ select:focus {
 
 /* Table container to handle horizontal scrolling */
 .table-container {
-  width: 85%;
+  width: 98%; /* Slightly less than full width */
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0;
   box-sizing: border-box;
-  display: flex;
-  justify-content: center;
+  overflow-x: auto; /* Allows scrolling if absolutely necessary */
 }
 
 /* Table styles */
@@ -535,17 +534,16 @@ table {
   border-collapse: collapse;
   margin: 20px auto;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
-  table-layout: auto;
+  table-layout: auto; /* Changed back to auto for better content fitting */
 }
 
 th, td {
-  padding: 10px 15px;
+  padding: 8px 5px; /* Reduced padding to fit more content */
   text-align: center;
   border: 1px solid #fdfdfd;
   white-space: normal;
   word-wrap: break-word;
-  max-width: 150px;
-  min-width: 100px;
+  font-size: 14px; /* Slightly smaller font size */
 }
 
 th {
@@ -579,13 +577,12 @@ tr:hover {
   }
 
   table {
-    font-size: 14px;
-    width: 100%;
+    font-size: 12px;
   }
 
   th, td {
-    padding: 8px 10px;
-    font-size: 13px;
+    padding: 6px 4px;
+    font-size: 12px;
   }
 }
 
