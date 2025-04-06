@@ -238,7 +238,7 @@ h3 {
 
 /* Status indicators for tickets */
 .status {
-  background-color: #333;
+  background-color: #922626;
   color: #fff;
   width: 100px;
   padding: 0 20px;
@@ -262,7 +262,7 @@ h3 {
 }
 
 .status-closed {
-  background-color: darkred;
+  background-color: #922626;
   color: #fff;
   border-radius: 10px;
 }
@@ -416,7 +416,7 @@ h3 {
 .btn-close {
   background: none;
   border: none;
-  color: #000;
+  color: #9f2e2e;
   position: absolute;
   top: 5px;
   right: 5px;
