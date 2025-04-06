@@ -522,7 +522,7 @@ select:focus {
 /* Table container to handle horizontal scrolling */
 .table-container {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   padding: 0 10px;
   margin: 0 auto;
   box-sizing: border-box;
@@ -535,16 +535,17 @@ table {
   margin-top: 20px;
   margin-right: 0px;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
-  table-layout: auto; /* Changed from fixed to auto to allow content-based sizing */
+  table-layout: auto;
 }
 
 th, td {
   padding: 10px 15px;
   text-align: center;
   border: 1px solid #fdfdfd;
-  white-space: normal; /* Changed from nowrap to normal to allow wrapping */
-  word-wrap: break-word; /* Allows long words to break and wrap */
-  max-width: 200px; /* Optional: Set a maximum width for cells */
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 150px;
+  min-width: 100px;
 }
 
 th {
