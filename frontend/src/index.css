@@ -541,7 +541,7 @@ table {
 
 th, td {
   padding: 12px 8px;
-  text-align: center;
+  text-align: left;
   border: 1px solid #fdfdfd;
   white-space: normal;
   word-break: break-word;
@@ -550,6 +550,7 @@ th, td {
   text-overflow: ellipsis;
   font-size: 14px;
   line-height: 1.4;
+  width: 150px;
 }
 
 th {
