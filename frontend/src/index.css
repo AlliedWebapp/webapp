@@ -567,6 +567,12 @@ td {
   color: #0c0202;
   vertical-align: middle;
 }
+.table-wrapper {
+  padding: 0 40px;
+  display: flex;
+  justify-content: center;
+}
+
 
 /* Specific styles for shong and solding tables */
 .table-container.shong-table,
