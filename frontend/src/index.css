@@ -525,6 +525,7 @@ select:focus {
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Table styles */
@@ -533,17 +534,17 @@ table {
   border-collapse: collapse;
   margin: 20px auto;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
-  table-layout: auto;
+  table-layout: fixed;
 }
 
 th, td {
-  padding: 8px 6px;
+  padding: 8px 4px;
   text-align: center;
   border: 1px solid #fdfdfd;
   white-space: normal;
   word-wrap: break-word;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.3;
 }
 
 th {
@@ -552,7 +553,6 @@ th {
   color: #000000;
   position: sticky;
   top: 0;
-  padding: 10px 6px;
 }
 
 td {
@@ -579,9 +579,9 @@ td {
 .table-container.shong-table td,
 .table-container.solding-table th,
 .table.container.solding-table td {
-  padding: 8px 4px;
-  font-size: 13px;
-  line-height: 1.3;
+  padding: 6px 3px;
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 /* Responsive styles for mobile devices */
