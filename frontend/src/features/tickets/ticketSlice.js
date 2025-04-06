@@ -152,7 +152,7 @@ export const ticketSlice = createSlice({
         state.isError = true
         state.message = action.payload
       })
-      .addCase(getTickets.pending, state => {
+      .addCase(getTickets.pending, (state) => {
         state.isLoading = true
       })
       .addCase(getTickets.fulfilled, (state, action) => {

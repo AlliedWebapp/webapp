@@ -16,7 +16,10 @@ function Tickets() {
     dispatch(getTickets());
 
     return () => {
-      dispatch(reset());
+      // Delay reset to avoid wiping state before rendering
+      setTimeout(() => {
+        dispatch(reset());
+      }, 500); // adjust delay if needed
     };
   }, [dispatch]);
 
