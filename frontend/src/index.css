@@ -538,19 +538,32 @@ table {
   margin-top: 20px;
   margin-right: 0px;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
+  table-layout: auto; /* Allow flexible width */
 }
 
-th{ padding: 10px 15px;
-  text-align: center;
+th{ padding: 0.75rem;
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-word;
   border: 1px solid #fdfdfd;
-  white-space: nowrap;
+  white-space: normal;
   }
 
 td {
-  padding: 10px 15px;
-  text-align: center;
+  padding: 0.75rem;
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-word;
   border: 1px solid #fdfdfd;
-  white-space: nowrap;
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  th, td {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    max-width: 150px;
+  }
 }
 
 
