@@ -174,6 +174,30 @@ function Ticket() {
           <p>{ticket.description}</p>
         </div>
 
+        {ticket.images && ticket.images.length > 0 && (
+  <div className="ticket-images">
+    <h3>Uploaded Images</h3>
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      {ticket.images.map((_, index) => (
+        // eslint-disable-next-line jsx-a11y/img-redundant-alt
+        <img
+        key={index}
+          src={`https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`}
+          alt={`Ticket Image ${index + 1}`}
+          style={{
+            width: "150px",
+            height: "auto",
+            objectFit: "cover",
+            borderRadius: "8px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+          }}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+
         <div className="ticket-notes">
           <h3>Notes</h3>
           {ticket.status !== "close" && (

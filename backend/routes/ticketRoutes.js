@@ -25,4 +25,24 @@ router.route("/:id")
   .put(protect, updateTicket)
   .delete(protect, deleteTicket);
 
+  
+// Serve individual images for a ticket
+router.get("/:ticketId/images/:index", protect, async (req, res) => {
+  try {
+    const ticket = await require("../models/ticketModel").findById(req.params.ticketId);
+    const index = parseInt(req.params.index);
+
+    if (!ticket || !ticket.images || index >= ticket.images.length) {
+      return res.status(404).send("Image not found");
+    }
+
+    const image = ticket.images[index];
+    res.set("Content-Type", image.contentType || "image/jpeg");
+    res.send(image.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
