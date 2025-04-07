@@ -22,7 +22,6 @@ function NewTicket() {
   const [spare, setspare] = useState("");
   const [rating, setrating] = useState("");
   const [images, setImages] = useState([]);
-  const [previewImages, setPreviewImages] = useState([]);
   
  
 
@@ -233,18 +232,6 @@ function NewTicket() {
           />
            </div>
         </section>
-        {previewImages.length > 0 && (
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
-           {previewImages.map((img, index) => (
-           <img
-             key={index}
-             src={img}
-            alt={`preview-${index}`}
-          style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px' }}
-        />
-      ))}
-         </div>
-       )}
 
         <div className="form-group">
           <button className="btn btn-block">Submit</button>
