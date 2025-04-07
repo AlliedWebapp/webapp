@@ -1,4 +1,4 @@
-//for individual ticket when click read button
+// Ticket.jsx — For viewing individual ticket
 
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
@@ -15,8 +15,6 @@ import { toast } from "react-toastify";
 import NoteItem from "../components/NoteItem";
 import Modal from "react-modal";
 import { FaPlus } from "react-icons/fa";
-import { store } from '../app/store';
-
 
 const customStyles = {
   content: {
@@ -38,7 +36,6 @@ function Ticket() {
   const [noteText, setNoteText] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
 
-
   const { ticket, isLoading, isError, message } = useSelector(
     (state) => state.tickets
   );
@@ -54,12 +51,10 @@ function Ticket() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Fetching ticket:', ticketId);
         await dispatch(getTicket(ticketId));
         await dispatch(getNotes(ticketId));
       } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Could not fetch ticket details');
+        toast.error("Could not fetch ticket details");
       }
     };
 
@@ -69,33 +64,29 @@ function Ticket() {
     };
   }, [ticketId, dispatch]);
 
-  if (isLoading || notesIsLoading) {
-    return <Spinner />;
-  }
+  if (isLoading || notesIsLoading) return <Spinner />;
 
-  if (isError) {
+  if (isError)
     return (
       <div className="error-container">
         <h3>Error: {message}</h3>
-        <button onClick={() => navigate('/tickets')} className="btn">
+        <button onClick={() => navigate("/tickets")} className="btn">
           Back to Tickets
         </button>
       </div>
     );
-  }
 
-  if (!ticket) {
+  if (!ticket)
     return (
       <div className="error-container">
         <h3>No ticket found</h3>
-        <button onClick={() => navigate('/tickets')} className="btn">
+        <button onClick={() => navigate("/tickets")} className="btn">
           Back to Tickets
         </button>
       </div>
     );
-  }
 
-  // Close ticket
+  // Close Ticket
   const onTicketClose = () => {
     dispatch(closeTicket(ticketId))
       .unwrap()
@@ -108,11 +99,9 @@ function Ticket() {
       });
   };
 
-  // Open/Close Modal
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
-  // Create Note Submit
   const onNoteSubmit = (e) => {
     e.preventDefault();
     if (!noteText.trim()) {
@@ -131,46 +120,59 @@ function Ticket() {
       });
   };
 
- 
-
   return (
     <div className="ticket-page">
       <header className="ticket-header">
         <BackButton url="/tickets" />
         <h2>Ticket Details</h2>
-        
+
         <div className="ticket-info">
           <div className="info-row">
-            <p><strong>ID:</strong> {ticket._id}</p>
             <p>
-              <strong>Status:</strong>
+              <strong>ID:</strong> {ticket._id}
+            </p>
+            <p>
+              <strong>Status:</strong>{" "}
               <span className={`status status-${ticket.status}`}>
                 {ticket.status}
               </span>
             </p>
           </div>
-          
           <div className="info-row">
             <p>
               <strong>Created:</strong>{" "}
               {new Date(ticket.createdAt).toLocaleString()}
             </p>
-            <p><strong>Project:</strong> {ticket.projectname}</p>
+            <p>
+              <strong>Project:</strong> {ticket.projectname}
+            </p>
           </div>
         </div>
 
         <div className="ticket-details">
           <h3>Issue Details</h3>
-          <p><strong>Fault Type:</strong> {ticket.fault}</p>
-          <p><strong>Issue Description:</strong> {ticket.issue}</p>
-          <p><strong>Site Location:</strong> {ticket.sitelocation}</p>
-          <p><strong>Project Location:</strong> {ticket.projectlocation}</p>
+          <p>
+            <strong>Fault Type:</strong> {ticket.fault}
+          </p>
+          <p>
+            <strong>Issue Description:</strong> {ticket.issue}
+          </p>
+          <p>
+            <strong>Site Location:</strong> {ticket.sitelocation}
+          </p>
+          <p>
+            <strong>Project Location:</strong> {ticket.projectlocation}
+          </p>
           <p>
             <strong>Date of Fault:</strong>{" "}
             {ticket.date && new Date(ticket.date).toLocaleDateString()}
           </p>
-          <p><strong>Spare Required:</strong> {ticket.spare}</p>
-          <p><strong>Rating:</strong> {ticket.rating}</p>
+          <p>
+            <strong>Spare Required:</strong> {ticket.spare}
+          </p>
+          <p>
+            <strong>Rating:</strong> {ticket.rating}
+          </p>
         </div>
 
         <div className="ticket-description">
@@ -179,34 +181,32 @@ function Ticket() {
         </div>
 
         {ticket.images && ticket.images.length > 0 && (
-  <div className="ticket-images">
-    <h3>Uploaded Images</h3>
-    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-      {ticket.images.map((_, index) => (
-      // eslint-disable-next-line jsx-a11y/img-redundant-alt
-      <img
-       key={index}
-          src={`https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`}
-          alt={`Ticket Image ${index + 1}`}
-          style={{
-            width: "150px",
-            height: "auto",
-            objectFit: "cover",
-            borderRadius: "8px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-            cursor: "pointer"
-          }}
-          onClick={() =>
-            setPreviewImage(
-              `https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`
-            )
-          }
-        />
-      ))}
-    </div>
-  </div>
-)}
-
+          <div className="ticket-images">
+            <h3>Uploaded Images</h3>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {ticket.images.map((_, index) => (
+                <img
+                  key={index}
+                  src={`https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`}
+                  alt={`Ticket Image ${index + 1}`}
+                  style={{
+                    width: "150px",
+                    height: "auto",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                    cursor: "pointer",
+                  }}
+                  onClick={() =>
+                    setPreviewImage(
+                      `https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`
+                    )
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="ticket-notes">
           <h3>Notes</h3>
@@ -241,7 +241,9 @@ function Ticket() {
         contentLabel="Add Note"
       >
         <h2>Add Note</h2>
-        <button className="btn-close" onClick={closeModal}>X</button>
+        <button className="btn-close" onClick={closeModal}>
+          X
+        </button>
         <form onSubmit={onNoteSubmit}>
           <div className="form-group">
             <textarea
@@ -254,41 +256,46 @@ function Ticket() {
             ></textarea>
           </div>
           <div className="form-group">
-            <button type="submit" className="btn">Submit</button>
+            <button type="submit" className="btn">
+              Submit
+            </button>
           </div>
         </form>
       </Modal>
-    {previewImage && (
-      <div
-        onClick={() => setPreviewImage(null)}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.6)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1000,
-        }}
-      >
-        <img
-          src={previewImage}
-          alt="Preview"
+
+      {/* Image preview overlay */}
+      {previewImage && (
+        <div
+          onClick={() => setPreviewImage(null)}
           style={{
-            maxWidth: "90%",
-            maxHeight: "80%",
-            borderRadius: "12px",
-            background: "#fff",
-            padding: "8px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
           }}
-        />
-      </div>
-    )}
-  </div>
-);
+        >
+          <img
+            src={previewImage}
+            alt="Preview"
+            style={{
+              maxWidth: "90%",
+              maxHeight: "80%",
+              borderRadius: "12px",
+              background: "#fff",
+              padding: "8px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default Ticket;
