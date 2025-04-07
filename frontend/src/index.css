@@ -573,6 +573,23 @@ td {
   justify-content: center;
 }
 
+/* Prevent full-page horizontal scrolling */
+body {
+  overflow-x: hidden;
+}
+
+/* Wrapper for scrolling table only when necessary */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  max-width: 100vw;
+}
+
+/* Keep table content neatly constrained */
+.table-scroll-wrapper table {
+  min-width: max-content;
+}
+
+
 
 /* Specific styles for shong and solding tables */
 .table-container.shong-table,
