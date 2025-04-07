@@ -44,6 +44,12 @@ const ticketSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please enter DG rating']
     },
+    images: [
+      {
+        data: Buffer,
+        contentType: String
+      }
+    ],
     status: {
       type: String,
       required: true,

@@ -67,8 +67,12 @@ const createTicket = asyncHandler(async (req, res) => {
     description, 
     date, 
     spare, 
-    rating 
+    rating,
   } = req.body
+
+   // Get uploaded files from multer
+  const imageFiles = req.files;
+  const imagePaths = imageFiles.map((file) => file.path); // save path to DB
 
   if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
     res.status(400)
@@ -83,6 +87,12 @@ const createTicket = asyncHandler(async (req, res) => {
     throw new Error('User not found')
   }
 
+  const images = req.files.map((file) => ({
+    data: file.buffer,
+    contentType: file.mimetype
+  }));
+
+
   const ticket = await Ticket.create({
     projectname,
     sitelocation,
@@ -93,6 +103,7 @@ const createTicket = asyncHandler(async (req, res) => {
     date,
     spare,
     rating,
+    images,
     user: req.user.id,
     status: 'new'
   })
