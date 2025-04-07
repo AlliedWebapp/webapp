@@ -21,7 +21,8 @@ function NewTicket() {
   const [date, setdate] = useState("");
   const [spare, setspare] = useState("");
   const [rating, setrating] = useState("");
-
+  const [images, setImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
   
  
 
@@ -58,7 +59,8 @@ function NewTicket() {
       description,
       date,
       spare,
-      rating
+      rating,
+      images
     }));
   };
 
@@ -214,6 +216,35 @@ function NewTicket() {
               ></textarea>
           </div>
         </section>
+
+        <section className="form">
+            <div className="form-group">
+              <label htmlFor="images">Upload Photos</label>
+              <input
+                  type="file"
+                  id="images"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                     const files = Array.from(e.target.files).slice(0, 4);
+                     setImages(files);
+                    setPreviewImages(files.map((file) => URL.createObjectURL(file)));
+            }}
+          />
+           </div>
+        </section>
+        {previewImages.length > 0 && (
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+           {previewImages.map((img, index) => (
+           <img
+             key={index}
+             src={img}
+            alt={`preview-${index}`}
+          style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px' }}
+        />
+      ))}
+         </div>
+       )}
 
         <div className="form-group">
           <button className="btn btn-block">Submit</button>
