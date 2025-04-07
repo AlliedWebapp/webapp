@@ -227,7 +227,6 @@ function NewTicket() {
                   onChange={(e) => {
                      const files = Array.from(e.target.files).slice(0, 4);
                      setImages(files);
-                    setPreviewImages(files.map((file) => URL.createObjectURL(file)));
             }}
           />
            </div>
