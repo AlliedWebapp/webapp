@@ -48,19 +48,22 @@ function NewTicket() {
       return;
     }
 
-    // Create ticket with all fields
-    dispatch(createTicket({
-      projectname,
-      sitelocation,
-      projectlocation,
-      fault,
-      issue,
-      description,
-      date,
-      spare,
-      rating,
-      images
-    }));
+    const formData = new FormData();
+    formData.append("projectname", projectname);
+    formData.append("sitelocation", sitelocation);
+    formData.append("projectlocation", projectlocation);
+    formData.append("fault", fault);
+    formData.append("issue", issue);
+    formData.append("description", description);
+    formData.append("date", date);
+    formData.append("spare", spare);
+    formData.append("rating", rating);
+  
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+
+    dispatch(createTicket(formData));
   };
 
   if (isLoading) return <Spinner />;

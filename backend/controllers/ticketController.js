@@ -86,11 +86,12 @@ const createTicket = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error('User not found')
   }
-  const images = req.files?.map(file => ({
-    data: file.buffer,
-    contentType: file.mimetype,
-  })) || [];
-  
+  const images = Array.isArray(req.files)
+  ? req.files.map(file => ({
+      data: file.buffer,
+      contentType: file.mimetype,
+    }))
+  : [];
 
 
   const ticket = await Ticket.create({
