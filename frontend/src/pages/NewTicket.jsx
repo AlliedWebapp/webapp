@@ -228,9 +228,15 @@ function NewTicket() {
                   accept="image/*"
                   multiple
                   onChange={(e) => {
-                     const files = Array.from(e.target.files).slice(0, 4);
-                     setImages(files);
-            }}
+                    const files = Array.from(e.target.files);
+                    if (files.length > 4) {
+                      toast.error("You can only upload up to 4 images.");
+                      e.target.value = ""; // reset file input
+                      return;
+                    }
+                    setImages(files);
+                  }}
+                  
           />
            </div>
         </section>
