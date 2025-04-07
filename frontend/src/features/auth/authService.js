@@ -4,7 +4,7 @@ const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Register user
 const register = async (userData) => {
-  const response = await axios.post(`${API_URL}/api/users/register`, userData, {  // Updated to include /api/users/register
+  const response = await axios.post(`${API_URL}/api/users`, userData, {  // Updated to include /api/users/register
     headers: {
       'Content-Type': 'application/json'
     }
