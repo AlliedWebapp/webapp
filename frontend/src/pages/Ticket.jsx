@@ -235,38 +235,6 @@ function Ticket() {
       </header>
 
       <Modal
-       // eslint-disable-next-line no-lone-blocks
-  {previewImage && (
-    <div
-      onClick={() => setPreviewImage(null)}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
-    >
-      <img
-        src={previewImage}
-        alt="Preview"
-        style={{
-          maxWidth: "90%",
-          maxHeight: "80%",
-          borderRadius: "12px",
-          background: "#fff",
-          padding: "8px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-        }}
-      />
-    </div>
-  )}
-  
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
@@ -290,8 +258,37 @@ function Ticket() {
           </div>
         </form>
       </Modal>
-    </div>
-  );
-}
+    {previewImage && (
+      <div
+        onClick={() => setPreviewImage(null)}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.6)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+        }}
+      >
+        <img
+          src={previewImage}
+          alt="Preview"
+          style={{
+            maxWidth: "90%",
+            maxHeight: "80%",
+            borderRadius: "12px",
+            background: "#fff",
+            padding: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+          }}
+        />
+      </div>
+    )}
+  </div>
+);
 
 export default Ticket;
