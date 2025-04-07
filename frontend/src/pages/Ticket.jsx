@@ -86,7 +86,6 @@ function Ticket() {
       </div>
     );
 
-  // Close Ticket
   const onTicketClose = () => {
     dispatch(closeTicket(ticketId))
       .unwrap()
@@ -180,30 +179,37 @@ function Ticket() {
           <p>{ticket.description}</p>
         </div>
 
+        {/* Image thumbnails */}
         {ticket.images && ticket.images.length > 0 && (
           <div className="ticket-images">
             <h3>Uploaded Images</h3>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {ticket.images.map((_, index) => (
-                <img
-                  key={index}
-                  src={`https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`}
-                  alt={`Ticket Image ${index + 1}`}
-                  style={{
-                    width: "150px",
-                    height: "auto",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                    cursor: "pointer",
-                  }}
-                  onClick={() =>
-                    setPreviewImage(
-                      `https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`
-                    )
-                  }
-                />
-              ))}
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+              {ticket.images.map((_, index) => {
+                const imageUrl = `https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`;
+                return (
+                  <img
+                    key={index}
+                    src={imageUrl}
+                    alt={`Ticket Image ${index + 1}`}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                      cursor: "pointer",
+                      transition: "transform 0.2s ease-in-out",
+                    }}
+                    onClick={() => setPreviewImage(imageUrl)}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.transform = "scale(1.05)")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
+                  />
+                );
+              })}
             </div>
           </div>
         )}
