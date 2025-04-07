@@ -9,7 +9,9 @@ import NewTicket from './pages/NewTicket';
 import Register from './pages/Register';
 import Tickets from './pages/Tickets';
 import Ticket from './pages/Ticket';
-import Inventory from './pages/inventory'; // Updated import name to match component
+import Inventory from './pages/inventory';
+import FSR from './pages/FSR'; // Import the FSR component
+import Monthly from './pages/monthly';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/ticket/:ticketId" element={<Ticket />} />
               <Route path="/inventory" element={<Inventory />} />
+              <Route path="/FSR" element={<FSR />} />
+              <Route path="/monthly" element={<Monthly />} />
             </Route>
           </Routes>
         </div>

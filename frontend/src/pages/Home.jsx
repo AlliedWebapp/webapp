@@ -20,6 +20,14 @@ function Home() {
       <Link to="/inventory" className="btn btn-block">
         <FaClipboardList /> View Inventory
       </Link>
+
+      <Link to="/FSR" className="btn btn-block">
+        <FaClipboardList /> View FSR
+      </Link>
+
+      <Link to="/monthly" className="btn btn-block">
+        <FaClipboardList /> View Monthly Summary
+      </Link>
     </>
   );
 }
