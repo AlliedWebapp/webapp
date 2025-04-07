@@ -37,12 +37,15 @@ router.get("/:ticketId/images/:index", protect, async (req, res) => {
     }
 
     const image = ticket.images[index];
-    res.set("Content-Type", image.contentType || "image/jpeg");
-    res.send(image.data);
+
+    // If image is stored as plain Buffer (which multer does), no .data needed
+    res.set("Content-Type", "image/jpeg"); // Adjust if you're storing PNGs
+    res.send(image);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
   }
 });
+
 
 module.exports = router;
