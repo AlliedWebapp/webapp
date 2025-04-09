@@ -221,7 +221,7 @@ h3 {
 .ticket,
 .ticket-headings {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 2fr 2fr 1fr 1fr 2fr;
   gap: 20px;
   justify-content: space-between;
   align-items: center;
@@ -520,7 +520,6 @@ select:focus {
 }
 
 /* Table container to handle horizontal scrolling */
-
 .table-container {
   width: 100%;
   margin: 0 auto;
@@ -533,24 +532,19 @@ select:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0 auto;
+  margin: 20px auto;
   box-shadow: 0 0 10px rgba(25, 24, 24, 0.1);
   table-layout: fixed;
-  word-wrap: break-word;
 }
 
 th, td {
   padding: 12px 8px;
-  text-align: left;
+  text-align: center;
   border: 1px solid #fdfdfd;
   white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  hyphens:none;
-  text-overflow: ellipsis;
+  word-wrap: break-word;
   font-size: 14px;
   line-height: 1.4;
-  width: 120px;
 }
 
 th {
@@ -567,14 +561,6 @@ td {
   color: #0c0202;
   vertical-align: middle;
 }
-.table-wrapper {
-  padding: 0 40px;
-  display: flex;
-  justify-content: center;
-  margin-right: 40px;
-}
-
-
 
 /* Specific styles for shong and solding tables */
 .table-container.shong-table,
@@ -597,10 +583,6 @@ td {
   padding: 10px 6px;
   font-size: 13px;
   line-height: 1.3;
-  white-space: normal !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
-  hyphens: none !important;
 }
 
 /* Responsive styles for mobile devices */

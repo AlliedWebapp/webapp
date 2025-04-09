@@ -37,6 +37,7 @@ function Tickets() {
       <h1>Tickets</h1>
       <div className="tickets">
         <div className="ticket-headings">
+          <div>Ticket ID</div>
           <div>Date</div>
           <div>Project</div>
           <div>Status</div>
