@@ -5,7 +5,10 @@ const ticketSchema = mongoose.Schema(
     ticket_id: {
       type: Number,
       required: true,
-      unique: true
+      unique: true,
+      default: function () {
+        return `TICKET-${Date.now()}`;
+      }
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
