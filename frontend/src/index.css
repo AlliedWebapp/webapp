@@ -781,4 +781,27 @@ td {
   .generator-service-report h2 {
     font-size: 2rem;
   }
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .section-title {
+    font-weight: bold;
+    margin: 2rem 0 1rem;
+    font-size: 1.2rem;
+  }
 }

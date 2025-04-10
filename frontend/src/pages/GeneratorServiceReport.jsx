@@ -1,19 +1,17 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import "../index.css"; // Reuse global styles
+import "../index.css"; // Global styles
 
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // You can collect form data here and send it to your backend
     console.log("Form submitted for ticket ID:", ticketId);
   };
 
   return (
-    <div className="report-container">
-      {/* Header with logo and title */}
+    <div className="generator-service-report">
       <header className="header">
         <div className="logo">
           <Link to="/">
@@ -30,93 +28,143 @@ const GeneratorServiceReport = () => {
       </header>
 
       <form onSubmit={handleSubmit}>
-        {/* ========== Basic Information Section ========== */}
+        {/* ===== Basic Info ===== */}
         <div className="section-title">Basic Information</div>
-        <label>SR No</label>
-        <input type="text" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>SR No</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Customer Name</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Installation Site Address</label>
+            <textarea rows="2" />
+          </div>
+        </div>
 
-        <label>Customer Name</label>
-        <input type="text" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Customer Site ID</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Date of Commissioning</label>
+            <input type="date" />
+          </div>
+          <div className="form-group">
+            <label>Instance ID</label>
+            <input type="text" />
+          </div>
+        </div>
 
-        <label>Installation Site Address</label>
-        <textarea rows="2" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>State</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Rating (KVA/HP)</label>
+            <input type="text" />
+          </div>
+        </div>
 
-        <label>Customer Site ID</label>
-        <input type="text" />
-
-        <label>Date of Commissioning</label>
-        <input type="date" />
-
-        <label>Instance ID</label>
-        <input type="text" />
-
-        <label>State</label>
-        <input type="text" />
-
-        <label>Rating (KVA/HP)</label>
-        <input type="text" />
-
-        {/* ========== Technical Details Section ========== */}
+        {/* ===== Technical Info ===== */}
         <div className="section-title">Technical Details</div>
-        <label>Engine Model</label>
-        <input type="text" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Engine Model</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Engine Serial Number</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Genset Serial Number</label>
+            <input type="text" />
+          </div>
+        </div>
 
-        <label>Engine Serial Number</label>
-        <input type="text" />
+        {/* ===== Task Info ===== */}
+        <div className="section-title">Task Details</div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Total Running Hours</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Task Start Date/Time</label>
+            <input type="datetime-local" />
+          </div>
+          <div className="form-group">
+            <label>Task End Date/Time</label>
+            <input type="datetime-local" />
+          </div>
+        </div>
 
-        <label>Genset Serial Number</label>
-        <input type="text" />
+        <div className="form-group full-width">
+          <label>Problem Summary</label>
+          <textarea rows="2" placeholder="E.g., Oil changed, filter cleaned, diagnostics checked..." />
+        </div>
 
-        <label>Total Running Hours</label>
-        <input type="text" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Nature of Failure</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Checklist/Action Taken</label>
+            <textarea rows="4" />
+          </div>
+          <div className="form-group">
+            <label>Engineer Remarks</label>
+            <textarea rows="3" />
+          </div>
+        </div>
 
-        <label>Task Start Date/Time</label>
-        <input type="datetime-local" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Customer Remarks</label>
+            <textarea rows="3" />
+          </div>
+        </div>
 
-        <label>Task End Date/Time</label>
-        <input type="datetime-local" />
-
-        <label>Problem Summary</label>
-        <textarea rows="2" />
-
-        <label>Nature of Failure</label>
-        <input type="text" />
-
-        <label>Checklist/Action Taken</label>
-        <textarea
-          rows="4"
-          placeholder="E.g., Oil changed, air filter cleaned, diagnostics checked..."
-        />
-
-        <label>Engineer Remarks</label>
-        <textarea rows="3" />
-
-        <label>Customer Remarks</label>
-        <textarea rows="3" />
-
-        {/* ========== Contact Section ========== */}
+        {/* ===== Contact Info ===== */}
         <div className="section-title">Contact</div>
-        <label>Engineer Name</label>
-        <input type="text" />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Engineer Name</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Customer Contact Number</label>
+            <input type="text" />
+          </div>
+          <div className="form-group">
+            <label>Customer Email</label>
+            <input type="email" />
+          </div>
+        </div>
 
-        <label>Customer Contact Number</label>
-        <input type="text" />
-
-        <label>Customer Email</label>
-        <input type="email" />
-
-        {/* ========== Uploads Section ========== */}
+        {/* ===== Uploads ===== */}
         <div className="section-title">Photos & Signatures (Optional)</div>
-        <label>Upload Customer Signature</label>
-        <input type="file" accept="image/*" />
+        <div className="form-group">
+          <label>Upload Customer Signature</label>
+          <input type="file" accept="image/*" />
+        </div>
+        <div className="form-group">
+          <label>Upload Engineer Signature</label>
+          <input type="file" accept="image/*" />
+        </div>
+        <div className="form-group">
+          <label>Upload Work Completion Photos</label>
+          <input type="file" accept="image/*" multiple />
+        </div>
 
-        <label>Upload Engineer Signature</label>
-        <input type="file" accept="image/*" />
-
-        <label>Upload Work Completion Photos</label>
-        <input type="file" accept="image/*" multiple />
-
-        <button type="submit">Submit Report</button>
+        <button type="submit" className="submit-btn">Submit Report</button>
       </form>
     </div>
   );
