@@ -665,7 +665,9 @@ td {
   display: none;
 }
 
-/* Generator Service Report Styles */
+/* ------------------------------
+   Generator Service Report Styles
+------------------------------ */
 .generator-service-report {
   font-family: 'Poppins', sans-serif;
   background-color: #ffffff;
