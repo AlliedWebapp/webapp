@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const ImprovementReport = () => {
   return (
-    <div className="report-container">
+    <div className="improvement-report">
       <header className="header">
         <div className="logo">
           <Link to="/">

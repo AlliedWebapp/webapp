@@ -4,7 +4,7 @@ import "../index.css"; // Assuming you're already using index.css
 
 const MaintenanceReport = () => {
   return (
-    <div className="report-container">
+    <div className="maintenance-report">
       <header className="header">
         <div className="logo">
           <Link to="/">
