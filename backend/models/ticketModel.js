@@ -5,10 +5,7 @@ const ticketSchema = mongoose.Schema(
     ticket_id: {
       type: String,
       required: true,
-      unique: true,
-      default: function () {
-        return `TICKET-${Date.now()}`;
-      }
+      unique: true
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -70,38 +67,28 @@ const ticketSchema = mongoose.Schema(
   }
 )
 
-// Generate 6-digit ticket_id before saving
+// Generate 4-digit unique ticket_id before saving
 ticketSchema.pre('save', async function (next) {
-  try {
-    if (!this.ticket_id) {
-      console.log('Generating new ticket_id...');
-      let isUnique = false;
-      let attempts = 0;
-      const maxAttempts = 10; // Prevent infinite loops
-      
-      while (!isUnique && attempts < maxAttempts) {
-        attempts++;
-        // Generate a random 6-digit number between 100000 and 999999
-        const randomId = Math.floor(100000 + Math.random() * 900000);
-        console.log(`Attempt ${attempts}: Trying ticket_id ${randomId}`);
-        
-        const existing = await mongoose.models.Ticket.findOne({ ticket_id: randomId });
-        if (!existing) {
-          this.ticket_id = randomId;
-          isUnique = true;
-          console.log('✅ Successfully generated ticket_id:', randomId);
-        }
-      }
-      
-      if (!isUnique) {
-        throw new Error('Could not generate a unique ticket_id after multiple attempts');
-      }
+  if (this.ticket_id) return next(); // already exists
+
+  let unique = false;
+  let attempts = 0;
+
+  while (!unique && attempts < 10) {
+    const candidate = Math.floor(1000 + Math.random() * 9000).toString();
+    const exists = await mongoose.models.Ticket.findOne({ ticket_id: candidate });
+    if (!exists) {
+      this.ticket_id = candidate;
+      unique = true;
     }
-    next();
-  } catch (error) {
-    console.error('Error in ticket_id generation:', error);
-    next(error);
+    attempts++;
   }
+
+  if (!unique) {
+    return next(new Error('Failed to generate unique 4-digit ticket_id'));
+  }
+
+  next();
 });
 
-module.exports = mongoose.model('Ticket', ticketSchema)
+module.exports = mongoose.model('Ticket', ticketSchema);

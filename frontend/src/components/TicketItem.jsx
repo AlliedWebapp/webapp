@@ -10,7 +10,7 @@ function TicketItem({ ticket }) {
   };
   return (
     <div className="ticket">
-      <div>#{ticket.ticket_id}</div> {/* 👈 this is the unique 6-digit ID */}
+      <div>{ticket.ticket_id}</div>
       <div>{new Date(ticket.createdAt).toLocaleString("en-US", options)}</div>
       <div>{ticket.projectname}</div>
       <div className={`status status-${ticket.status}`}>{ticket.status}</div>
