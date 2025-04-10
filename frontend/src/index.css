@@ -664,3 +664,101 @@ td {
 .ticket-actions {
   display: none;
 }
+
+/* Generator Service Report Styles */
+.generator-service-report {
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+  padding: 30px;
+  margin: 30px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  max-width: 1000px;
+}
+
+.generator-service-report h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* Form group layout */
+.generator-service-report .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.generator-service-report .form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.generator-service-report .form-group input,
+.generator-service-report .form-group select,
+.generator-service-report .form-group textarea {
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.generator-service-report .form-group input:focus,
+.generator-service-report .form-group select:focus,
+.generator-service-report .form-group textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #ffffff;
+}
+
+/* Flex layout for grouped fields */
+.generator-service-report .form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.generator-service-report .form-row .form-group {
+  flex: 1;
+  min-width: 240px;
+}
+
+/* Submit Button */
+.generator-service-report .submit-btn {
+  padding: 12px 24px;
+  background-color: #111827;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-top: 10px;
+}
+
+.generator-service-report .submit-btn:hover {
+  background-color: #1f2937;
+  transform: scale(0.98);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .generator-service-report {
+    padding: 20px;
+  }
+
+  .generator-service-report .form-row {
+    flex-direction: column;
+  }
+
+  .generator-service-report h2 {
+    font-size: 1.5rem;
+  }
+}
