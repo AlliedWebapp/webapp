@@ -5,7 +5,7 @@ import "../index.css"; // Reusing global styles
 const OtherReports = () => {
   return (
     <div className="report-container">
-      <header className="header">
+      <header className="header center-header">
         <h2 className="other-reports-heading">Other Reports</h2>
         <p className="other-reports-subheading">
           Select the report
