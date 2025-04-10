@@ -6,25 +6,23 @@ const Ticket = require('../models/ticketModel')
 // @desc    Get user tickets
 // @route   GET /api/tickets
 // @access  Private
-
-/**
- * 'asyncHandler' is a simple middleware for handling exceptions
- * inside of async express routes and passing them to your express
- * error handlers.
- */
 const getTickets = asyncHandler(async (req, res) => {
   // Get user using the id and JWT
-  const user = await User.findById(req.user.id)
+  const user = await User.findById(req.user.id);
 
   if (!user) {
-    res.status(401)
-    throw new Error('User not found')
+    res.status(401);
+    throw new Error('User not found');
   }
 
   const tickets = await Ticket.find({ user: req.user._id })
+    .sort({
+      status: 1,         // sort alphabetically: 'close' comes last
+      createdAt: -1      // newest ticket at the top within each status
+    });
 
-  res.status(200).json(tickets)
-})
+  res.status(200).json(tickets);
+});
 
 // @desc    Get user ticket
 // @route   GET /api/tickets/:id
@@ -94,7 +92,7 @@ const createTicket = asyncHandler(async (req, res) => {
     })) || [];
 
     console.log('Creating new ticket...');
-    const ticket = new Ticket({
+    const ticket = await Ticket.create({
       projectname,
       sitelocation,
       projectlocation,
@@ -107,7 +105,9 @@ const createTicket = asyncHandler(async (req, res) => {
       images,
       user: req.user.id,
       status: 'new'
-    })
+      // ❌ DO NOT pass `ticket_id` here manually!
+    });
+    
     
     await ticket.save(); // ✅ triggers the pre('save') hook and sets ticket_id
     
