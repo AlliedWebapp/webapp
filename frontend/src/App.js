@@ -38,7 +38,7 @@ function App() {
               <Route path="/monthly" element={<Monthly />} />
               <Route path="/improvement-report" element={<ImprovementReport />} />
               <Route path="/maintenance-report" element={<MaintenanceReport />} />
-              <Route path="/generator-service-report" element={<GeneratorServiceReport />} />
+              <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
             </Route>
           </Routes>
         </div>
