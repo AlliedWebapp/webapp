@@ -66,20 +66,21 @@ const ticketSchema = mongoose.Schema(
   }
 )
 
-// ✅ Triggered for both `.save()` and `.create()`
-ticketSchema.pre('validate', async function (next) {
+// ✅ Use pre('save') and log for debugging
+ticketSchema.pre('save', async function (next) {
   if (!this.ticket_id) {
-    let isUnique = false
+    let isUnique = false;
     while (!isUnique) {
-      const randomId = Math.floor(100000 + Math.random() * 900000)
-      const existing = await mongoose.models.Ticket.findOne({ ticket_id: randomId })
+      const randomId = Math.floor(100000 + Math.random() * 900000);
+      const existing = await mongoose.models.Ticket.findOne({ ticket_id: randomId });
       if (!existing) {
-        this.ticket_id = randomId
-        isUnique = true
+        this.ticket_id = randomId;
+        isUnique = true;
+        console.log('✅ ticket_id generated:', randomId);
       }
     }
   }
-  next()
-})
+  next();
+});
 
 module.exports = mongoose.model('Ticket', ticketSchema)
