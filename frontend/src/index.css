@@ -809,23 +809,30 @@ td {
    Styles for OtherReports Page
 ------------------------------ */
 
-/* Header Styles */
-.other-reports-heading {
+/* ------------------------------
+   Styles for OtherReports Page
+------------------------------ */
+
+.other-reports-header {
   text-align: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.other-reports-heading {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #050505;
-  margin-top: 30px;
+  color: #121213;
   margin-bottom: 8px;
 }
 
 .other-reports-subheading {
-  text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 500;
-  color: #050505;
+  color: #121213;
   margin-bottom: 30px;
 }
+
 
 /* Button Layout */
 .button-wrapper {
