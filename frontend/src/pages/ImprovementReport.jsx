@@ -22,7 +22,7 @@ const ImprovementReport = () => {
         <input type="text" name="number" />
 
         <label>Department:</label>
-        <input type="text" name="department" />
+        <input type="taext" name="department" />
 
         <label>Equipment/Structure No:</label>
         <input type="text" name="equipment_no" />

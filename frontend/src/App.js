@@ -15,6 +15,7 @@ import Monthly from './pages/monthly';
 import ImprovementReport from './pages/ImprovementReport';
 import MaintenanceReport from './pages/MaintenanceReport';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
+import OtherReports from './pages/OtherReports';  
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
               <Route path="/improvement-report" element={<ImprovementReport />} />
               <Route path="/maintenance-report" element={<MaintenanceReport />} />
               <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
+              <Route path="/other-reports" element={<OtherReports />} />
             </Route>
           </Routes>
         </div>
