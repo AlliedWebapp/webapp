@@ -1,8 +1,16 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "../index.css"; // Reuse global styles
 
 const GeneratorServiceReport = () => {
+  const { ticketId } = useParams();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // You can collect form data here and send it to your backend
+    console.log("Form submitted for ticket ID:", ticketId);
+  };
+
   return (
     <div className="report-container">
       {/* Header with logo and title */}
@@ -18,9 +26,10 @@ const GeneratorServiceReport = () => {
         </div>
         <h2>Generator Service Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
+        <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
       </header>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         {/* ========== Basic Information Section ========== */}
         <div className="section-title">Basic Information</div>
         <label>SR No</label>
