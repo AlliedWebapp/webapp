@@ -18,53 +18,85 @@ const ImprovementReport = () => {
       </header>
 
       <form id="improvementForm">
-        <label>No.:</label>
-        <input type="text" name="number" />
+        <div className="form-group">
+          <label>No.:</label>
+          <input type="text" name="number" />
+        </div>
 
-        <label>Department:</label>
-        <input type="taext" name="department" />
+        <div className="form-group">
+          <label>Department:</label>
+          <input type="text" name="department" />
+        </div>
 
-        <label>Equipment/Structure No:</label>
-        <input type="text" name="equipment_no" />
+        <div className="form-group">
+          <label>Equipment/Structure No:</label>
+          <input type="text" name="equipment_no" />
+        </div>
 
-        <label>Equipment/Structure/System:</label>
-        <input type="text" name="equipment_system" />
+        <div className="form-group">
+          <label>Equipment/Structure/System:</label>
+          <input type="text" name="equipment_system" />
+        </div>
 
-        <label>Location:</label>
-        <input type="text" name="location" />
+        <div className="form-group">
+          <label>Location:</label>
+          <input type="text" name="location" />
+        </div>
 
-        <label>Objectives:</label>
-        <textarea name="objectives" rows="3" />
+        <div className="form-group">
+          <label>Objectives:</label>
+          <textarea name="objectives" rows="3" />
+        </div>
 
-        <label>Concept Date:</label>
-        <input type="date" name="concept_date" />
+        <div className="form-group">
+          <label>Concept Date:</label>
+          <input type="date" name="concept_date" />
+        </div>
 
-        <label>Implementation Date:</label>
-        <input type="date" name="implementation_date" />
+        <div className="form-group">
+          <label>Implementation Date:</label>
+          <input type="date" name="implementation_date" />
+        </div>
 
-        <label>Present Condition:</label>
-        <textarea name="present_condition" rows="3" />
+        <div className="form-group">
+          <label>Present Condition:</label>
+          <textarea name="present_condition" rows="3" />
+        </div>
 
-        <label>Modification Carried Out:</label>
-        <textarea name="modification" rows="3" />
+        <div className="form-group">
+          <label>Modification Carried Out:</label>
+          <textarea name="modification" rows="3" />
+        </div>
 
-        <label>Manpower / Materials Utilization:</label>
-        <textarea name="resources" rows="3" />
+        <div className="form-group">
+          <label>Manpower / Materials Utilization:</label>
+          <textarea name="resources" rows="3" />
+        </div>
 
-        <label>No. of Man Days Involved:</label>
-        <input type="text" name="mandays" />
+        <div className="form-group">
+          <label>No. of Man Days Involved:</label>
+          <input type="text" name="mandays" />
+        </div>
 
-        <label>Cost Involved:</label>
-        <input type="text" name="cost" />
+        <div className="form-group">
+          <label>Cost Involved:</label>
+          <input type="text" name="cost" />
+        </div>
 
-        <label>Payback Period:</label>
-        <input type="text" name="payback" />
+        <div className="form-group">
+          <label>Payback Period:</label>
+          <input type="text" name="payback" />
+        </div>
 
-        <label>End Result:</label>
-        <textarea name="end_result" rows="3" />
+        <div className="form-group">
+          <label>End Result:</label>
+          <textarea name="end_result" rows="3" />
+        </div>
 
-        <label>Additional Information if Any:</label>
-        <textarea name="additional_info" rows="3" />
+        <div className="form-group">
+          <label>Additional Information if Any:</label>
+          <textarea name="additional_info" rows="3" />
+        </div>
 
         <div className="signatures">
           <div className="signature-block">
@@ -92,7 +124,9 @@ const ImprovementReport = () => {
           </div>
         </div>
 
-        <button type="submit">Submit Report</button>
+        <div className="form-group">
+          <button type="submit" className="submit-btn">Submit Report</button>
+        </div>
       </form>
     </div>
   );

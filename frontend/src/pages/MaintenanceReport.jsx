@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../index.css"; // Assuming you're already using index.css
 
 const MaintenanceReport = () => {
   return (
@@ -19,35 +18,55 @@ const MaintenanceReport = () => {
       </header>
 
       <form id="breakdownForm">
-        <label>Unit:</label>
-        <input type="text" name="unit" />
+        <div className="form-group">
+          <label>Unit:</label>
+          <input type="text" name="unit" />
+        </div>
 
-        <label>Outage Date:</label>
-        <input type="date" name="outage_date" />
+        <div className="form-group">
+          <label>Outage Date:</label>
+          <input type="date" name="outage_date" />
+        </div>
 
-        <label>Time:</label>
-        <input type="time" name="outage_time" />
+        <div className="form-group">
+          <label>Time:</label>
+          <input type="time" name="outage_time" />
+        </div>
 
-        <label>Defect/Problem Reported:</label>
-        <textarea name="defect_reported" rows="3" />
+        <div className="form-group">
+          <label>Defect/Problem Reported:</label>
+          <textarea name="defect_reported" rows="3" />
+        </div>
 
-        <label>Outcome of Investigation:</label>
-        <textarea name="investigation_outcome" rows="3" />
+        <div className="form-group">
+          <label>Outcome of Investigation:</label>
+          <textarea name="investigation_outcome" rows="3" />
+        </div>
 
-        <label>Corrective Action Taken:</label>
-        <textarea name="corrective_action" rows="3" />
+        <div className="form-group">
+          <label>Corrective Action Taken:</label>
+          <textarea name="corrective_action" rows="3" />
+        </div>
 
-        <label>Any Follow-up to be Carried Out:</label>
-        <textarea name="follow_up" rows="2" />
+        <div className="form-group">
+          <label>Any Follow-up to be Carried Out:</label>
+          <textarea name="follow_up" rows="2" />
+        </div>
 
-        <label>Replacement / Repair Cost:</label>
-        <input type="text" name="repair_cost" />
+        <div className="form-group">
+          <label>Replacement / Repair Cost:</label>
+          <input type="text" name="repair_cost" />
+        </div>
 
-        <label>Remarks:</label>
-        <textarea name="remarks" rows="2" />
+        <div className="form-group">
+          <label>Remarks:</label>
+          <textarea name="remarks" rows="2" />
+        </div>
 
-        <label>Loss of Generation:</label>
-        <input type="text" name="generation_loss" />
+        <div className="form-group">
+          <label>Loss of Generation:</label>
+          <input type="text" name="generation_loss" />
+        </div>
 
         <div className="signatures">
           <div className="signature-block">
@@ -75,7 +94,9 @@ const MaintenanceReport = () => {
           </div>
         </div>
 
-        <button type="submit">Submit Report</button>
+        <div className="form-group">
+          <button type="submit" className="submit-btn">Submit Report</button>
+        </div>
       </form>
     </div>
   );
