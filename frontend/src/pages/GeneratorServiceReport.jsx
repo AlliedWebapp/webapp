@@ -28,8 +28,6 @@ const GeneratorServiceReport = () => {
       </header>
 
       <form onSubmit={handleSubmit}>
-        {/* ===== Basic Info ===== */}
-        <div className="section-title">Basic Information</div>
         <div className="form-row">
           <div className="form-group">
             <label>SR No</label>
@@ -43,9 +41,6 @@ const GeneratorServiceReport = () => {
             <label>Installation Site Address</label>
             <textarea rows="2" />
           </div>
-        </div>
-
-        <div className="form-row">
           <div className="form-group">
             <label>Customer Site ID</label>
             <input type="text" />
@@ -58,9 +53,6 @@ const GeneratorServiceReport = () => {
             <label>Instance ID</label>
             <input type="text" />
           </div>
-        </div>
-
-        <div className="form-row">
           <div className="form-group">
             <label>State</label>
             <input type="text" />
@@ -69,11 +61,6 @@ const GeneratorServiceReport = () => {
             <label>Rating (KVA/HP)</label>
             <input type="text" />
           </div>
-        </div>
-
-        {/* ===== Technical Info ===== */}
-        <div className="section-title">Technical Details</div>
-        <div className="form-row">
           <div className="form-group">
             <label>Engine Model</label>
             <input type="text" />
@@ -86,11 +73,6 @@ const GeneratorServiceReport = () => {
             <label>Genset Serial Number</label>
             <input type="text" />
           </div>
-        </div>
-
-        {/* ===== Task Info ===== */}
-        <div className="section-title">Task Details</div>
-        <div className="form-row">
           <div className="form-group">
             <label>Total Running Hours</label>
             <input type="text" />
@@ -103,14 +85,10 @@ const GeneratorServiceReport = () => {
             <label>Task End Date/Time</label>
             <input type="datetime-local" />
           </div>
-        </div>
-
-        <div className="form-group full-width">
-          <label>Problem Summary</label>
-          <textarea rows="2" placeholder="E.g., Oil changed, filter cleaned, diagnostics checked..." />
-        </div>
-
-        <div className="form-row">
+          <div className="form-group">
+            <label>Problem Summary</label>
+            <textarea rows="2" placeholder="E.g., Oil changed, filter cleaned, diagnostics checked..." />
+          </div>
           <div className="form-group">
             <label>Nature of Failure</label>
             <input type="text" />
@@ -123,18 +101,10 @@ const GeneratorServiceReport = () => {
             <label>Engineer Remarks</label>
             <textarea rows="3" />
           </div>
-        </div>
-
-        <div className="form-row">
           <div className="form-group">
             <label>Customer Remarks</label>
             <textarea rows="3" />
           </div>
-        </div>
-
-        {/* ===== Contact Info ===== */}
-        <div className="section-title">Contact</div>
-        <div className="form-row">
           <div className="form-group">
             <label>Engineer Name</label>
             <input type="text" />
@@ -147,21 +117,18 @@ const GeneratorServiceReport = () => {
             <label>Customer Email</label>
             <input type="email" />
           </div>
-        </div>
-
-        {/* ===== Uploads ===== */}
-        <div className="section-title">Photos & Signatures (Optional)</div>
-        <div className="form-group">
-          <label>Upload Customer Signature</label>
-          <input type="file" accept="image/*" />
-        </div>
-        <div className="form-group">
-          <label>Upload Engineer Signature</label>
-          <input type="file" accept="image/*" />
-        </div>
-        <div className="form-group">
-          <label>Upload Work Completion Photos</label>
-          <input type="file" accept="image/*" multiple />
+          <div className="form-group">
+            <label>Upload Customer Signature</label>
+            <input type="file" accept="image/*" />
+          </div>
+          <div className="form-group">
+            <label>Upload Engineer Signature</label>
+            <input type="file" accept="image/*" />
+          </div>
+          <div className="form-group">
+            <label>Upload Work Completion Photos</label>
+            <input type="file" accept="image/*" multiple />
+          </div>
         </div>
 
         <button type="submit" className="submit-btn">Submit Report</button>
