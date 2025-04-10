@@ -58,57 +58,66 @@ const getTicket = asyncHandler(async (req, res) => {
 // @route   POST /api/tickets
 // @access  Private
 const createTicket = asyncHandler(async (req, res) => {
-  const { 
-    projectname, 
-    sitelocation, 
-    projectlocation, 
-    fault, 
-    issue, 
-    description, 
-    date, 
-    spare, 
-    rating,
-  } = req.body
+  try {
+    const { 
+      projectname, 
+      sitelocation, 
+      projectlocation, 
+      fault, 
+      issue, 
+      description, 
+      date, 
+      spare, 
+      rating,
+    } = req.body
 
    // Get uploaded files from multer
   const imageFiles = req.files;
   const imagePaths = imageFiles.map((file) => file.path); // save path to DB
 
-  if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
-    res.status(400)
-    throw new Error('Please provide all required fields')
+    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
+      res.status(400)
+      throw new Error('Please provide all required fields')
+    }
+
+    // Get user using the id and JWT
+    const user = await User.findById(req.user.id)
+
+    if (!user) {
+      res.status(401)
+      throw new Error('User not found')
+    }
+
+    const images = req.files?.map(file => ({
+      data: file.buffer,
+      contentType: file.mimetype,
+    })) || [];
+
+    console.log('Creating new ticket...');
+    const ticket = await Ticket.create({
+      projectname,
+      sitelocation,
+      projectlocation,
+      fault,
+      issue,
+      description,
+      date,
+      spare,
+      rating,
+      images,
+      user: req.user.id,
+      status: 'new'
+    })
+
+    console.log('Ticket created successfully:', ticket);
+    res.status(201).json(ticket)
+  } catch (error) {
+    console.error('Error creating ticket:', error);
+    res.status(500).json({
+      message: 'Error creating ticket',
+      error: error.message
+    });
   }
-
-  // Get user using the id and JWT
-  const user = await User.findById(req.user.id)
-
-  if (!user) {
-    res.status(401)
-    throw new Error('User not found')
-  }
-  const images = req.files?.map(file => ({
-    data: file.buffer,
-    contentType: file.mimetype,
-  })) || [];
-  
-
-
-  const ticket = await Ticket.create({
-    projectname,
-    sitelocation,
-    projectlocation,
-    fault,
-    issue,
-    description,
-    date,
-    spare,
-    rating,
-    images,
-    user: req.user.id,
-    status: 'new'
-  })
-
-  res.status(201).json(ticket)
 })
 
 // @desc    Delete ticket
