@@ -6,9 +6,12 @@ const OtherReports = () => {
   return (
     <div className="report-container">
       <header className="header">
-        <h2>Other Reports</h2>
-        <p>Select the report you want to view or fill</p>
+        <h2 className="other-reports-heading">Other Reports</h2>
+        <p className="other-reports-subheading">
+          Select the report
+        </p>
       </header>
+
 
       <div className="button-wrapper">
         <Link to="/improvement-report" className="report-button">

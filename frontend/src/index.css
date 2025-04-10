@@ -819,7 +819,7 @@ td {
 
 .report-button {
   padding: 14px 24px;
-  background-color: #1f2937;
+  background-color: #080909;
   color: #fff;
   text-decoration: none;
   font-weight: 600;
@@ -832,4 +832,19 @@ td {
 
 .report-button:hover {
   background-color: #374151;
+}
+.other-reports-heading {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #050505;
+  margin-top: 20px;
+}
+
+.other-reports-subheading {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #050505;
+  margin-bottom: 30px;
 }
