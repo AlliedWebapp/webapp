@@ -805,9 +805,6 @@ td {
 }
 
 
-/* ------------------------------
-   Styles for OtherReports Page
------------------------------- */
 
 /* ------------------------------
    Styles for OtherReports Page
@@ -820,15 +817,15 @@ td {
 }
 
 .other-reports-heading {
-  font-size: 1.8rem;
-  font-weight: 600;
+  font-size: 2.0rem;
+  font-weight: 700;
   color: #121213;
   margin-bottom: 8px;
 }
 
 .other-reports-subheading {
-  font-size: 1.2rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #121213;
   margin-bottom: 30px;
 }
@@ -859,4 +856,190 @@ td {
 
 .report-button:hover {
   background-color: #374151;
+}
+
+/* ------------------------------
+   Styles for Improvement Report
+------------------------------ */
+
+.improvement-report {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.improvement-report .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.improvement-report .logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.improvement-report .logo-image {
+  width: 200px;
+  height: auto;
+}
+
+.improvement-report .header h2 {
+  font-size: 32px;
+  margin: 20px 0 10px;
+  text-align: center;
+  font-weight: 700;
+  color: #333;
+}
+
+.improvement-report .header p {
+  margin: 5px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.improvement-report form {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.improvement-report .form-group {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.improvement-report .form-group label {
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: #000;
+  font-size: 16px;
+}
+
+.improvement-report .form-group input,
+.improvement-report .form-group select,
+.improvement-report .form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  resize: none;
+}
+
+.improvement-report .submit-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 20px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.improvement-report .submit-btn:hover {
+  background: #45a049;
+}
+
+/* -------------------------------
+   Styles for Maintenance Report
+------------------------------- */
+
+.maintenance-report {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.maintenance-report .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.maintenance-report .logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.maintenance-report .logo-image {
+  width: 200px;
+  height: auto;
+}
+
+.maintenance-report .header h2 {
+  font-size: 32px;
+  margin: 20px 0 10px;
+  text-align: center;
+  font-weight: 700;
+  color: #333;
+}
+
+.maintenance-report .header p {
+  margin: 5px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.maintenance-report form {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.maintenance-report .form-group {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.maintenance-report .form-group label {
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: #000;
+  font-size: 16px;
+}
+
+.maintenance-report .form-group input,
+.maintenance-report .form-group select,
+.maintenance-report .form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  resize: none;
+}
+
+.maintenance-report .submit-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 20px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.maintenance-report .submit-btn:hover {
+  background: #45a049;
 }
