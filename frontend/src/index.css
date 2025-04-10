@@ -671,55 +671,69 @@ td {
 .generator-service-report {
   font-family: 'Poppins', sans-serif;
   background-color: #ffffff;
-  padding: 30px;
-  margin: 30px auto;
+  padding: 40px;
+  margin: 40px auto;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  max-width: 1000px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  max-width: 1100px;
 }
 
 .generator-service-report h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
   color: #1f2937;
   text-align: center;
 }
 
-/* Form group layout */
+.generator-service-report h3 {
+  font-size: 1.3rem;
+  margin: 30px 0 15px;
+  color: #111827;
+  font-weight: 600;
+  border-bottom: 1px solid #d1d5db;
+  padding-bottom: 6px;
+}
+
+/* Label and input layout */
 .generator-service-report .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .generator-service-report .form-group label {
-  margin-bottom: 8px;
-  font-weight: 600;
-  font-size: 1rem;
+  margin-bottom: 6px;
+  font-weight: 500;
   color: #374151;
 }
 
 .generator-service-report .form-group input,
-.generator-service-report .form-group select,
-.generator-service-report .form-group textarea {
-  padding: 12px;
-  font-size: 14px;
+.generator-service-report .form-group textarea,
+.generator-service-report .form-group select {
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
   background-color: #f9fafb;
-  transition: border-color 0.3s ease-in-out;
+  transition: all 0.2s ease;
+}
+
+.generator-service-report .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 .generator-service-report .form-group input:focus,
-.generator-service-report .form-group select:focus,
-.generator-service-report .form-group textarea:focus {
-  outline: none;
+.generator-service-report .form-group textarea:focus,
+.generator-service-report .form-group select:focus {
   border-color: #2563eb;
   background-color: #ffffff;
+  outline: none;
 }
 
-/* Flex layout for grouped fields */
+/* Row structure */
 .generator-service-report .form-row {
   display: flex;
   gap: 20px;
@@ -728,12 +742,17 @@ td {
 
 .generator-service-report .form-row .form-group {
   flex: 1;
-  min-width: 240px;
+  min-width: 280px;
+}
+
+/* Full-width rows */
+.generator-service-report .form-group.full-width {
+  width: 100%;
 }
 
 /* Submit Button */
 .generator-service-report .submit-btn {
-  padding: 12px 24px;
+  padding: 12px 30px;
   background-color: #111827;
   color: white;
   font-weight: 600;
@@ -741,16 +760,15 @@ td {
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  margin-top: 10px;
+  margin-top: 30px;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .generator-service-report .submit-btn:hover {
   background-color: #1f2937;
-  transform: scale(0.98);
 }
 
-/* Responsive tweaks */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .generator-service-report {
     padding: 20px;
@@ -761,6 +779,6 @@ td {
   }
 
   .generator-service-report h2 {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 }
