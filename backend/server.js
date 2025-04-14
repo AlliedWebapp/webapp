@@ -13,7 +13,8 @@ const spareRoutes = require('./routes/spareRoutes');
 const userRoutes = require("./routes/userRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
 const noteRoutes = require("./routes/noteRoutes");
-const reportRoutes = require("./routes/ReportRoutes"); // ✅ Import your routes
+const reportRoutes = require("./routes/ReportRoutes"); // 👈 Make sure the path is correct
+
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
@@ -59,6 +60,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/notes", noteRoutes);
 app.use('/api', spareRoutes);
+app.use("/api/reports", reportRoutes); // ✅ Mount at /api/reports
+
 
 // 📌 Default Root Route
 app.get('/', (req, res) => {

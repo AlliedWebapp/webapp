@@ -1,4 +1,4 @@
-const FSR = require("../models/FSR"); // Your mongoose model
+const FSR = require("../models/FSRModel"); // Your mongoose model
 
 exports.submitFSR = async (req, res) => {
   try {
@@ -68,3 +68,14 @@ exports.submitFSR = async (req, res) => {
     res.status(500).json({ message: "Something went wrong." });
   }
 };
+
+exports.getAllFSRs = async (req, res) => {
+  try {
+    const reports = await FSR.find().sort({ createdAt: -1 }); // optional sorting
+    res.json(reports);
+  } catch (err) {
+    console.error("Error fetching FSRs:", err);
+    res.status(500).json({ message: "Failed to fetch FSRs" });
+  }
+};
+

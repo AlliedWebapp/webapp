@@ -86,15 +86,6 @@ const handleSubmit = async (e) => {
   return (
     <div className="generator-service-report">
       <header className="header">
-        <div className="logo">
-          <Link to="/">
-            <img
-              src="https://github.com/ShaivyaaSharma/GITHUB/blob/main/logo.png?raw=true"
-              alt="Allied Hydroprojects Logo"
-              className="logo-image"
-            />
-          </Link>
-        </div>
         <h2>Generator Service Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
         <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
