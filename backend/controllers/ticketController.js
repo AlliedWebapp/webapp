@@ -15,11 +15,18 @@ const getTickets = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 
-  const tickets = await Ticket.find({ user: req.user._id })
-    .sort({
-      status: 1,         // sort alphabetically: 'close' comes last
-      createdAt: -1      // newest ticket at the top within each status
-    });
+  const tickets = await Ticket.aggregate([
+    { $match: { user: req.user._id } },
+    {
+      $addFields: {
+        statusPriority: {
+          $cond: [{ $eq: ["$status", "new"] }, 0, 1] // new = 0, close = 1
+        }
+      }
+    },
+    { $sort: { statusPriority: 1, createdAt: -1 } } // new first, then recent
+  ]);
+  
 
   res.status(200).json(tickets);
 });

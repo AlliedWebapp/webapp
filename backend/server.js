@@ -13,6 +13,7 @@ const spareRoutes = require('./routes/spareRoutes');
 const userRoutes = require("./routes/userRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
 const noteRoutes = require("./routes/noteRoutes");
+const reportRoutes = require("./routes/ReportRoutes"); // ✅ Import your routes
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
