@@ -1,9 +1,13 @@
 const FSR = require("../models/FSRModel"); // Your mongoose model
 
+// Function to generate a 4-digit unique fsr_id
+function generateFSRId() {
+  return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
+}
+
 exports.submitFSR = async (req, res) => {
   try {
     const {
-      srNo,
       customerName,
       installationAddress,
       siteId,
@@ -28,13 +32,18 @@ exports.submitFSR = async (req, res) => {
       ticketId
     } = req.body;
 
+    // Retrieve image buffers for signatures and work photos
     const customerSignature = req.files["customerSignature"]?.[0]?.buffer;
     const engineerSignature = req.files["engineerSignature"]?.[0]?.buffer;
     const workPhotos = req.files["workPhotos"]?.map(file => file.buffer) || [];
 
+    // Generate a 4-digit fsr_id for each report
+    const fsrId = generateFSRId();
+
+    // Create new FSR report with generated fsr_id
     const newReport = new FSR({
+      fsrId,  // Add the unique 4-digit fsr_id
       ticketId,
-      srNo,
       customerName,
       installationAddress,
       siteId,
@@ -61,6 +70,7 @@ exports.submitFSR = async (req, res) => {
       workPhotos
     });
 
+    // Save the new report to the database
     await newReport.save();
     res.status(201).json({ message: "FSR submitted successfully!" });
   } catch (err) {
@@ -71,7 +81,8 @@ exports.submitFSR = async (req, res) => {
 
 exports.getAllFSRs = async (req, res) => {
   try {
-    const reports = await FSR.find().sort({ createdAt: -1 }); // optional sorting
+    // Fetch all reports from the database, sorted by creation date in descending order
+    const reports = await FSR.find().sort({ createdAt: -1 });
     res.json(reports);
   } catch (err) {
     console.error("Error fetching FSRs:", err);
@@ -79,3 +90,21 @@ exports.getAllFSRs = async (req, res) => {
   }
 };
 
+// New function to get a specific FSR by fsrId
+exports.getFSRById = async (req, res) => {
+  try {
+    const { fsrId } = req.params;
+
+    // Find the specific FSR by fsrId
+    const report = await FSR.findOne({ fsrId });
+
+    if (!report) {
+      return res.status(404).json({ message: "FSR not found" });
+    }
+
+    res.json(report); // Return the found report
+  } catch (err) {
+    console.error("Error fetching FSR details:", err);
+    res.status(500).json({ message: "Failed to fetch FSR details" });
+  }
+};
