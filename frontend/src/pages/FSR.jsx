@@ -5,9 +5,24 @@ import BackButton from "../components/BackButton";
 
 // Helper to convert buffer to base64 string
 const imageToBase64 = (buffer) => {
-  return `data:image/jpeg;base64,${Buffer.from(buffer).toString("base64")}`;
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  return `data:image/jpeg;base64,${btoa(binary)}`;
 };
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Displays a list of Generator Service Reports (FSRs) and allows viewing details of a selected report.
+ * 
+ * The component fetches a list of FSRs from the backend server on mount and displays them with their basic
+ * information such as FSR ID, creation date, customer name, and installation address. Users can view detailed
+ * information about a specific FSR by clicking the "View" button, which loads the full report, including images
+ * like customer signature, engineer signature, and work photos.
+ * 
+ * Handles loading states with a spinner and displays error messages when fetching data fails. 
+ * Utilizes React useState for managing component state and useEffect for fetching data on component mount.
+ */
+
+/*******  202559ee-8336-47d4-a315-e3d37ee1e066  *******/
 function ViewFSR() {
   const [fsrs, setFsrs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
