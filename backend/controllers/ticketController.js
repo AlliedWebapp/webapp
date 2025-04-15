@@ -56,14 +56,6 @@ const getTicket = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error('Not authorized')
   }
-  // Sort: 'new' first, then 'closed', each by latest createdAt
-  const sortedTickets = tickets.sort((a, b) => {
-    const statusOrder = { new: 0, closed: 1 }; // you can add more if needed
-    if (statusOrder[a.status] !== statusOrder[b.status]) {
-      return statusOrder[a.status] - statusOrder[b.status];
-    }
-    return new Date(b.createdAt) - new Date(a.createdAt); // newest first within same status
-  });
 
   res.status(200).json(ticket)
 })

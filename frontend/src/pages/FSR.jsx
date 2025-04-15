@@ -60,7 +60,7 @@ function ViewFSR() {
       <h1>Generator Service Reports</h1>
       <div className="tickets">
         <div className="ticket-headings">
-          <div>SR No</div>
+          <div>FSR ID</div>
           <div>Date</div>
           <div>Customer</div>
           <div>Site</div>
