@@ -34,20 +34,23 @@ function ViewFSR() {
     fetchFSRs();
   }, []); // Only runs once when the component mounts
 
-  // Fetch a specific FSR report with useCallback to prevent unnecessary re-renders
-  const viewReport = useCallback(async (fsrId) => {
-    // Avoid fetching the same report again
-    if (selectedFSR && selectedFSR.fsrId === fsrId) return;
+  // Fetch a specific FSR report
+  useEffect(() => {
+    const fetchReportDetails = async () => {
+      if (!selectedFSR) return; // Don't fetch if no report is selected
 
-    try {
-      const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${fsrId}`);
-      setSelectedFSR(res.data); // Set the selected report to display it
-    } catch (err) {
-      console.error("Failed to fetch FSR details", err);
-      setMessage("Error fetching report details");
-      setIsError(true);
-    }
-  }, [selectedFSR]); // `selectedFSR` will trigger the callback to be recreated when it changes
+      try {
+        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${selectedFSR.fsrId}`);
+        setSelectedFSR(res.data); // Set the selected report to display it
+      } catch (err) {
+        console.error("Failed to fetch FSR details", err);
+        setMessage("Error fetching report details");
+        setIsError(true);
+      }
+    };
+
+    fetchReportDetails();
+  }, [selectedFSR]); // Fetch details only when selectedFSR changes
 
   // Loading spinner
   if (isLoading) return <Spinner />;
@@ -83,7 +86,7 @@ function ViewFSR() {
               <div>{fsr.customerName}</div>
               <div>{fsr.installationAddress}</div>
               <div>
-                <button className="btn btn-sm btn-outline" onClick={() => viewReport(fsr.fsrId)}>
+                <button className="btn btn-sm btn-outline" onClick={() => setSelectedFSR(fsr)}>
                   View
                 </button>
               </div>
