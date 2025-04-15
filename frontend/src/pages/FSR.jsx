@@ -9,20 +9,6 @@ const imageToBase64 = (buffer) => {
   return `data:image/jpeg;base64,${btoa(binary)}`;
 };
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * Displays a list of Generator Service Reports (FSRs) and allows viewing details of a selected report.
- * 
- * The component fetches a list of FSRs from the backend server on mount and displays them with their basic
- * information such as FSR ID, creation date, customer name, and installation address. Users can view detailed
- * information about a specific FSR by clicking the "View" button, which loads the full report, including images
- * like customer signature, engineer signature, and work photos.
- * 
- * Handles loading states with a spinner and displays error messages when fetching data fails. 
- * Utilizes React useState for managing component state and useEffect for fetching data on component mount.
- */
-
-/*******  202559ee-8336-47d4-a315-e3d37ee1e066  *******/
 function ViewFSR() {
   const [fsrs, setFsrs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +16,7 @@ function ViewFSR() {
   const [message, setMessage] = useState("");
   const [selectedFSR, setSelectedFSR] = useState(null); // State to hold the selected FSR report
 
+  // Fetch all FSRs
   useEffect(() => {
     const fetchFSRs = async () => {
       try {
@@ -47,7 +34,11 @@ function ViewFSR() {
     fetchFSRs();
   }, []);
 
+  // Fetch a specific FSR report
   const viewReport = async (fsrId) => {
+    // Avoid fetching the same report again
+    if (selectedFSR && selectedFSR.fsrId === fsrId) return;
+
     try {
       const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${fsrId}`);
       setSelectedFSR(res.data); // Set the selected report to display it
@@ -58,8 +49,10 @@ function ViewFSR() {
     }
   };
 
+  // Loading spinner
   if (isLoading) return <Spinner />;
 
+  // Error handling
   if (isError) {
     return (
       <div>
@@ -101,6 +94,7 @@ function ViewFSR() {
         )}
       </div>
 
+      {/* Display the selected FSR details */}
       {selectedFSR && (
         <div className="fsr-details">
           <h2>FSR Details</h2>
@@ -108,32 +102,45 @@ function ViewFSR() {
           <p><strong>Installation Address:</strong> {selectedFSR.installationAddress}</p>
           <p><strong>Engine Model:</strong> {selectedFSR.engineModel}</p>
           <p><strong>Problem Summary:</strong> {selectedFSR.problemSummary}</p>
-          {/* Render images */}
-          <h3>Customer Signature:</h3>
+
+          {/* Render customer signature */}
           {selectedFSR.customerSignature && (
-            <img
-              src={imageToBase64(selectedFSR.customerSignature.data)} // Adjust this based on how the data is stored
-              alt="Customer Signature"
-              style={{ maxWidth: "100%", maxHeight: "400px" }}
-            />
+            <div>
+              <h3>Customer Signature:</h3>
+              <img
+                src={imageToBase64(selectedFSR.customerSignature.data)}
+                alt="Customer Signature"
+                style={{ maxWidth: "100%", maxHeight: "400px" }}
+              />
+            </div>
           )}
-          <h3>Engineer Signature:</h3>
+
+          {/* Render engineer signature */}
           {selectedFSR.engineerSignature && (
-            <img
-              src={imageToBase64(selectedFSR.engineerSignature.data)}
-              alt="Engineer Signature"
-              style={{ maxWidth: "100%", maxHeight: "400px" }}
-            />
+            <div>
+              <h3>Engineer Signature:</h3>
+              <img
+                src={imageToBase64(selectedFSR.engineerSignature.data)}
+                alt="Engineer Signature"
+                style={{ maxWidth: "100%", maxHeight: "400px" }}
+              />
+            </div>
           )}
-          <h3>Work Photos:</h3>
-          {selectedFSR.workPhotos && selectedFSR.workPhotos.map((photo, index) => (
-            <img
-              key={index}
-              src={imageToBase64(photo.data)} // Adjust this based on how work photos are returned
-              alt={`Work Photo ${index + 1}`}
-              style={{ maxWidth: "100%", maxHeight: "400px" }}
-            />
-          ))}
+
+          {/* Render work photos */}
+          {selectedFSR.workPhotos && selectedFSR.workPhotos.length > 0 && (
+            <div>
+              <h3>Work Photos:</h3>
+              {selectedFSR.workPhotos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={imageToBase64(photo.data)}
+                  alt={`Work Photo ${index + 1}`}
+                  style={{ maxWidth: "100%", maxHeight: "400px", marginBottom: "10px" }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
