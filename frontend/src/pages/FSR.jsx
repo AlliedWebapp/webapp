@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
@@ -32,10 +32,10 @@ function ViewFSR() {
     };
 
     fetchFSRs();
-  }, []);
+  }, []); // Only runs once when the component mounts
 
-  // Fetch a specific FSR report
-  const viewReport = async (fsrId) => {
+  // Fetch a specific FSR report with useCallback to prevent unnecessary re-renders
+  const viewReport = useCallback(async (fsrId) => {
     // Avoid fetching the same report again
     if (selectedFSR && selectedFSR.fsrId === fsrId) return;
 
@@ -47,7 +47,7 @@ function ViewFSR() {
       setMessage("Error fetching report details");
       setIsError(true);
     }
-  };
+  }, [selectedFSR]); // `selectedFSR` will trigger the callback to be recreated when it changes
 
   // Loading spinner
   if (isLoading) return <Spinner />;
