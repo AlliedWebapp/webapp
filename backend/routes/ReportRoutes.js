@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const ReportController = require("../controllers/ReportController");
+
 
 const storage = multer.memoryStorage();  // Store file as buffer in memory
 const upload = multer({ storage: storage });
@@ -23,8 +25,6 @@ router.post(
 );
 
 
-// Route to fetch a specific FSR report by MongoDB _id (updated)
-router.get("/fsr/:id", getFSRById); // 👈 GET route to fetch a specific report by MongoDB _id
-
+router.get("/fsr/:id", ReportController.getFSRByMongoId); // 👈 GET FSR by _id
 
 module.exports = router;

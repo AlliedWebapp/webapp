@@ -14,9 +14,9 @@ function ViewFSR() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedFSR, setSelectedFSR] = useState(null); // State to hold the selected FSR report
+  const [selectedFSR, setSelectedFSR] = useState(null); // Selected full report
 
-  // Fetch all FSRs
+  // Fetch all FSRs on load
   useEffect(() => {
     const fetchFSRs = async () => {
       try {
@@ -32,25 +32,19 @@ function ViewFSR() {
     };
 
     fetchFSRs();
-  }, []); // Only runs once when the component mounts
+  }, []);
 
-  // Fetch a specific FSR report
-  useEffect(() => {
-    const fetchReportDetails = async () => {
-      if (!selectedFSR) return; // Don't fetch if no report is selected
-
-      try {
-        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${selectedFSR._id}`);
-        setSelectedFSR(res.data); // Set the selected report to display it
-      } catch (err) {
-        console.error("Failed to fetch FSR details", err);
-        setMessage("Error fetching report details");
-        setIsError(true);
-      }
-    };
-
-    fetchReportDetails();
-  }, [selectedFSR]); // Fetch details only when selectedFSR changes
+  // Function to fetch full FSR by Mongo _id
+  const handleViewFSR = async (id) => {
+    try {
+      const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
+      setSelectedFSR(res.data);
+    } catch (err) {
+      console.error("Failed to fetch FSR details", err);
+      setMessage("Error fetching report details");
+      setIsError(true);
+    }
+  };
 
   // Loading spinner
   if (isLoading) return <Spinner />;
@@ -81,12 +75,15 @@ function ViewFSR() {
         {fsrs.length > 0 ? (
           fsrs.map((fsr) => (
             <div className="ticket" key={fsr._id}>
-              <div>{fsr.fsrId}</div> {/* Display fsrId instead of srNo */}
+              <div>{fsr.fsrId}</div>
               <div>{new Date(fsr.createdAt).toLocaleDateString()}</div>
               <div>{fsr.customerName}</div>
               <div>{fsr.installationAddress}</div>
               <div>
-                <button className="btn btn-sm btn-outline" onClick={() => setSelectedFSR(fsr)}>
+                <button
+                  className="btn btn-sm btn-outline"
+                  onClick={() => handleViewFSR(fsr._id)} // 👉 now fetching from DB
+                >
                   View
                 </button>
               </div>
@@ -97,7 +94,7 @@ function ViewFSR() {
         )}
       </div>
 
-      {/* Display the selected FSR details */}
+      {/* Show fetched full FSR details */}
       {selectedFSR && (
         <div className="fsr-details">
           <h2>FSR Details</h2>
@@ -106,7 +103,6 @@ function ViewFSR() {
           <p><strong>Engine Model:</strong> {selectedFSR.engineModel}</p>
           <p><strong>Problem Summary:</strong> {selectedFSR.problemSummary}</p>
 
-          {/* Render customer signature */}
           {selectedFSR.customerSignature && (
             <div>
               <h3>Customer Signature:</h3>
@@ -118,7 +114,6 @@ function ViewFSR() {
             </div>
           )}
 
-          {/* Render engineer signature */}
           {selectedFSR.engineerSignature && (
             <div>
               <h3>Engineer Signature:</h3>
@@ -130,7 +125,6 @@ function ViewFSR() {
             </div>
           )}
 
-          {/* Render work photos */}
           {selectedFSR.workPhotos && selectedFSR.workPhotos.length > 0 && (
             <div>
               <h3>Work Photos:</h3>
