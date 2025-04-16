@@ -7,9 +7,8 @@ import BackButton from '../components/BackButton';
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
   if (!buffer) return '';
-
   try {
-    const bytes = new Uint8Array(buffer.data || buffer); // handles either `.data` or raw buffer
+    const bytes = new Uint8Array(buffer.data || buffer);
     let binary = '';
     for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCharCode(bytes[i]);
@@ -21,10 +20,10 @@ const imageToBase64 = (buffer) => {
   }
 };
 
-
 function FSRDetails() {
   const [fsr, setFSR] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [ticketDetails, setTicketDetails] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -33,13 +32,25 @@ function FSRDetails() {
     const fetchFSR = async () => {
       try {
         const response = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
-        
         if (!response.ok) throw new Error('Failed to fetch FSR details');
-
         const data = await response.json();
         if (!data) throw new Error('No FSR data received');
-
         setFSR(data);
+
+        // Fetch ticket details if ticketId exists
+        if (data.ticketId) {
+          try {
+            const ticketRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${data.ticketId}`);
+            if (ticketRes.ok) {
+              const ticketData = await ticketRes.json();
+              setTicketDetails(ticketData);
+            } else {
+              console.warn("Ticket not found or error in fetching");
+            }
+          } catch (ticketErr) {
+            console.error("Error fetching ticket:", ticketErr);
+          }
+        }
       } catch (error) {
         console.error("Error fetching FSR:", error);
         toast.error(error.message || 'Failed to fetch FSR details');
@@ -75,9 +86,20 @@ function FSRDetails() {
         <div className="info-group">
           <h3>Basic Information</h3>
           <p><strong>FSR ID:</strong> {fsr.fsrId}</p>
-          <p><strong>Ticket ID:</strong> {fsr.ticketId}</p>
+          <p><strong>Ticket ID:</strong> {fsr.ticketId || 'N/A'}</p>
           <p><strong>Created Date:</strong> {new Date(fsr.createdAt).toLocaleString()}</p>
         </div>
+
+        {/* Ticket Details if available */}
+        {ticketDetails && (
+          <div className="info-group">
+            <h3>Related Ticket Details</h3>
+            <p><strong>Title:</strong> {ticketDetails.title}</p>
+            <p><strong>Description:</strong> {ticketDetails.description}</p>
+            <p><strong>Status:</strong> {ticketDetails.status}</p>
+            <p><strong>Created At:</strong> {new Date(ticketDetails.createdAt).toLocaleString()}</p>
+          </div>
+        )}
 
         {/* Customer Information */}
         <div className="info-group">
