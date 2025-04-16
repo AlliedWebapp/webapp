@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import axios from 'axios';
 import Spinner from '../components/Spinner';
 import BackButton from '../components/BackButton';
+import { toast } from 'react-toastify';
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -34,26 +35,45 @@ const imageToBase64 = (buffer) => {
 };
 
 function FSRDetails() {
-  const [fsr, setFSR] = useState(null);
+  const [fsr, setFsr] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFSR = async () => {
       try {
-        const response = await fetch(`/api/fsr/${id}`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Failed to fetch FSR details');
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
         }
 
-        setFSR(data);
-      } catch (error) {
-        toast.error(error.message || 'Failed to fetch FSR details');
-        navigate('/FSR');
-      } finally {
+        const res = await axios.get(`http://localhost:5000/api/reports/fsr/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.data) {
+          setFsr(res.data);
+        } else {
+          setMessage("Invalid response format");
+          setIsError(true);
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching FSR:", err);
+        if (err.response) {
+          setMessage(err.response.data.message || "Error fetching FSR");
+        } else if (err.request) {
+          setMessage("No response from server");
+        } else {
+          setMessage("Error setting up request");
+        }
+        setIsError(true);
         setIsLoading(false);
       }
     };
@@ -65,58 +85,68 @@ function FSRDetails() {
     return <Spinner />;
   }
 
+  if (isError) {
+    return (
+      <div className="error-container">
+        <h3>{message}</h3>
+        <button onClick={() => navigate("/fsr")}>Back to FSRs</button>
+      </div>
+    );
+  }
+
   if (!fsr) {
     return (
       <div className="error-container">
-        <h3>No FSR found</h3>
-        <button onClick={() => navigate('/FSR')}>
-          Back to FSR List
-        </button>
+        <h3>FSR not found</h3>
+        <button onClick={() => navigate("/fsr")}>Back to FSRs</button>
       </div>
     );
   }
 
   return (
     <div className="fsr-details">
+      <BackButton />
       <div className="fsr-header">
-        <BackButton url="/FSR" />
-        <h2>FSR Details</h2>
+        <h2>FSR #{fsr.fsrId}</h2>
       </div>
 
       <div className="fsr-info">
         <div className="info-group">
           <h3>Basic Information</h3>
-          <p><strong>FSR ID:</strong> {fsr.fsr_id}</p>
-          <p><strong>Date:</strong> {new Date(fsr.date).toLocaleDateString()}</p>
-          <p><strong>Status:</strong> {fsr.status}</p>
+          <p><strong>Customer Name:</strong> {fsr.customerName}</p>
+          <p><strong>Installation Address:</strong> {fsr.installationAddress}</p>
+          <p><strong>Site ID:</strong> {fsr.siteId}</p>
+          <p><strong>Commissioning Date:</strong> {new Date(fsr.commissioningDate).toLocaleDateString()}</p>
         </div>
 
         <div className="info-group">
           <h3>Service Details</h3>
-          <p><strong>Service Type:</strong> {fsr.service_type}</p>
-          <p><strong>Description:</strong> {fsr.description}</p>
-          <p><strong>Technician:</strong> {fsr.technician}</p>
+          <p><strong>Task Start:</strong> {new Date(fsr.taskStart).toLocaleString()}</p>
+          <p><strong>Task End:</strong> {new Date(fsr.taskEnd).toLocaleString()}</p>
+          <p><strong>Problem Summary:</strong> {fsr.problemSummary}</p>
+          <p><strong>Nature of Failure:</strong> {fsr.natureOfFailure}</p>
         </div>
 
         <div className="info-group">
           <h3>Customer Information</h3>
-          <p><strong>Customer Name:</strong> {fsr.customer_name}</p>
-          <p><strong>Contact:</strong> {fsr.customer_contact}</p>
-          <p><strong>Address:</strong> {fsr.customer_address}</p>
+          <p><strong>Contact:</strong> {fsr.customerContact}</p>
+          <p><strong>Email:</strong> {fsr.customerEmail}</p>
+          <p><strong>Remarks:</strong> {fsr.customerRemarks}</p>
         </div>
 
         <div className="info-group">
           <h3>Equipment Details</h3>
-          <p><strong>Equipment Type:</strong> {fsr.equipment_type}</p>
-          <p><strong>Model:</strong> {fsr.equipment_model}</p>
-          <p><strong>Serial Number:</strong> {fsr.equipment_serial}</p>
+          <p><strong>Engine Model:</strong> {fsr.engineModel}</p>
+          <p><strong>Engine Serial:</strong> {fsr.engineSerial}</p>
+          <p><strong>Genset Serial:</strong> {fsr.gensetSerial}</p>
+          <p><strong>Running Hours:</strong> {fsr.runningHours}</p>
         </div>
 
         <div className="info-group">
           <h3>Service Report</h3>
-          <p><strong>Work Performed:</strong> {fsr.work_performed}</p>
-          <p><strong>Parts Used:</strong> {fsr.parts_used}</p>
-          <p><strong>Recommendations:</strong> {fsr.recommendations}</p>
+          <p><strong>Engineer Name:</strong> {fsr.engineerName}</p>
+          <p><strong>Engineer Remarks:</strong> {fsr.engineerRemarks}</p>
+          <p><strong>Checklist:</strong> {fsr.checklist}</p>
         </div>
       </div>
     </div>

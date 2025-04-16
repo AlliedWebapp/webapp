@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -33,80 +34,83 @@ const imageToBase64 = (buffer) => {
   }
 };
 
-function ViewFSR() {
+function FSR() {
   const [fsrs, setFsrs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  // Fetch all FSRs when the component mounts
   useEffect(() => {
     const fetchFSRs = async () => {
       try {
-        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/fsrs");
-        setFsrs(res.data);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const res = await axios.get("http://localhost:5000/api/reports/fsrs", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.data && Array.isArray(res.data.reports)) {
+          setFsrs(res.data.reports);
+        } else {
+          setMessage("Invalid response format");
+          setIsError(true);
+        }
         setIsLoading(false);
       } catch (err) {
-        console.error("Failed to fetch FSRs", err);
-        setMessage("Error fetching reports");
+        console.error("Error fetching FSRs:", err);
+        if (err.response) {
+          setMessage(err.response.data.message || "Error fetching reports");
+        } else if (err.request) {
+          setMessage("No response from server");
+        } else {
+          setMessage("Error setting up request");
+        }
         setIsError(true);
         setIsLoading(false);
       }
     };
 
     fetchFSRs();
-  }, []);
+  }, [navigate]);
 
-  // Loading spinner is shown while data is being fetched
-  if (isLoading) return <Spinner />;
+  if (isLoading) {
+    return <Spinner />;
+  }
 
-  // Show error message if there is an error
   if (isError) {
     return (
-      <div>
-        <h3 className="text-red-500">Error: {message}</h3>
-        <BackButton url="/" />
+      <div className="error-container">
+        <h3>{message}</h3>
+        <button onClick={() => navigate("/")}>Back to Home</button>
       </div>
     );
   }
 
   return (
-    <>
-      <BackButton url="/" />
-      <h1>Generator Service Reports</h1>
-      <div className="tickets">
-        <div className="ticket-headings">
-          <div>FSR ID</div>
-          <div>Date</div>
-          <div>Customer</div>
-          <div>Site</div>
-          <div></div>
-        </div>
-
-        {fsrs.length > 0 ? (
-          fsrs.map((fsr) => (
-            <div className="ticket" key={fsr._id}>
-              <div>{fsr.fsrId}</div>
-              <div>{new Date(fsr.createdAt).toLocaleDateString()}</div>
-              <div>{fsr.customerName}</div>
-              <div>{fsr.installationAddress}</div>
-              <div>
-                <button
-                  className="btn btn-sm btn-outline"
-                  onClick={() => navigate(`/fsr/${fsr._id}`)}
-                >
-                  View
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No FSRs found.</p>
-        )}
+    <div className="fsr-container">
+      <BackButton />
+      <h1>Field Service Reports</h1>
+      <div className="fsr-list">
+        {fsrs.map((fsr) => (
+          <div key={fsr._id} className="fsr-card">
+            <h3>FSR #{fsr.fsrId}</h3>
+            <p><strong>Customer:</strong> {fsr.customerName}</p>
+            <p><strong>Site ID:</strong> {fsr.siteId}</p>
+            <p><strong>Engineer:</strong> {fsr.engineerName}</p>
+            <p><strong>Date:</strong> {new Date(fsr.createdAt).toLocaleDateString()}</p>
+            <button onClick={() => navigate(`/fsr/${fsr._id}`)}>View Details</button>
+          </div>
+        ))}
       </div>
-    </>
+    </div>
   );
 }
 
-export default ViewFSR;
+export default FSR;
