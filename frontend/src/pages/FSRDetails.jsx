@@ -8,16 +8,19 @@ import BackButton from '../components/BackButton';
 const imageToBase64 = (buffer) => {
   if (!buffer) return '';
 
-  if (typeof buffer === 'string') return buffer;
-
   try {
-    const binary = String.fromCharCode(...new Uint8Array(buffer));
+    const bytes = new Uint8Array(buffer.data || buffer); // handles either `.data` or raw buffer
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
     return `data:image/jpeg;base64,${btoa(binary)}`;
   } catch (error) {
     console.error("Base64 conversion error:", error);
     return '';
   }
 };
+
 
 function FSRDetails() {
   const [fsr, setFSR] = useState(null);
@@ -72,7 +75,7 @@ function FSRDetails() {
         <div className="info-group">
           <h3>Basic Information</h3>
           <p><strong>FSR ID:</strong> {fsr.fsrId}</p>
-          <p><strong>Ticket ID:</strong> {fsr.ticket_id}</p>
+          <p><strong>Ticket ID:</strong> {fsr.ticketId}</p>
           <p><strong>Created Date:</strong> {new Date(fsr.createdAt).toLocaleString()}</p>
         </div>
 
