@@ -1,153 +1,205 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import Spinner from "../components/Spinner";
-import BackButton from "../components/BackButton";
+import React, { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import "../index.css"; // Global styles
 
-// Helper to convert buffer to base64 string
-const imageToBase64 = (buffer) => {
-  const binary = String.fromCharCode(...new Uint8Array(buffer));
-  return `data:image/jpeg;base64,${btoa(binary)}`;
+const GeneratorServiceReport = () => {
+  const { ticketId } = useParams();
+
+  const [formData, setFormData] = useState({
+    srNo: "",
+    customerName: "",
+    installationAddress: "",  // updated from "address"
+    siteId: "",
+    commissioningDate: "",    // updated from "dateOfCommissioning"
+    instanceId: "",
+    state: "",
+    rating: "",
+    engineModel: "",
+    engineSerial: "",
+    gensetSerial: "",
+    runningHours: "",
+    taskStart: "",            // updated from "startTime"
+    taskEnd: "",              // updated from "endTime"
+    problemSummary: "",
+    natureOfFailure: "",      // updated from "failureNature"
+    checklist: "",
+    engineerRemarks: "",
+    customerRemarks: "",
+    engineerName: "",
+    customerContact: "",
+    customerEmail: "",
+    customerSignature: null,
+    engineerSignature: null,
+    workPhotos: []
+  });
+  
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
 };
 
-function ViewFSR() {
-  const [fsrs, setFsrs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [message, setMessage] = useState("");
-  const [selectedFSR, setSelectedFSR] = useState(null); // State to hold the selected FSR report
-
-  // Fetch all FSRs
-  useEffect(() => {
-    const fetchFSRs = async () => {
-      try {
-        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/fsrs");
-        setFsrs(res.data);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch FSRs", err);
-        setMessage("Error fetching reports");
-        setIsError(true);
-        setIsLoading(false);
-      }
-    };
-
-    fetchFSRs();
-  }, []); // Only runs once when the component mounts
-
-  // Fetch a specific FSR report when selectedFSR is set
-  useEffect(() => {
-    if (!selectedFSR) return; // Don't fetch if no report is selected
-    const fetchReportDetails = async () => {
-      try {
-        // Pass MongoDB _id instead of fsrId if required
-        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${selectedFSR._id}`);
-        setSelectedFSR(res.data); // Update the selected report details
-      } catch (err) {
-        console.error("Failed to fetch FSR details", err);
-        setMessage("Error fetching report details");
-        setIsError(true);
-      }
-    };
-
-    fetchReportDetails();
-  }, [selectedFSR?._id]); // Triggered only when selectedFSR._id changes
-
-  // Loading spinner
-  if (isLoading) return <Spinner />;
-
-  // Error handling
-  if (isError) {
-    return (
-      <div>
-        <h3 className="text-red-500">Error: {message}</h3>
-        <BackButton url="/" />
-      </div>
-    );
+const handleFileChange = (e) => {
+  const { name, files } = e.target;
+  if (name === "workPhotos") {
+    setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: files[0] }));
   }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const data = new FormData();
+  data.append("ticketId", ticketId);
+
+  Object.entries(formData).forEach(([key, value]) => {
+    if (key === "workPhotos") {
+      value.forEach((file) => data.append("workPhotos", file));
+    } else {
+      data.append(key, value);
+    }
+  });
+
+  try {
+    const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
+      method: "POST",
+      body: data,
+    });
+
+    if (response.ok) {
+      alert("Report submitted successfully!");
+    } else {
+      const errorData = await response.json();
+      console.error("Submit failed:", errorData);
+      alert("Failed to submit. Please try again.");
+    }
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    alert("Something went wrong.");
+  }
+};
+
+
 
   return (
-    <>
-      <BackButton url="/" />
-      <h1>Generator Service Reports</h1>
-      <div className="tickets">
-        <div className="ticket-headings">
-          <div>FSR ID</div>
-          <div>Date</div>
-          <div>Customer</div>
-          <div>Site</div>
-          <div></div>
-        </div>
+    <div className="generator-service-report">
+      <header className="header">
+        <h2>Generator Service Report</h2>
+        <p><strong>Allied Hydroprojects</strong></p>
+        <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
+      </header>
 
-        {fsrs.length > 0 ? (
-          fsrs.map((fsr) => (
-            <div className="ticket" key={fsr._id}>
-              <div>{fsr.fsrId}</div> {/* Display fsrId instead of srNo */}
-              <div>{new Date(fsr.createdAt).toLocaleDateString()}</div>
-              <div>{fsr.customerName}</div>
-              <div>{fsr.installationAddress}</div>
-              <div>
-                <button className="btn btn-sm btn-outline" onClick={() => setSelectedFSR(fsr)}>
-                  View
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No FSRs found.</p>
-        )}
-      </div>
+      <form onSubmit={handleSubmit}>
+  <div className="form-row">
+    <div className="form-group">
+      <label>SR No</label>
+      <input type="text" name="srNo" value={formData.srNo} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Customer Name</label>
+      <input type="text" name="customerName" value={formData.customerName} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Installation Site Address</label>
+      <textarea name="installationAddress" rows="2" value={formData.installationAddress} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Customer Site ID</label>
+      <input type="text" name="siteId" value={formData.siteId} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Date of Commissioning</label>
+      <input type="date" name="commissioningDate" value={formData.commissioningDate} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Instance ID</label>
+      <input type="text" name="instanceId" value={formData.instanceId} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>State</label>
+      <input type="text" name="state" value={formData.state} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Rating (KVA/HP)</label>
+      <input type="text" name="rating" value={formData.rating} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Engine Model</label>
+      <input type="text" name="engineModel" value={formData.engineModel} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Engine Serial Number</label>
+      <input type="text" name="engineSerial" value={formData.engineSerial} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Genset Serial Number</label>
+      <input type="text" name="gensetSerial" value={formData.gensetSerial} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Total Running Hours</label>
+      <input type="text" name="runningHours" value={formData.runningHours} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Task Start Date/Time</label>
+      <input type="datetime-local" name="taskStart" value={formData.taskStart} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Task End Date/Time</label>
+      <input type="datetime-local" name="taskEnd" value={formData.taskEnd} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Problem Summary</label>
+      <textarea name="problemSummary" rows="2" value={formData.problemSummary} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Nature of Failure</label>
+      <input type="text" name="natureOfFailure" value={formData.natureOfFailure} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Checklist/Action Taken</label>
+      <textarea name="checklist" rows="4" value={formData.checklist} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Engineer Remarks</label>
+      <textarea name="engineerRemarks" rows="3" value={formData.engineerRemarks} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Customer Remarks</label>
+      <textarea name="customerRemarks" rows="3" value={formData.customerRemarks} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Engineer Name</label>
+      <input type="text" name="engineerName" value={formData.engineerName} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Customer Contact Number</label>
+      <input type="text" name="customerContact" value={formData.customerContact} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Customer Email</label>
+      <input type="email" name="customerEmail" value={formData.customerEmail} onChange={handleChange} />
+    </div>
+    <div className="form-group">
+      <label>Upload Customer Signature</label>
+      <input type="file" name="customerSignature" accept="image/*" onChange={handleFileChange} />
+    </div>
+    <div className="form-group">
+      <label>Upload Engineer Signature</label>
+      <input type="file" name="engineerSignature" accept="image/*" onChange={handleFileChange} />
+    </div>
+    <div className="form-group">
+      <label>Upload Work Completion Photos</label>
+      <input type="file" name="workPhotos" accept="image/*" multiple onChange={handleFileChange} />
+    </div>
+  </div>
 
-      {/* Display the selected FSR details */}
-      {selectedFSR && (
-        <div className="fsr-details">
-          <h2>FSR Details</h2>
-          <p><strong>Customer Name:</strong> {selectedFSR.customerName}</p>
-          <p><strong>Installation Address:</strong> {selectedFSR.installationAddress}</p>
-          <p><strong>Engine Model:</strong> {selectedFSR.engineModel}</p>
-          <p><strong>Problem Summary:</strong> {selectedFSR.problemSummary}</p>
+  <button type="submit" className="submit-btn">Submit Report</button>
+</form>
 
-          {/* Render customer signature */}
-          {selectedFSR.customerSignature && (
-            <div>
-              <h3>Customer Signature:</h3>
-              <img
-                src={imageToBase64(selectedFSR.customerSignature.data)}
-                alt="Customer Signature"
-                style={{ maxWidth: "100%", maxHeight: "400px" }}
-              />
-            </div>
-          )}
-
-          {/* Render engineer signature */}
-          {selectedFSR.engineerSignature && (
-            <div>
-              <h3>Engineer Signature:</h3>
-              <img
-                src={imageToBase64(selectedFSR.engineerSignature.data)}
-                alt="Engineer Signature"
-                style={{ maxWidth: "100%", maxHeight: "400px" }}
-              />
-            </div>
-          )}
-
-          {/* Render work photos */}
-          {selectedFSR.workPhotos && selectedFSR.workPhotos.length > 0 && (
-            <div>
-              <h3>Work Photos:</h3>
-              {selectedFSR.workPhotos.map((photo, index) => (
-                <img
-                  key={index}
-                  src={imageToBase64(photo.data)}
-                  alt={`Work Photo ${index + 1}`}
-                  style={{ maxWidth: "100%", maxHeight: "400px", marginBottom: "10px" }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </>
+    </div>
   );
-}
+};
 
-export default ViewFSR;
+export default GeneratorServiceReport;
