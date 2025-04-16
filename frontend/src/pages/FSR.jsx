@@ -37,12 +37,15 @@ function ViewFSR() {
   // Function to fetch full FSR details by MongoDB _id
   const handleViewFSR = async (id) => {
     try {
+      setIsLoading(true); // Show loading state while fetching
       const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
       setSelectedFSR(res.data); // Set the selected FSR details
+      setIsLoading(false); // Hide loading state
     } catch (err) {
       console.error("Failed to fetch FSR details", err);
       setMessage("Error fetching report details");
       setIsError(true); // Set error state
+      setIsLoading(false); // Hide loading state
     }
   };
 
@@ -99,7 +102,7 @@ function ViewFSR() {
 
       {/* Show fetched full FSR details */}
       {selectedFSR && (
-        <div className="fsr-details">
+        <div className="fsr-details" style={{ marginTop: '20px', padding: '20px', background: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <h2>FSR Details</h2>
           {/* Display all fields from the selected FSR model */}
           <p><strong>FSR ID:</strong> {selectedFSR.fsrId}</p>
@@ -132,9 +135,9 @@ function ViewFSR() {
             <div>
               <h3>Customer Signature:</h3>
               <img
-                src={imageToBase64(selectedFSR.customerSignature.data)} // Convert buffer to base64 string
+                src={imageToBase64(selectedFSR.customerSignature.data)}
                 alt="Customer Signature"
-                style={{ maxWidth: "100%", maxHeight: "400px" }} // Styling for image
+                style={{ maxWidth: "100%", maxHeight: "400px" }}
               />
             </div>
           )}
@@ -144,9 +147,9 @@ function ViewFSR() {
             <div>
               <h3>Engineer Signature:</h3>
               <img
-                src={imageToBase64(selectedFSR.engineerSignature.data)} // Convert buffer to base64 string
+                src={imageToBase64(selectedFSR.engineerSignature.data)}
                 alt="Engineer Signature"
-                style={{ maxWidth: "100%", maxHeight: "400px" }} // Styling for image
+                style={{ maxWidth: "100%", maxHeight: "400px" }}
               />
             </div>
           )}
@@ -158,9 +161,9 @@ function ViewFSR() {
               {selectedFSR.workPhotos.map((photo, index) => (
                 <img
                   key={index}
-                  src={imageToBase64(photo.data)} // Convert buffer to base64 string
+                  src={imageToBase64(photo.data)}
                   alt={`Work Photo ${index + 1}`}
-                  style={{ maxWidth: "100%", maxHeight: "400px", marginBottom: "10px" }} // Styling for image
+                  style={{ maxWidth: "100%", maxHeight: "400px", marginBottom: "10px" }}
                 />
               ))}
             </div>
