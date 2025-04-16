@@ -26,7 +26,7 @@ function FSRDetails() {
         }
 
         const data = await response.json();
-        console.log("Received FSR data:", data); // Debug log
+        console.log("Received FSR data:", data);
         
         if (!data) {
           throw new Error('No FSR data received');
@@ -112,43 +112,26 @@ function FSRDetails() {
           <p><strong>Engineer Name:</strong> {fsr.engineerName}</p>
         </div>
 
-        {fsr.customerSignature && (
-          <div className="info-group">
-            <h3>Customer Signature</h3>
-            <img 
-              src={`data:image/jpeg;base64,${fsr.customerSignature}`} 
-              alt="Customer Signature" 
-              style={{ maxWidth: '200px' }}
-            />
+        <div className="info-group">
+          <h3>Uploaded Signatures</h3>
+          <div>
+            <strong>Customer Signature:</strong><br />
+            {fsr.customerSignature && <img src={imageToBase64(fsr.customerSignature.data)} alt="Customer Signature" className="uploaded-image" />}
           </div>
-        )}
+          <div>
+            <strong>Engineer Signature:</strong><br />
+            {fsr.engineerSignature && <img src={imageToBase64(fsr.engineerSignature.data)} alt="Engineer Signature" className="uploaded-image" />}
+          </div>
+        </div>
 
-        {fsr.engineerSignature && (
-          <div className="info-group">
-            <h3>Engineer Signature</h3>
-            <img 
-              src={`data:image/jpeg;base64,${fsr.engineerSignature}`} 
-              alt="Engineer Signature" 
-              style={{ maxWidth: '200px' }}
-            />
+        <div className="info-group">
+          <h3>Work Completion Photos</h3>
+          <div className="photo-gallery">
+            {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
+              <img key={idx} src={imageToBase64(photo.data)} alt={`Work Photo ${idx + 1}`} className="uploaded-image" />
+            ))}
           </div>
-        )}
-
-        {fsr.workPhotos && fsr.workPhotos.length > 0 && (
-          <div className="info-group">
-            <h3>Work Photos</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {fsr.workPhotos.map((photo, index) => (
-                <img 
-                  key={index}
-                  src={`data:image/jpeg;base64,${photo}`} 
-                  alt={`Work Photo ${index + 1}`}
-                  style={{ maxWidth: '200px' }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
