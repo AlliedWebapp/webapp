@@ -1,11 +1,12 @@
 const FSR = require("../models/FSRModel"); // Your mongoose model
+const { ErrorHandler } = require("../middleware/errorMiddleware");
 
 // Function to generate a 4-digit unique fsr_id
 function generateFSRId() {
   return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
 }
 
-exports.submitFSR = async (req, res) => {
+exports.submitFSR = async (req, res, next) => {
   try {
     const {
       customerName,
@@ -31,6 +32,11 @@ exports.submitFSR = async (req, res) => {
       customerEmail,
       ticketId
     } = req.body;
+
+    // Validate required fields
+    if (!customerName || !installationAddress || !siteId || !engineerName) {
+      throw new ErrorHandler(400, "Missing required fields");
+    }
 
     // Retrieve image buffers for signatures and work photos
     const customerSignature = req.files["customerSignature"]?.[0]?.buffer;
@@ -72,35 +78,57 @@ exports.submitFSR = async (req, res) => {
 
     // Save the new report to the database
     await newReport.save();
-    res.status(201).json({ message: "FSR submitted successfully!" });
+    res.status(201).json({ 
+      message: "FSR submitted successfully!",
+      fsrId: newReport.fsrId
+    });
   } catch (err) {
-    console.error("Error in submitFSR:", err);
-    res.status(500).json({ message: "Something went wrong." });
+    next(err);
   }
 };
 
-exports.getAllFSRs = async (req, res) => {
+exports.getAllFSRs = async (req, res, next) => {
   try {
-    // Fetch all reports from the database, sorted by creation date in descending order
-    const reports = await FSR.find().sort({ createdAt: -1 });
-    res.json(reports);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Fetch reports with pagination
+    const reports = await FSR.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination
+    const total = await FSR.countDocuments();
+
+    res.json({
+      reports,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalReports: total
+    });
   } catch (err) {
-    console.error("Error fetching FSRs:", err);
-    res.status(500).json({ message: "Failed to fetch FSRs" });
+    next(err);
   }
 };
 
 // ✅ NEW FUNCTION TO FETCH BY MONGO _id
-exports.getFSRByMongoId = async (req, res) => {
+exports.getFSRByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
+    
+    if (!id) {
+      throw new ErrorHandler(400, "FSR ID is required");
+    }
+
     const report = await FSR.findById(id);
     if (!report) {
-      return res.status(404).json({ message: "FSR not found" });
+      throw new ErrorHandler(404, "FSR not found");
     }
+
     res.json(report);
   } catch (err) {
-    console.error("Error fetching FSR by _id:", err);
-    res.status(500).json({ message: "Failed to fetch FSR" });
+    next(err);
   }
 };
