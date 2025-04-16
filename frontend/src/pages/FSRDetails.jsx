@@ -96,36 +96,6 @@ function FSRDetails() {
           <p><strong>State:</strong> {fsr.state}</p>
         </div>
 
-        {/* Equipment Details */}
-        <div className="info-group">
-          <h3>Equipment Details</h3>
-          <p><strong>Instance ID:</strong> {fsr.instanceId}</p>
-          <p><strong>Rating:</strong> {fsr.rating}</p>
-          <p><strong>Engine Model:</strong> {fsr.engineModel}</p>
-          <p><strong>Engine Serial:</strong> {fsr.engineSerial}</p>
-          <p><strong>Genset Serial:</strong> {fsr.gensetSerial}</p>
-          <p><strong>Running Hours:</strong> {fsr.runningHours}</p>
-        </div>
-
-        {/* Service Details */}
-        <div className="info-group">
-          <h3>Service Details</h3>
-          <p><strong>Commissioning Date:</strong> {new Date(fsr.commissioningDate).toLocaleDateString()}</p>
-          <p><strong>Task Start:</strong> {new Date(fsr.taskStart).toLocaleString()}</p>
-          <p><strong>Task End:</strong> {new Date(fsr.taskEnd).toLocaleString()}</p>
-          <p><strong>Problem Summary:</strong> {fsr.problemSummary}</p>
-          <p><strong>Nature of Failure:</strong> {fsr.natureOfFailure}</p>
-        </div>
-
-        {/* Service Report */}
-        <div className="info-group">
-          <h3>Service Report</h3>
-          <p><strong>Checklist:</strong> {fsr.checklist}</p>
-          <p><strong>Engineer Remarks:</strong> {fsr.engineerRemarks}</p>
-          <p><strong>Customer Remarks:</strong> {fsr.customerRemarks}</p>
-          <p><strong>Engineer Name:</strong> {fsr.engineerName}</p>
-        </div>
-
         {/* Uploaded Signatures */}
         <div className="info-group">
           <h3>Uploaded Signatures</h3>
