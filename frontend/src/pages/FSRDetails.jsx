@@ -6,38 +6,18 @@ import BackButton from '../components/BackButton';
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
+  if (!buffer) return '';
+
+  if (typeof buffer === 'string') return buffer;
+
   try {
-    if (!buffer) return '';
-
-    // Already a valid base64 image URL
-    if (typeof buffer === 'string' && buffer.startsWith('data:image')) {
-      return buffer;
-    }
-
-    // Just a plain base64 string (no prefix)
-    if (typeof buffer === 'string') {
-      return `data:image/jpeg;base64,${buffer}`;
-    }
-
-    // Buffer object (like { type: "Buffer", data: [...] })
-    if (buffer?.type === 'Buffer' && Array.isArray(buffer.data)) {
-      const binary = String.fromCharCode(...buffer.data);
-      return `data:image/jpeg;base64,${btoa(binary)}`;
-    }
-
-    // Uint8Array or ArrayBuffer
-    if (Array.isArray(buffer)) {
-      const binary = String.fromCharCode(...buffer);
-      return `data:image/jpeg;base64,${btoa(binary)}`;
-    }
-
-    return '';
+    const binary = String.fromCharCode(...new Uint8Array(buffer));
+    return `data:image/jpeg;base64,${btoa(binary)}`;
   } catch (error) {
     console.error("Base64 conversion error:", error);
     return '';
   }
 };
-
 
 function FSRDetails() {
   const [fsr, setFSR] = useState(null);

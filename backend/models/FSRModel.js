@@ -3,11 +3,10 @@ const mongoose = require("mongoose");
 
 const fsrSchema = new mongoose.Schema({
 fsrId: { type: Number, required: true, unique: true }, // Unique 4-digit fsr_id
-  ticketId: { type: String, required: true },
+  ticket_id: { type: String, required: true,unique },
   srNo: String,
   customerName: String,
-  installationAddress: String,
-  siteId: String,
+  installationAddress: String, String,
   commissioningDate: Date,
   instanceId: String,
   state: String,
