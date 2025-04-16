@@ -6,6 +6,7 @@ import BackButton from '../components/BackButton';
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
+  if (!buffer) return '';
   const binary = String.fromCharCode(...new Uint8Array(buffer));
   return `data:image/jpeg;base64,${btoa(binary)}`;
 };
@@ -119,11 +120,11 @@ function FSRDetails() {
             <strong>Customer Signature:</strong><br />
             {fsr.customerSignature && (
               <img 
-                src={fsr.customerSignature} 
+                src={imageToBase64(fsr.customerSignature.data)} 
                 alt="Customer Signature" 
                 className="uploaded-image"
-                onClick={() => setSelectedImage(fsr.customerSignature)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedImage(imageToBase64(fsr.customerSignature.data))}
+                style={{ cursor: 'pointer', maxWidth: '300px' }}
               />
             )}
           </div>
@@ -131,11 +132,11 @@ function FSRDetails() {
             <strong>Engineer Signature:</strong><br />
             {fsr.engineerSignature && (
               <img 
-                src={fsr.engineerSignature} 
+                src={imageToBase64(fsr.engineerSignature.data)} 
                 alt="Engineer Signature" 
                 className="uploaded-image"
-                onClick={() => setSelectedImage(fsr.engineerSignature)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedImage(imageToBase64(fsr.engineerSignature.data))}
+                style={{ cursor: 'pointer', maxWidth: '300px' }}
               />
             )}
           </div>
@@ -147,11 +148,11 @@ function FSRDetails() {
             {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
               <img 
                 key={idx} 
-                src={photo} 
+                src={imageToBase64(photo.data)} 
                 alt={`Work Photo ${idx + 1}`} 
                 className="uploaded-image"
-                onClick={() => setSelectedImage(photo)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => setSelectedImage(imageToBase64(photo.data))}
+                style={{ cursor: 'pointer', maxWidth: '300px' }}
               />
             ))}
           </div>
