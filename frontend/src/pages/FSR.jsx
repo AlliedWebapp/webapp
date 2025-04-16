@@ -6,10 +6,14 @@ import BackButton from "../components/BackButton";
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
   try {
-    console.log("Buffer data:", buffer); // Debug log
     if (!buffer) return '';
     
-    // Check if buffer is already a Buffer object
+    // If the buffer is already a base64 string, return it
+    if (typeof buffer === 'string' && buffer.startsWith('data:image')) {
+      return buffer;
+    }
+    
+    // If it's a Buffer object
     if (buffer.type === 'Buffer' && Array.isArray(buffer.data)) {
       const binary = String.fromCharCode(...new Uint8Array(buffer.data));
       return `data:image/jpeg;base64,${btoa(binary)}`;
@@ -58,11 +62,26 @@ function ViewFSR() {
     try {
       setIsLoading(true);
       const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
-      console.log("FSR Details:", res.data); // Debug log
-      console.log("Customer Signature:", res.data.customerSignature); // Debug log
-      console.log("Engineer Signature:", res.data.engineerSignature); // Debug log
-      console.log("Work Photos:", res.data.workPhotos); // Debug log
-      setSelectedFSR(res.data);
+      console.log("FSR Details:", res.data);
+      
+      // Process the response data
+      const processedData = {
+        ...res.data,
+        customerSignature: res.data.customerSignature ? {
+          ...res.data.customerSignature,
+          data: res.data.customerSignature.data || res.data.customerSignature
+        } : null,
+        engineerSignature: res.data.engineerSignature ? {
+          ...res.data.engineerSignature,
+          data: res.data.engineerSignature.data || res.data.engineerSignature
+        } : null,
+        workPhotos: res.data.workPhotos ? res.data.workPhotos.map(photo => ({
+          ...photo,
+          data: photo.data || photo
+        })) : []
+      };
+      
+      setSelectedFSR(processedData);
       setIsLoading(false);
     } catch (err) {
       console.error("Failed to fetch FSR details", err);
@@ -170,7 +189,7 @@ function ViewFSR() {
             <div style={{ marginTop: '20px' }}>
               <h3>Customer Signature:</h3>
               <img
-                src={imageToBase64(selectedFSR.customerSignature)}
+                src={imageToBase64(selectedFSR.customerSignature.data)}
                 alt="Customer Signature"
                 style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
                 onError={(e) => {
@@ -186,7 +205,7 @@ function ViewFSR() {
             <div style={{ marginTop: '20px' }}>
               <h3>Engineer Signature:</h3>
               <img
-                src={imageToBase64(selectedFSR.engineerSignature)}
+                src={imageToBase64(selectedFSR.engineerSignature.data)}
                 alt="Engineer Signature"
                 style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
                 onError={(e) => {
@@ -205,7 +224,7 @@ function ViewFSR() {
                 {selectedFSR.workPhotos.map((photo, index) => (
                   <img
                     key={index}
-                    src={imageToBase64(photo)}
+                    src={imageToBase64(photo.data)}
                     alt={`Work Photo ${index + 1}`}
                     style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
                     onError={(e) => {
