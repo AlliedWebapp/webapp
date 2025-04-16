@@ -4,12 +4,13 @@ import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
 import BackButton from '../components/BackButton';
 
-// Convert Buffer to Base64 string
-const imageToBase64 = (buffer) => {
-  if (!buffer || !buffer.data) return '';
-  const binary = String.fromCharCode(...buffer.data);
-  return `data:image/jpeg;base64,${btoa(binary)}`;
+// Helper function to convert buffer data to a base64 string
+const imageToBase64 = (buffer, mimeType = 'image/jpeg') => {
+  if (!buffer) return '';
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  return `data:${mimeType};base64,${btoa(binary)}`;
 };
+
 
 function FSRDetails() {
   const [fsr, setFSR] = useState(null);
@@ -22,11 +23,17 @@ function FSRDetails() {
     const fetchFSR = async () => {
       try {
         const response = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch FSR details');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch FSR details');
+        }
 
         const data = await response.json();
         console.log("Received FSR data:", data);
-        if (!data) throw new Error('No FSR data received');
+        
+        if (!data) {
+          throw new Error('No FSR data received');
+        }
 
         setFSR(data);
       } catch (error) {
@@ -41,13 +48,17 @@ function FSRDetails() {
     fetchFSR();
   }, [id, navigate]);
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   if (!fsr) {
     return (
       <div className="error-container">
         <h3>No FSR found</h3>
-        <button onClick={() => navigate('/FSR')}>Back to FSR List</button>
+        <button onClick={() => navigate('/FSR')}>
+          Back to FSR List
+        </button>
       </div>
     );
   }
@@ -108,43 +119,45 @@ function FSRDetails() {
           <h3>Uploaded Signatures</h3>
           <div>
             <strong>Customer Signature:</strong><br />
-            {fsr.customerSignature && (
-              <img
-                src={imageToBase64(fsr.customerSignature)}
-                alt="Customer Signature"
-                className="uploaded-image"
-                onClick={() => setSelectedImage(imageToBase64(fsr.customerSignature))}
-                style={{ cursor: 'pointer', maxWidth: '300px' }}
-              />
-            )}
+            {fsr.customerSignature && fsr.customerSignature.data && (
+        <img 
+          src={imageToBase64(fsr.customerSignature.data)} 
+          alt="Customer Signature" 
+          className="uploaded-image"
+          onClick={() => setSelectedImage(imageToBase64(fsr.customerSignature.data))}
+          style={{ cursor: 'pointer', maxWidth: '300px' }}
+      />
+    )}
           </div>
           <div>
             <strong>Engineer Signature:</strong><br />
-            {fsr.engineerSignature && (
-              <img
-                src={imageToBase64(fsr.engineerSignature)}
-                alt="Engineer Signature"
-                className="uploaded-image"
-                onClick={() => setSelectedImage(imageToBase64(fsr.engineerSignature))}
-                style={{ cursor: 'pointer', maxWidth: '300px' }}
-              />
-            )}
+            {fsr.engineerSignature && fsr.engineerSignature.data && (
+             <img 
+             src={imageToBase64(fsr.engineerSignature.data)} 
+             alt="Engineer Signature" 
+             className="uploaded-image"
+             onClick={() => setSelectedImage(imageToBase64(fsr.engineerSignature.data))}
+            style={{ cursor: 'pointer', maxWidth: '300px' }}
+          />
+         )}
           </div>
         </div>
 
         <div className="info-group">
           <h3>Work Completion Photos</h3>
           <div className="photo-gallery">
-            {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
-              <img
-                key={idx}
-                src={imageToBase64(photo)}
-                alt={`Work Photo ${idx + 1}`}
-                className="uploaded-image"
-                onClick={() => setSelectedImage(imageToBase64(photo))}
-                style={{ cursor: 'pointer', maxWidth: '300px' }}
-              />
-            ))}
+          {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
+           photo.data && (
+           <img 
+            key={idx} 
+            src={imageToBase64(photo.data)} 
+            alt={`Work Photo ${idx + 1}`} 
+            className="uploaded-image"
+           onClick={() => setSelectedImage(imageToBase64(photo.data))}
+         style={{ cursor: 'pointer', maxWidth: '300px' }}
+       />
+      )
+   ))}
           </div>
         </div>
       </div>
@@ -163,3 +176,4 @@ function FSRDetails() {
 }
 
 export default FSRDetails;
+
