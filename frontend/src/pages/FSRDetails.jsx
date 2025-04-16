@@ -19,24 +19,19 @@ function FSRDetails() {
   useEffect(() => {
     const fetchFSR = async () => {
       try {
-        const response = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-
+        const response = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
+        
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Response is not JSON");
+          throw new Error('Failed to fetch FSR details');
         }
 
         const data = await response.json();
-        console.log("FSR Data:", data); // Debug log
+        console.log("Received FSR data:", data); // Debug log
+        
+        if (!data) {
+          throw new Error('No FSR data received');
+        }
+
         setFSR(data);
       } catch (error) {
         console.error("Error fetching FSR:", error);
@@ -117,26 +112,43 @@ function FSRDetails() {
           <p><strong>Engineer Name:</strong> {fsr.engineerName}</p>
         </div>
 
-        <div className="info-group">
-          <h3>Uploaded Signatures</h3>
-          <div>
-            <strong>Customer Signature:</strong><br />
-            {fsr.customerSignature && <img src={imageToBase64(fsr.customerSignature.data)} alt="Customer Signature" className="uploaded-image" />}
+        {fsr.customerSignature && (
+          <div className="info-group">
+            <h3>Customer Signature</h3>
+            <img 
+              src={`data:image/jpeg;base64,${fsr.customerSignature}`} 
+              alt="Customer Signature" 
+              style={{ maxWidth: '200px' }}
+            />
           </div>
-          <div>
-            <strong>Engineer Signature:</strong><br />
-            {fsr.engineerSignature && <img src={imageToBase64(fsr.engineerSignature.data)} alt="Engineer Signature" className="uploaded-image" />}
-          </div>
-        </div>
+        )}
 
-        <div className="info-group">
-          <h3>Work Completion Photos</h3>
-          <div className="photo-gallery">
-            {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
-              <img key={idx} src={imageToBase64(photo.data)} alt={`Work Photo ${idx + 1}`} className="uploaded-image" />
-            ))}
+        {fsr.engineerSignature && (
+          <div className="info-group">
+            <h3>Engineer Signature</h3>
+            <img 
+              src={`data:image/jpeg;base64,${fsr.engineerSignature}`} 
+              alt="Engineer Signature" 
+              style={{ maxWidth: '200px' }}
+            />
           </div>
-        </div>
+        )}
+
+        {fsr.workPhotos && fsr.workPhotos.length > 0 && (
+          <div className="info-group">
+            <h3>Work Photos</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {fsr.workPhotos.map((photo, index) => (
+                <img 
+                  key={index}
+                  src={`data:image/jpeg;base64,${photo}`} 
+                  alt={`Work Photo ${index + 1}`}
+                  style={{ maxWidth: '200px' }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
