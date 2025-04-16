@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
@@ -40,7 +40,7 @@ function ViewFSR() {
       if (!selectedFSR) return; // Don't fetch if no report is selected
 
       try {
-        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${selectedFSR.fsrId}`);
+        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${selectedFSR._id}`);
         setSelectedFSR(res.data); // Set the selected report to display it
       } catch (err) {
         console.error("Failed to fetch FSR details", err);

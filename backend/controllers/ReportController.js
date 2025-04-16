@@ -90,19 +90,18 @@ exports.getAllFSRs = async (req, res) => {
   }
 };
 
-// New function to get a specific FSR by fsrId
 exports.getFSRById = async (req, res) => {
   try {
     const { fsrId } = req.params;
 
-    // Find the specific FSR by fsrId
-    const report = await FSR.findOne({ fsrId });
+    // Use _id instead of fsrId
+    const report = await FSR.findById(fsrId); // 👈 fetch using MongoDB _id
 
     if (!report) {
       return res.status(404).json({ message: "FSR not found" });
     }
 
-    res.json(report); // Return the found report
+    res.json(report);
   } catch (err) {
     console.error("Error fetching FSR details:", err);
     res.status(500).json({ message: "Failed to fetch FSR details" });
