@@ -119,10 +119,10 @@ function FSRDetails() {
             <strong>Customer Signature:</strong><br />
             {fsr.customerSignature && (
               <img 
-                src={imageToBase64(fsr.customerSignature.data)} 
+                src={fsr.customerSignature} 
                 alt="Customer Signature" 
                 className="uploaded-image"
-                onClick={() => setSelectedImage(imageToBase64(fsr.customerSignature.data))}
+                onClick={() => setSelectedImage(fsr.customerSignature)}
                 style={{ cursor: 'pointer' }}
               />
             )}
@@ -131,10 +131,10 @@ function FSRDetails() {
             <strong>Engineer Signature:</strong><br />
             {fsr.engineerSignature && (
               <img 
-                src={imageToBase64(fsr.engineerSignature.data)} 
+                src={fsr.engineerSignature} 
                 alt="Engineer Signature" 
                 className="uploaded-image"
-                onClick={() => setSelectedImage(imageToBase64(fsr.engineerSignature.data))}
+                onClick={() => setSelectedImage(fsr.engineerSignature)}
                 style={{ cursor: 'pointer' }}
               />
             )}
@@ -147,10 +147,10 @@ function FSRDetails() {
             {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
               <img 
                 key={idx} 
-                src={imageToBase64(photo.data)} 
+                src={photo} 
                 alt={`Work Photo ${idx + 1}`} 
                 className="uploaded-image"
-                onClick={() => setSelectedImage(imageToBase64(photo.data))}
+                onClick={() => setSelectedImage(photo)}
                 style={{ cursor: 'pointer' }}
               />
             ))}
