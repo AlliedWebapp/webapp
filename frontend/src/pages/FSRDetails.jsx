@@ -26,18 +26,17 @@ function FSRDetails() {
           }
         });
 
-        // Check if the response is OK
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Try to parse the response as JSON
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("Response is not JSON");
         }
 
         const data = await response.json();
+        console.log("FSR Data:", data); // Debug log
         setFSR(data);
       } catch (error) {
         console.error("Error fetching FSR:", error);
@@ -74,52 +73,47 @@ function FSRDetails() {
       </div>
 
       <div className="fsr-info">
-
         <div className="info-group">
           <h3>Basic Information</h3>
           <p><strong>FSR ID:</strong> {fsr.fsrId}</p>
-          <p><strong>SR No:</strong> {fsr.srNo}</p>
           <p><strong>Ticket ID:</strong> {fsr.ticketId}</p>
           <p><strong>Created Date:</strong> {new Date(fsr.createdAt).toLocaleString()}</p>
         </div>
 
         <div className="info-group">
-        <h3>Customer Details</h3>
+          <h3>Customer Information</h3>
           <p><strong>Customer Name:</strong> {fsr.customerName}</p>
-          <p><strong>Customer Contact:</strong> {fsr.customerContact}</p>
-          <p><strong>Customer Email:</strong> {fsr.customerEmail}</p>
-          <p><strong>Site ID:</strong> {fsr.siteId}</p>
+          <p><strong>Contact:</strong> {fsr.customerContact}</p>
+          <p><strong>Email:</strong> {fsr.customerEmail}</p>
           <p><strong>Installation Address:</strong> {fsr.installationAddress}</p>
+          <p><strong>Site ID:</strong> {fsr.siteId}</p>
           <p><strong>State:</strong> {fsr.state}</p>
         </div>
 
         <div className="info-group">
-        <h3>Equipment Details</h3>
+          <h3>Equipment Details</h3>
           <p><strong>Instance ID:</strong> {fsr.instanceId}</p>
-          <p><strong>Rating (KVA/HP):</strong> {fsr.rating}</p>
+          <p><strong>Rating:</strong> {fsr.rating}</p>
           <p><strong>Engine Model:</strong> {fsr.engineModel}</p>
-          <p><strong>Engine Serial No:</strong> {fsr.engineSerial}</p>
-          <p><strong>Genset Serial No:</strong> {fsr.gensetSerial}</p>
-          <p><strong>Total Running Hours:</strong> {fsr.runningHours}</p>
+          <p><strong>Engine Serial:</strong> {fsr.engineSerial}</p>
+          <p><strong>Genset Serial:</strong> {fsr.gensetSerial}</p>
+          <p><strong>Running Hours:</strong> {fsr.runningHours}</p>
         </div>
 
         <div className="info-group">
-          <h3>Task Details</h3>
-          <p><strong>Date of Commissioning:</strong> {fsr.commissioningDate}</p>
-          <p><strong>Task Start:</strong> {fsr.taskStart}</p>
-          <p><strong>Task End:</strong> {fsr.taskEnd}</p>
-        </div>
-
-        <div className="info-group">
-        <h3>Service Report</h3>
+          <h3>Service Details</h3>
+          <p><strong>Commissioning Date:</strong> {new Date(fsr.commissioningDate).toLocaleDateString()}</p>
+          <p><strong>Task Start:</strong> {new Date(fsr.taskStart).toLocaleString()}</p>
+          <p><strong>Task End:</strong> {new Date(fsr.taskEnd).toLocaleString()}</p>
           <p><strong>Problem Summary:</strong> {fsr.problemSummary}</p>
           <p><strong>Nature of Failure:</strong> {fsr.natureOfFailure}</p>
-          <p><strong>Checklist/Action Taken:</strong> {fsr.checklist}</p>
+        </div>
+
+        <div className="info-group">
+          <h3>Service Report</h3>
+          <p><strong>Checklist:</strong> {fsr.checklist}</p>
           <p><strong>Engineer Remarks:</strong> {fsr.engineerRemarks}</p>
           <p><strong>Customer Remarks:</strong> {fsr.customerRemarks}</p>
-        </div>
-        <div className="info-group">
-          <h3>Personnel</h3>
           <p><strong>Engineer Name:</strong> {fsr.engineerName}</p>
         </div>
 
@@ -143,7 +137,6 @@ function FSRDetails() {
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );
