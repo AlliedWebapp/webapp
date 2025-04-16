@@ -9,19 +9,29 @@ const imageToBase64 = (buffer) => {
   try {
     if (!buffer) return '';
 
-    // Avoid re-processing if it's already a base64 string
+    // Already a valid base64 image URL
     if (typeof buffer === 'string' && buffer.startsWith('data:image')) {
       return buffer;
     }
 
-    // If buffer is already in base64 but not prefixed, add the prefix
+    // Just a plain base64 string (no prefix)
     if (typeof buffer === 'string') {
       return `data:image/jpeg;base64,${buffer}`;
     }
 
-    // Convert raw buffer to base64
-    const binary = String.fromCharCode(...new Uint8Array(buffer));
-    return `data:image/jpeg;base64,${btoa(binary)}`;
+    // Buffer object (like { type: "Buffer", data: [...] })
+    if (buffer?.type === 'Buffer' && Array.isArray(buffer.data)) {
+      const binary = String.fromCharCode(...buffer.data);
+      return `data:image/jpeg;base64,${btoa(binary)}`;
+    }
+
+    // Uint8Array or ArrayBuffer
+    if (Array.isArray(buffer)) {
+      const binary = String.fromCharCode(...buffer);
+      return `data:image/jpeg;base64,${btoa(binary)}`;
+    }
+
+    return '';
   } catch (error) {
     console.error("Base64 conversion error:", error);
     return '';
@@ -82,7 +92,7 @@ function FSRDetails() {
         <div className="info-group">
           <h3>Basic Information</h3>
           <p><strong>FSR ID:</strong> {fsr.fsrId}</p>
-          <p><strong>Ticket ID:</strong> {fsr.ticketId}</p>
+          <p><strong>Ticket ID:</strong> {fsr.ticket_id}</p>
           <p><strong>Created Date:</strong> {new Date(fsr.createdAt).toLocaleString()}</p>
         </div>
 
