@@ -11,6 +11,7 @@ import Tickets from './pages/Tickets';
 import Ticket from './pages/Ticket';
 import Inventory from './pages/inventory';
 import FSR from './pages/FSR'; // Import the FSR component
+import FSRDetails from './pages/FSRDetails';
 import Monthly from './pages/monthly';
 import ImprovementReport from './pages/ImprovementReport';
 import MaintenanceReport from './pages/MaintenanceReport';
@@ -36,6 +37,7 @@ function App() {
               <Route path="/ticket/:ticketId" element={<Ticket />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/FSR" element={<FSR />} />
+              <Route path="/fsr/:id" element={<FSRDetails />} />
               <Route path="/monthly" element={<Monthly />} />
               <Route path="/improvement-report" element={<ImprovementReport />} />
               <Route path="/maintenance-report" element={<MaintenanceReport />} />

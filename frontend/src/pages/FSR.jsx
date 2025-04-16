@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
@@ -37,7 +38,7 @@ function ViewFSR() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedFSR, setSelectedFSR] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch all FSRs when the component mounts
   useEffect(() => {
@@ -56,40 +57,6 @@ function ViewFSR() {
 
     fetchFSRs();
   }, []);
-
-  // Function to fetch full FSR details by MongoDB _id
-  const handleViewFSR = async (id) => {
-    try {
-      setIsLoading(true);
-      const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
-      console.log("FSR Details:", res.data);
-      
-      // Process the response data
-      const processedData = {
-        ...res.data,
-        customerSignature: res.data.customerSignature ? {
-          ...res.data.customerSignature,
-          data: res.data.customerSignature.data || res.data.customerSignature
-        } : null,
-        engineerSignature: res.data.engineerSignature ? {
-          ...res.data.engineerSignature,
-          data: res.data.engineerSignature.data || res.data.engineerSignature
-        } : null,
-        workPhotos: res.data.workPhotos ? res.data.workPhotos.map(photo => ({
-          ...photo,
-          data: photo.data || photo
-        })) : []
-      };
-      
-      setSelectedFSR(processedData);
-      setIsLoading(false);
-    } catch (err) {
-      console.error("Failed to fetch FSR details", err);
-      setMessage("Error fetching report details");
-      setIsError(true);
-      setIsLoading(false);
-    }
-  };
 
   // Loading spinner is shown while data is being fetched
   if (isLoading) return <Spinner />;
@@ -127,7 +94,7 @@ function ViewFSR() {
               <div>
                 <button
                   className="btn btn-sm btn-outline"
-                  onClick={() => handleViewFSR(fsr._id)}
+                  onClick={() => navigate(`/fsr/${fsr._id}`)}
                 >
                   View
                 </button>
@@ -138,106 +105,6 @@ function ViewFSR() {
           <p>No FSRs found.</p>
         )}
       </div>
-
-      {/* Show fetched full FSR details */}
-      {selectedFSR && (
-        <div className="fsr-details" style={{ 
-          marginTop: '20px', 
-          padding: '20px', 
-          background: '#fff', 
-          borderRadius: '8px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          maxWidth: '800px',
-          margin: '20px auto'
-        }}>
-          <h2>FSR Details</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div>
-              <p><strong>FSR ID:</strong> {selectedFSR.fsrId}</p>
-              <p><strong>Ticket ID:</strong> {selectedFSR.ticketId}</p>
-              <p><strong>Customer Name:</strong> {selectedFSR.customerName}</p>
-              <p><strong>Installation Address:</strong> {selectedFSR.installationAddress}</p>
-              <p><strong>Site ID:</strong> {selectedFSR.siteId}</p>
-              <p><strong>Commissioning Date:</strong> {new Date(selectedFSR.commissioningDate).toLocaleDateString()}</p>
-              <p><strong>Instance ID:</strong> {selectedFSR.instanceId}</p>
-              <p><strong>State:</strong> {selectedFSR.state}</p>
-              <p><strong>Rating:</strong> {selectedFSR.rating}</p>
-            </div>
-            <div>
-              <p><strong>Engine Model:</strong> {selectedFSR.engineModel}</p>
-              <p><strong>Engine Serial No.:</strong> {selectedFSR.engineSerial}</p>
-              <p><strong>Genset Serial No.:</strong> {selectedFSR.gensetSerial}</p>
-              <p><strong>Running Hours:</strong> {selectedFSR.runningHours}</p>
-              <p><strong>Task Start:</strong> {new Date(selectedFSR.taskStart).toLocaleString()}</p>
-              <p><strong>Task End:</strong> {new Date(selectedFSR.taskEnd).toLocaleString()}</p>
-              <p><strong>Problem Summary:</strong> {selectedFSR.problemSummary}</p>
-              <p><strong>Nature of Failure:</strong> {selectedFSR.natureOfFailure}</p>
-              <p><strong>Checklist:</strong> {selectedFSR.checklist}</p>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '20px' }}>
-            <p><strong>Engineer Remarks:</strong> {selectedFSR.engineerRemarks}</p>
-            <p><strong>Customer Remarks:</strong> {selectedFSR.customerRemarks}</p>
-            <p><strong>Engineer Name:</strong> {selectedFSR.engineerName}</p>
-            <p><strong>Customer Contact:</strong> {selectedFSR.customerContact}</p>
-            <p><strong>Customer Email:</strong> {selectedFSR.customerEmail}</p>
-          </div>
-
-          {/* Display Customer Signature if available */}
-          {selectedFSR.customerSignature && (
-            <div style={{ marginTop: '20px' }}>
-              <h3>Customer Signature:</h3>
-              <img
-                src={imageToBase64(selectedFSR.customerSignature.data)}
-                alt="Customer Signature"
-                style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
-                onError={(e) => {
-                  console.error("Error loading customer signature image");
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
-
-          {/* Display Engineer Signature if available */}
-          {selectedFSR.engineerSignature && (
-            <div style={{ marginTop: '20px' }}>
-              <h3>Engineer Signature:</h3>
-              <img
-                src={imageToBase64(selectedFSR.engineerSignature.data)}
-                alt="Engineer Signature"
-                style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
-                onError={(e) => {
-                  console.error("Error loading engineer signature image");
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
-
-          {/* Display Work Photos if available */}
-          {selectedFSR.workPhotos && selectedFSR.workPhotos.length > 0 && (
-            <div style={{ marginTop: '20px' }}>
-              <h3>Work Photos:</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {selectedFSR.workPhotos.map((photo, index) => (
-                  <img
-                    key={index}
-                    src={imageToBase64(photo.data)}
-                    alt={`Work Photo ${index + 1}`}
-                    style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
-                    onError={(e) => {
-                      console.error(`Error loading work photo ${index + 1}`);
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </>
   );
 }
