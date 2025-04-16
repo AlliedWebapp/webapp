@@ -7,7 +7,7 @@ import BackButton from '../components/BackButton';
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
   if (!buffer) return '';
-  
+
   // If buffer is already a base64 string, just return it
   if (typeof buffer === 'string') return buffer;
 
@@ -107,7 +107,7 @@ function FSRDetails() {
                 alt="Customer Signature" 
                 className="uploaded-image"
                 onClick={() => setSelectedImage(imageToBase64(fsr.customerSignature?.data || fsr.customerSignature))}
-                style={{ cursor: 'pointer', maxWidth: '300px' }}
+                style={{ cursor: 'pointer', maxWidth: '150px', margin: '10px' }}
               />
             )}
           </div>
@@ -119,7 +119,7 @@ function FSRDetails() {
                 alt="Engineer Signature" 
                 className="uploaded-image"
                 onClick={() => setSelectedImage(imageToBase64(fsr.engineerSignature?.data || fsr.engineerSignature))}
-                style={{ cursor: 'pointer', maxWidth: '300px' }}
+                style={{ cursor: 'pointer', maxWidth: '150px', margin: '10px' }}
               />
             )}
           </div>
@@ -136,7 +136,7 @@ function FSRDetails() {
                 alt={`Work Photo ${idx + 1}`} 
                 className="uploaded-image"
                 onClick={() => setSelectedImage(imageToBase64(photo?.data || photo))}
-                style={{ cursor: 'pointer', maxWidth: '300px' }}
+                style={{ cursor: 'pointer', maxWidth: '150px', margin: '10px' }}
               />
             ))}
           </div>
