@@ -6,11 +6,20 @@ import BackButton from '../components/BackButton';
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
-  if (!buffer) return '';
-
-  if (typeof buffer === 'string') return buffer;
-
   try {
+    if (!buffer) return '';
+
+    // Avoid re-processing if it's already a base64 string
+    if (typeof buffer === 'string' && buffer.startsWith('data:image')) {
+      return buffer;
+    }
+
+    // If buffer is already in base64 but not prefixed, add the prefix
+    if (typeof buffer === 'string') {
+      return `data:image/jpeg;base64,${buffer}`;
+    }
+
+    // Convert raw buffer to base64
     const binary = String.fromCharCode(...new Uint8Array(buffer));
     return `data:image/jpeg;base64,${btoa(binary)}`;
   } catch (error) {
@@ -18,6 +27,7 @@ const imageToBase64 = (buffer) => {
     return '';
   }
 };
+
 
 function FSRDetails() {
   const [fsr, setFSR] = useState(null);
