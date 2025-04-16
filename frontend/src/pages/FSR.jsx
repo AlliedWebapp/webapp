@@ -5,9 +5,27 @@ import BackButton from "../components/BackButton";
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
-  if (!buffer || !buffer.data) return '';
-  const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-  return `data:image/jpeg;base64,${btoa(binary)}`;
+  try {
+    console.log("Buffer data:", buffer); // Debug log
+    if (!buffer) return '';
+    
+    // Check if buffer is already a Buffer object
+    if (buffer.type === 'Buffer' && Array.isArray(buffer.data)) {
+      const binary = String.fromCharCode(...new Uint8Array(buffer.data));
+      return `data:image/jpeg;base64,${btoa(binary)}`;
+    }
+    
+    // If it's a direct buffer
+    if (buffer instanceof ArrayBuffer || ArrayBuffer.isView(buffer)) {
+      const binary = String.fromCharCode(...new Uint8Array(buffer));
+      return `data:image/jpeg;base64,${btoa(binary)}`;
+    }
+    
+    return '';
+  } catch (error) {
+    console.error("Error converting buffer to base64:", error);
+    return '';
+  }
 };
 
 function ViewFSR() {
@@ -41,6 +59,9 @@ function ViewFSR() {
       setIsLoading(true);
       const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
       console.log("FSR Details:", res.data); // Debug log
+      console.log("Customer Signature:", res.data.customerSignature); // Debug log
+      console.log("Engineer Signature:", res.data.engineerSignature); // Debug log
+      console.log("Work Photos:", res.data.workPhotos); // Debug log
       setSelectedFSR(res.data);
       setIsLoading(false);
     } catch (err) {
@@ -152,6 +173,10 @@ function ViewFSR() {
                 src={imageToBase64(selectedFSR.customerSignature)}
                 alt="Customer Signature"
                 style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
+                onError={(e) => {
+                  console.error("Error loading customer signature image");
+                  e.target.style.display = 'none';
+                }}
               />
             </div>
           )}
@@ -164,6 +189,10 @@ function ViewFSR() {
                 src={imageToBase64(selectedFSR.engineerSignature)}
                 alt="Engineer Signature"
                 style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
+                onError={(e) => {
+                  console.error("Error loading engineer signature image");
+                  e.target.style.display = 'none';
+                }}
               />
             </div>
           )}
@@ -179,6 +208,10 @@ function ViewFSR() {
                     src={imageToBase64(photo)}
                     alt={`Work Photo ${index + 1}`}
                     style={{ maxWidth: "300px", maxHeight: "200px", border: '1px solid #ddd' }}
+                    onError={(e) => {
+                      console.error(`Error loading work photo ${index + 1}`);
+                      e.target.style.display = 'none';
+                    }}
                   />
                 ))}
               </div>
