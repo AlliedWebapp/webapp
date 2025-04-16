@@ -1225,3 +1225,18 @@ td {
   color: black;
   cursor: pointer;
 }
+.thumbnail-image {
+  cursor: pointer;
+  max-width: 120px;
+  max-height: 80px;
+  object-fit: contain;
+  margin: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.thumbnail-image:hover {
+  transform: scale(1.03);
+}
+
