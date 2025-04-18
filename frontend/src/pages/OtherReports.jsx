@@ -21,9 +21,24 @@ const OtherReports = () => {
             BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT
           </Link>
         </div>
-      </div>
+     {/* New Section for Viewing Reports */}
+  <div className="view-reports-header">
+    <h2 className="view-reports-heading">View Reports</h2>
+    <p className="view-reports-subheading">
+      Select the report you want to view
+    </p>
+  </div>
+
+  <div className="button-wrapper">
+    <Link to="/view-improvement-report" className="report-button">
+      VIEW CONTINUAL IMPROVEMENT REPORT
+    </Link>
+    <Link to="/view-maintenance-report" className="report-button">
+      VIEW BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT
+    </Link>
+  </div>
+</div>
     );
   };
-  
   export default OtherReports;
   
