@@ -1,7 +1,7 @@
 const FSR = require("../models/FSRModel"); // Your mongoose model
 const { ErrorHandler } = require("../middleware/errorMiddleware");
 const ImprovementReport = require("../models/ImprovementReportModel"); // Import your model
-
+const MaintenanceReport = require("../models/MaintenanceReportModel");
 // Function to generate a 4-digit unique fsr_id
 function generateFSRId() {
   return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
@@ -10,6 +10,11 @@ function generateFSRId() {
 // Generate a 4-digit unique irId
 function generateIRId() {
   return Math.floor(1000 + Math.random() * 9000); // 1000–9999
+}
+
+// Generate a 4-digit unique mrId
+function generateMRId() {
+  return Math.floor(1000 + Math.random() * 9000);
 }
 
 //fsr
@@ -139,6 +144,8 @@ exports.getFSRByMongoId = async (req, res, next) => {
     next(err);
   }
 };
+
+
 //improvement report
 exports.submitImprovementReport = async (req, res, next) => {
   try {
@@ -205,6 +212,70 @@ exports.submitImprovementReport = async (req, res, next) => {
     res.status(201).json({
       message: "Improvement Report submitted successfully!",
       irId: newReport.irId // 👈 Return irId in response
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+//maintenance report
+exports.submitMaintenanceReport = async (req, res, next) => {
+  try {
+    const {
+      unit,
+      outageDate,
+      outageTime,
+      defectReported,
+      investigationOutcome,
+      correctiveAction,
+      followUp,
+      repairCost,
+      remarks,
+      generationLoss,
+    } = req.body;
+
+    if (!unit || !outageDate || !outageTime || !defectReported) {
+      throw new ErrorHandler(400, "Missing required fields");
+    }
+
+    const hodSignature = req.files["hodSignature"]?.[0]?.buffer;
+    const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0]?.buffer;
+    const workPhotos = req.files["workPhotos"]?.map(file => ({
+      data: file.buffer,
+      contentType: file.mimetype,
+    })) || [];
+
+    const mrId = generateMRId();
+
+    const newReport = new MaintenanceReport({
+      mrId,
+      unit,
+      outageDate,
+      outageTime,
+      defectReported,
+      investigationOutcome,
+      correctiveAction,
+      followUp,
+      repairCost,
+      remarks,
+      generationLoss,
+      hodSignature: {
+        data: hodSignature,
+        contentType: req.files["hodSignature"]?.[0]?.mimetype
+      },
+      plantInchargeSignature: {
+        data: plantInchargeSignature,
+        contentType: req.files["plantInchargeSignature"]?.[0]?.mimetype
+      },
+      workPhotos
+    });
+
+    await newReport.save();
+
+    res.status(201).json({
+      message: "Maintenance Report submitted successfully!",
+      mrId: newReport.mrId
     });
 
   } catch (err) {
