@@ -51,7 +51,7 @@ const ImprovementReport = () => {
     if (plantSign) data.append("plantSign", plantSign);
 
     try {
-      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-improvement", {
+      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-improvement-report", {
         method: "POST",
         body: data,
       });
