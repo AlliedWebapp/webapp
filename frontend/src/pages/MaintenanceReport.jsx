@@ -48,7 +48,7 @@ const MaintenanceReport = () => {
     });
 
     try {
-      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-maintenance", {
+      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-maintenance-report", {
         method: "POST",
         body: data,
       });
