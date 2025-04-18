@@ -1,3 +1,4 @@
+//view other report list//
 import React from "react";
 import { Link } from "react-router-dom";
 import "../index.css"; // Reusing global styles

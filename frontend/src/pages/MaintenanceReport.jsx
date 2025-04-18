@@ -1,3 +1,4 @@
+// form of BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT//
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -5,15 +6,6 @@ const MaintenanceReport = () => {
   return (
     <div className="maintenance-report">
       <header className="header">
-        <div className="logo">
-          <Link to="/">
-            <img
-              src="https://github.com/ShaivyaaSharma/GITHUB/blob/main/logo.png?raw=true"
-              alt="Logo"
-              className="logo-image"
-            />
-          </Link>
-        </div>
         <h2>BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT</h2>
       </header>
 
