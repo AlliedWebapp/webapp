@@ -9,7 +9,7 @@ const OtherReports = () => {
         <div className="other-reports-header">
           <h2 className="other-reports-heading">Other Reports</h2>
           <p className="other-reports-subheading">
-            Select the report 
+            Select the report you want to submit
           </p>
         </div>
   
