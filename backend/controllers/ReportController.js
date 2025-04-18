@@ -197,11 +197,11 @@ exports.submitImprovementReport = async (req, res, next) => {
       payback,
       end_result,
       additional_info,
-      hod_sign: {
+      hodSignature: {
         data: hodSign,
         contentType: req.files["hodSign"]?.[0]?.mimetype
       },
-      plant_incharge_sign: {
+      plantInchargeSignature: {
         data: plantSign,
         contentType: req.files["plantSign"]?.[0]?.mimetype
       }
@@ -239,12 +239,8 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       throw new ErrorHandler(400, "Missing required fields");
     }
 
-    const hodSignature = req.files["hodSignature"]?.[0]?.buffer;
-    const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0]?.buffer;
-    const workPhotos = req.files["workPhotos"]?.map(file => ({
-      data: file.buffer,
-      contentType: file.mimetype,
-    })) || [];
+    const hodSignFile = req.files["hod_sign"]?.[0];
+    const plantSignFile = req.files["plant_incharge_sign"]?.[0];
 
     const mrId = generateMRId();
 
@@ -261,14 +257,13 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       remarks,
       generationLoss,
       hodSignature: {
-        data: hodSignature,
-        contentType: req.files["hodSignature"]?.[0]?.mimetype
+        data: hodSignFile?.buffer,
+        contentType: hodSignFile?.mimetype
       },
       plantInchargeSignature: {
-        data: plantInchargeSignature,
-        contentType: req.files["plantInchargeSignature"]?.[0]?.mimetype
-      },
-      workPhotos
+        data: plantSignFile?.buffer,
+        contentType: plantSignFile?.mimetype
+      }
     });
 
     await newReport.save();

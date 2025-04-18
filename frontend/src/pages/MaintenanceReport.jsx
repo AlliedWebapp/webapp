@@ -19,7 +19,8 @@ const MaintenanceReport = () => {
     generation_loss: "",
     hod_sign: "",
     plant_incharge_sign: "",
-    workPhotos: [],
+    hod_sign_photo: null,  // For HOD Signature Photo
+    plant_incharge_sign_photo: null,  // For Plant Incharge Signature Photo
   });
 
   const handleChange = (e) => {
@@ -125,18 +126,13 @@ const MaintenanceReport = () => {
           </div>
 
           <div className="form-group">
-            <label>HOD Signature:</label>
-            <input type="text" name="hod_sign" value={formData.hod_sign} onChange={handleChange} />
+            <label>Upload HOD Signature Photo:</label>
+            <input type="file" name="hod_sign_photo" accept="image/*" onChange={handleFileChange} />
           </div>
 
           <div className="form-group">
-            <label>Plant Incharge Signature:</label>
-            <input type="text" name="plant_incharge_sign" value={formData.plant_incharge_sign} onChange={handleChange} />
-          </div>
-
-          <div className="form-group">
-            <label>Upload Work Photos</label>
-            <input type="file" name="workPhotos" accept="image/*" multiple onChange={handleFileChange} />
+            <label>Upload Plant Incharge Signature Photo:</label>
+            <input type="file" name="plant_incharge_sign_photo" accept="image/*" onChange={handleFileChange} />
           </div>
 
           <div className="signatures">

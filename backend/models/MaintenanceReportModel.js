@@ -22,12 +22,6 @@ const MaintenanceReportSchema = new mongoose.Schema({
     data: Buffer,
     contentType: String
   },
-  workPhotos: [
-    {
-      data: Buffer,
-      contentType: String
-    }
-  ],
 
   // Timestamp for creation
   createdAt: {
