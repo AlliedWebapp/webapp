@@ -810,6 +810,10 @@ td {
    Styles for OtherReports Page
 ------------------------------ */
 
+/* ------------------------------
+   Styles for OtherReports Page
+------------------------------ */
+
 .other-reports-header {
   text-align: center;
   margin-top: 30px;
@@ -830,6 +834,15 @@ td {
   margin-bottom: 30px;
 }
 
+/* Reusing subheading style for view reports section */
+.view-reports-subheading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #121213;
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
 
 /* Button Layout */
 .button-wrapper {
@@ -857,6 +870,7 @@ td {
 .report-button:hover {
   background-color: #374151;
 }
+
 
 /* ------------------------------
    Styles for Improvement Report
