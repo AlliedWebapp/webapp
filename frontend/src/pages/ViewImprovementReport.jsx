@@ -81,25 +81,26 @@ function ViewImprovementReport() {
             <div>Actions</div>
           </div>
           {reports.map((report) => (
-            <div key={report._id} className="ticket">
-              <div>{report.irId || 'N/A'}</div>
-              <div>{report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'N/A'}</div>
-              <div>{report.department || 'N/A'}</div>
-              <div>{report.location || 'N/A'}</div>
-              <div>
-                <button
-                  onClick={() => navigate(`/improvement-report/${report._id}`)}
-                  className="btn btn-sm"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+  <div key={report._id} className="ticket-row">
+    <div>{report.irId || 'N/A'}</div>
+    <div>{report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'N/A'}</div>
+    <div>{report.department || 'N/A'}</div>
+    <div>{report.location || 'N/A'}</div>
+    <div>
+      <button
+        onClick={() => navigate(`/improvement-report/${report._id}`)}
+        className="btn btn-sm"
+      >
+        View Details
+      </button>
+    </div>
+  </div>
+))}
+        </div>      
       )}
     </div>
   );
+
 }
 
 export default ViewImprovementReport; 
