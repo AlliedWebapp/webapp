@@ -1,171 +1,218 @@
 //individual fsr form from view button//
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import Spinner from '../components/Spinner';
-import BackButton from '../components/BackButton';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import Spinner from "../components/Spinner";
+import BackButton from "../components/BackButton";
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
-  if (!buffer) return '';
-
-  try {
-    const bytes = new Uint8Array(buffer.data || buffer); // handles either `.data` or raw buffer
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return `data:image/jpeg;base64,${btoa(binary)}`;
-  } catch (error) {
-    console.error("Base64 conversion error:", error);
-    return '';
-  }
+  if (!buffer) return null;
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  return `data:image/jpeg;base64,${btoa(binary)}`;
 };
 
-
 function FSRDetails() {
-  const [fsr, setFSR] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [previewImage, setPreviewImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [fsr, setFsr] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchFSR = async () => {
       try {
-        const response = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
-        
-        if (!response.ok) throw new Error('Failed to fetch FSR details');
-
-        const data = await response.json();
-        if (!data) throw new Error('No FSR data received');
-
-        setFSR(data);
-      } catch (error) {
-        console.error("Error fetching FSR:", error);
-        toast.error(error.message || 'Failed to fetch FSR details');
-        navigate('/FSR');
+        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
+        if (res.data && res.data.report) {
+          setFsr(res.data.report);
+        } else {
+          setError("FSR not found");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch FSR details");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchFSR();
-  }, [id, navigate]);
+  }, [id]);
 
   if (isLoading) return <Spinner />;
-
-  if (!fsr) {
-    return (
-      <div className="error-container">
-        <h3>No FSR found</h3>
-        <button onClick={() => navigate('/FSR')}>Back to FSR List</button>
-      </div>
-    );
-  }
+  if (error) return <div className="error">{error}</div>;
+  if (!fsr) return <div>FSR not found</div>;
 
   return (
     <div className="fsr-details">
-      <div className="fsr-header">
-        <BackButton url="/FSR" />
-        <h2>FSR Details</h2>
+      <BackButton url="/fsr" />
+      <h1>Generator Service Report Details</h1>
+      
+      <div className="fsr-details-container">
+        <div className="fsr-section">
+          <h2>Basic Information</h2>
+          <div className="fsr-grid">
+            <div className="fsr-field">
+              <label>FSR ID:</label>
+              <span>{fsr.fsrId}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Ticket ID:</label>
+              <span>{fsr.ticketId}</span>
+            </div>
+            <div className="fsr-field">
+              <label>SR No:</label>
+              <span>{fsr.srNo || "N/A"}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fsr-section">
+          <h2>Customer Information</h2>
+          <div className="fsr-grid">
+            <div className="fsr-field">
+              <label>Customer Name:</label>
+              <span>{fsr.customerName}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Installation Address:</label>
+              <span>{fsr.installationAddress}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Site ID:</label>
+              <span>{fsr.siteId}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Customer Contact:</label>
+              <span>{fsr.customerContact}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Customer Email:</label>
+              <span>{fsr.customerEmail}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fsr-section">
+          <h2>Equipment Details</h2>
+          <div className="fsr-grid">
+            <div className="fsr-field">
+              <label>Commissioning Date:</label>
+              <span>{new Date(fsr.commissioningDate).toLocaleDateString()}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Instance ID:</label>
+              <span>{fsr.instanceId}</span>
+            </div>
+            <div className="fsr-field">
+              <label>State:</label>
+              <span>{fsr.state}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Rating:</label>
+              <span>{fsr.rating}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Engine Model:</label>
+              <span>{fsr.engineModel}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Engine Serial:</label>
+              <span>{fsr.engineSerial}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Genset Serial:</label>
+              <span>{fsr.gensetSerial}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Running Hours:</label>
+              <span>{fsr.runningHours}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fsr-section">
+          <h2>Service Details</h2>
+          <div className="fsr-grid">
+            <div className="fsr-field">
+              <label>Task Start:</label>
+              <span>{new Date(fsr.taskStart).toLocaleString()}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Task End:</label>
+              <span>{new Date(fsr.taskEnd).toLocaleString()}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Problem Summary:</label>
+              <span>{fsr.problemSummary}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Nature of Failure:</label>
+              <span>{fsr.natureOfFailure}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Checklist:</label>
+              <span>{fsr.checklist}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fsr-section">
+          <h2>Remarks</h2>
+          <div className="fsr-grid">
+            <div className="fsr-field">
+              <label>Engineer Remarks:</label>
+              <span>{fsr.engineerRemarks}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Customer Remarks:</label>
+              <span>{fsr.customerRemarks}</span>
+            </div>
+            <div className="fsr-field">
+              <label>Engineer Name:</label>
+              <span>{fsr.engineerName}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fsr-section">
+          <h2>Signatures and Photos</h2>
+          <div className="fsr-grid">
+            <div className="fsr-field">
+              <label>Customer Signature:</label>
+              {fsr.customerSignature && (
+                <img 
+                  src={imageToBase64(fsr.customerSignature.data)} 
+                  alt="Customer Signature" 
+                  className="signature-image"
+                />
+              )}
+            </div>
+            <div className="fsr-field">
+              <label>Engineer Signature:</label>
+              {fsr.engineerSignature && (
+                <img 
+                  src={imageToBase64(fsr.engineerSignature.data)} 
+                  alt="Engineer Signature" 
+                  className="signature-image"
+                />
+              )}
+            </div>
+            <div className="fsr-field">
+              <label>Work Photos:</label>
+              <div className="work-photos">
+                {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
+                  <img 
+                    key={index}
+                    src={imageToBase64(photo.data)} 
+                    alt={`Work Photo ${index + 1}`}
+                    className="work-photo"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="fsr-info">
-        {/* Basic Information */}
-        <div className="info-group">
-          <h3>Basic Information</h3>
-          <p><strong>FSR ID:</strong> {fsr.fsrId}</p>
-          <p><strong>Ticket ID:</strong> {fsr.ticketId}</p>
-          <p><strong>Created Date:</strong> {new Date(fsr.createdAt).toLocaleString()}</p>
-        </div>
-
-        {/* Customer Information */}
-        <div className="info-group">
-          <h3>Customer Information</h3>
-          <p><strong>Customer Name:</strong> {fsr.customerName}</p>
-          <p><strong>Contact:</strong> {fsr.customerContact}</p>
-          <p><strong>Email:</strong> {fsr.customerEmail}</p>
-          <p><strong>Installation Address:</strong> {fsr.installationAddress}</p>
-          <p><strong>Site ID:</strong> {fsr.siteId}</p>
-          <p><strong>State:</strong> {fsr.state}</p>
-        </div>
-
-        {/* Uploaded Signatures */}
-        <div className="info-group">
-          <h3>Uploaded Signatures</h3>
-          <div>
-            <strong>Customer Signature:</strong><br />
-            {fsr.customerSignature && (
-              <img 
-                src={imageToBase64(fsr.customerSignature?.data || fsr.customerSignature)} 
-                alt="Customer Signature" 
-                className="thumbnail-image"
-                onClick={() => setPreviewImage(imageToBase64(fsr.customerSignature?.data || fsr.customerSignature))}
-              />
-            )}
-          </div>
-          <div>
-            <strong>Engineer Signature:</strong><br />
-            {fsr.engineerSignature && (
-              <img 
-                src={imageToBase64(fsr.engineerSignature?.data || fsr.engineerSignature)} 
-                alt="Engineer Signature" 
-                className="thumbnail-image"
-                onClick={() => setPreviewImage(imageToBase64(fsr.engineerSignature?.data || fsr.engineerSignature))}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Work Completion Photos */}
-        <div className="info-group">
-          <h3>Work Completion Photos</h3>
-          <div className="photo-gallery">
-            {fsr.workPhotos && fsr.workPhotos.map((photo, idx) => (
-              <img 
-                key={idx} 
-                src={imageToBase64(photo?.data || photo)} 
-                alt={`Work Photo ${idx + 1}`} 
-                className="thumbnail-image"
-                onClick={() => setPreviewImage(imageToBase64(photo?.data || photo))}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Image preview overlay */}
-      {previewImage && (
-        <div
-          onClick={() => setPreviewImage(null)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <img
-            src={previewImage}
-            alt="Preview"
-            style={{
-              maxWidth: "90%",
-              maxHeight: "80%",
-              borderRadius: "12px",
-              background: "#fff",
-              padding: "8px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 }
