@@ -31,8 +31,9 @@ function ViewFSR() {
 
         console.log("FSR Response:", res.data);
 
-        if (res.data && Array.isArray(res.data)) {
-          setFsrs(res.data);
+        // Check if we have the reports array in the response
+        if (res.data && res.data.reports && Array.isArray(res.data.reports)) {
+          setFsrs(res.data.reports);
         } else {
           console.warn("Unexpected response format:", res.data);
           setFsrs([]);
