@@ -31,8 +31,8 @@ function ViewFSR() {
 
         console.log("FSR Response:", res.data);
 
-        // Check if we have the reports array in the response
-        if (res.data && res.data.reports && Array.isArray(res.data.reports)) {
+        // The backend returns the reports directly in the response
+        if (res.data && Array.isArray(res.data.reports)) {
           setFsrs(res.data.reports);
         } else {
           console.warn("Unexpected response format:", res.data);

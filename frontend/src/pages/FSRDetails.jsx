@@ -22,13 +22,17 @@ function FSRDetails() {
   useEffect(() => {
     const fetchFSR = async () => {
       try {
+        console.log("Fetching FSR with ID:", id);
         const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
-        if (res.data && res.data.report) {
-          setFsr(res.data.report);
+        console.log("FSR Details Response:", res.data);
+        
+        if (res.data) {
+          setFsr(res.data);
         } else {
           setError("FSR not found");
         }
       } catch (err) {
+        console.error("Error fetching FSR:", err);
         setError(err.response?.data?.message || "Failed to fetch FSR details");
       } finally {
         setIsLoading(false);
@@ -40,7 +44,7 @@ function FSRDetails() {
 
   if (isLoading) return <Spinner />;
   if (error) return <div className="error">{error}</div>;
-  if (!fsr) return <div>FSR not found</div>;
+  if (!fsr) return <div className="error">FSR not found</div>;
 
   return (
     <div className="fsr-details">
