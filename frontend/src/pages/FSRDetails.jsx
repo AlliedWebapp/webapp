@@ -7,9 +7,14 @@ import BackButton from "../components/BackButton";
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
-  if (!buffer) return null;
-  const binary = String.fromCharCode(...new Uint8Array(buffer));
-  return `data:image/jpeg;base64,${btoa(binary)}`;
+  try {
+    if (!buffer || !buffer.data) return null;
+    const binary = String.fromCharCode(...new Uint8Array(buffer.data));
+    return `data:image/jpeg;base64,${btoa(binary)}`;
+  } catch (error) {
+    console.error("Error converting image to base64:", error);
+    return null;
+  }
 };
 
 function FSRDetails() {
@@ -185,7 +190,7 @@ function FSRDetails() {
               <label>Customer Signature:</label>
               {fsr.customerSignature && (
                 <img 
-                  src={imageToBase64(fsr.customerSignature.data)} 
+                  src={imageToBase64(fsr.customerSignature)} 
                   alt="Customer Signature" 
                   className="signature-image"
                 />
@@ -195,7 +200,7 @@ function FSRDetails() {
               <label>Engineer Signature:</label>
               {fsr.engineerSignature && (
                 <img 
-                  src={imageToBase64(fsr.engineerSignature.data)} 
+                  src={imageToBase64(fsr.engineerSignature)} 
                   alt="Engineer Signature" 
                   className="signature-image"
                 />
@@ -207,7 +212,7 @@ function FSRDetails() {
                 {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
                   <img 
                     key={index}
-                    src={imageToBase64(photo.data)} 
+                    src={imageToBase64(photo)} 
                     alt={`Work Photo ${index + 1}`}
                     className="work-photo"
                   />
