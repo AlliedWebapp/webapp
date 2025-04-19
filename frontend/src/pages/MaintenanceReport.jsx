@@ -79,37 +79,37 @@ const MaintenanceReport = () => {
 
           <div className="form-group">
             <label>Outage Date:</label>
-            <input type="date" name="outageDate" value={formData.outage_date} onChange={handleChange} />
+            <input type="date" name="outageDate" value={formData.outageDate} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Time:</label>
-            <input type="time" name="outageTime" value={formData.outage_time} onChange={handleChange} />
+            <input type="time" name="outageTime" value={formData.outageTime} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Defect/Problem Reported:</label>
-            <textarea name="defectReported" rows="3" value={formData.defect_reported} onChange={handleChange} />
+            <textarea name="defectReported" rows="3" value={formData.defectReported} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Outcome of Investigation:</label>
-            <textarea name="investigationOutcome" rows="3" value={formData.investigation_outcome} onChange={handleChange} />
+            <textarea name="investigationOutcome" rows="3" value={formData.investigationOutcome} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Corrective Action Taken:</label>
-            <textarea name="correctiveAction" rows="3" value={formData.corrective_action} onChange={handleChange} />
+            <textarea name="correctiveAction" rows="3" value={formData.correctiveAction} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Any Follow-up to be Carried Out:</label>
-            <textarea name="followUp" rows="2" value={formData.follow_up} onChange={handleChange} />
+            <textarea name="followUp" rows="2" value={formData.followUp} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Replacement / Repair Cost:</label>
-            <input type="text" name="repairCost" value={formData.repair_cost} onChange={handleChange} />
+            <input type="text" name="repairCost" value={formData.repairCost} onChange={handleChange} />
           </div>
 
           <div className="form-group">
@@ -119,7 +119,7 @@ const MaintenanceReport = () => {
 
           <div className="form-group">
             <label>Loss of Generation:</label>
-            <input type="text" name="generationLoss" value={formData.generation_loss} onChange={handleChange} />
+            <input type="text" name="generationLoss" value={formData.generationLoss} onChange={handleChange} />
           </div>
 
           <div className="form-group">

@@ -39,9 +39,8 @@ router.post(
 router.post(
   "/submit-maintenance-report",
   upload.fields([
-    { name: "hod_sign", maxCount: 1 },
-    { name: "plant_incharge_sign", maxCount: 1 },
-    { name: "workPhotos", maxCount: 4 }
+    { name: "hodSignature", maxCount: 1 },
+    { name: "plantInchargeSignature", maxCount: 1 },
   ]),
 submitMaintenanceReport
 );

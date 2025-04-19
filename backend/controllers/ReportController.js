@@ -239,8 +239,8 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       throw new ErrorHandler(400, "Missing required fields");
     }
 
-    const hodSignFile = req.files["hod_sign"]?.[0];
-    const plantSignFile = req.files["plant_incharge_sign"]?.[0];
+    const hodSignature = req.files["hodSignature"]?.[0];
+    const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0];
 
     const mrId = generateMRId();
 
@@ -257,12 +257,12 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       remarks,
       generationLoss,
       hodSignature: {
-        data: hodSignFile?.buffer,
-        contentType: hodSignFile?.mimetype
+        data: hodSignature?.buffer,
+        contentType: hodSignature?.mimetype
       },
       plantInchargeSignature: {
-        data: plantSignFile?.buffer,
-        contentType: plantSignFile?.mimetype
+        data: plantInchargeSignature?.buffer,
+        contentType: plantInchargeSignature?.mimetype
       }
     });
 
