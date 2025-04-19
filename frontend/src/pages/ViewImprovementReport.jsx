@@ -4,6 +4,12 @@ import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 
+// Helper function to convert buffer data to a base64 string
+const imageToBase64 = (buffer) => {
+  const binary = String.fromCharCode(...new Uint8Array(buffer));
+  return `data:image/jpeg;base64,${btoa(binary)}`;      
+};
+
 function ViewImprovementReport() {
   const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +19,7 @@ function ViewImprovementReport() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        console.log("Fetching improvement reports...");
+        console.log("Starting to fetch improvement reports...");
         const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/improvement-reports", {
           headers: {
             'Accept': 'application/json',
@@ -21,17 +27,32 @@ function ViewImprovementReport() {
           }
         });
 
-        console.log("Improvement Reports Response:", res.data);
+        console.log("Raw API Response:", res);
+        console.log("Response Data:", res.data);
 
-        if (res.data && Array.isArray(res.data.reports)) {
-          setReports(res.data.reports);
+        if (res.data) {
+          if (Array.isArray(res.data.reports)) {
+            console.log("Reports found:", res.data.reports);
+            setReports(res.data.reports);
+          } else if (Array.isArray(res.data)) {
+            console.log("Reports array found directly:", res.data);
+            setReports(res.data);
+          } else {
+            console.warn("Unexpected response format:", res.data);
+            setReports([]);
+          }
         } else {
-          console.warn("Unexpected response format:", res.data);
+          console.warn("No data in response");
           setReports([]);
         }
         setIsLoading(false);
       } catch (err) {
-        console.error("Failed to fetch improvement reports:", err);
+        console.error("Error fetching improvement reports:", err);
+        console.error("Error details:", {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
         setError(err.response?.data?.message || "Failed to fetch reports");
         setIsLoading(false);
       }
@@ -61,10 +82,10 @@ function ViewImprovementReport() {
           </div>
           {reports.map((report) => (
             <div key={report._id} className="ticket">
-              <div>{report.irId}</div>
-              <div>{new Date(report.createdAt).toLocaleDateString()}</div>
-              <div>{report.department}</div>
-              <div>{report.location}</div>
+              <div>{report.irId || 'N/A'}</div>
+              <div>{report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'N/A'}</div>
+              <div>{report.department || 'N/A'}</div>
+              <div>{report.location || 'N/A'}</div>
               <div>
                 <button
                   onClick={() => navigate(`/improvement-report/${report._id}`)}
