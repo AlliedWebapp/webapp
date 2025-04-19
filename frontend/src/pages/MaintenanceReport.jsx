@@ -43,6 +43,9 @@ const MaintenanceReport = () => {
         data.append(key, value);
       }
     });
+
+    // Debug logging
+    console.log("Form Data:", Object.fromEntries(data));
   
     try {
       const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-maintenance-report", {
@@ -51,14 +54,16 @@ const MaintenanceReport = () => {
       });
   
       if (response.ok) {
+        const result = await response.json();
+        console.log("Success Response:", result);
         alert("Maintenance Report submitted successfully!");
       } else {
         const errorData = await response.json();
-        console.error("Submission failed:", errorData);
+        console.error("Error Response:", errorData);
         alert("Failed to submit. Please try again.");
       }
     } catch (err) {
-      console.error("Error submitting form:", err);
+      console.error("Network Error:", err);
       alert("Something went wrong.");
     }
   };
