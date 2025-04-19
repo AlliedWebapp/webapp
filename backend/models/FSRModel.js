@@ -37,5 +37,5 @@ fsrId: { type: Number, required: true, unique: true }, // Unique 4-digit fsr_id
   },
 });
 
-const FSR = mongoose.model("FSR", fsrSchema);
+const FSR = mongoose.model("FSR", fsrSchema, "fsrs");
 module.exports = FSR;

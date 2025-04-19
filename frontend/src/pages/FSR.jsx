@@ -21,7 +21,7 @@ function ViewFSR() {
   useEffect(() => {
     const fetchFSRs = async () => {
       try {
-        // First check if the API is accessible
+        console.log("Fetching FSRs...");
         const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/fsrs", {
           headers: {
             'Accept': 'application/json',
@@ -29,25 +29,23 @@ function ViewFSR() {
           }
         });
 
-        // Check if the response is valid JSON
-        if (typeof res.data === 'object' && res.data !== null) {
+        console.log("FSR Response:", res.data);
+
+        if (res.data && Array.isArray(res.data)) {
           setFsrs(res.data);
         } else {
-          throw new Error('Invalid response format');
+          console.warn("Unexpected response format:", res.data);
+          setFsrs([]);
         }
         setIsLoading(false);
       } catch (err) {
         console.error("Failed to fetch FSRs:", err);
         if (err.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          setMessage(`Server error: ${err.response.status}`);
+          setMessage(`Server error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
         } else if (err.request) {
-          // The request was made but no response was received
-          setMessage("No response from server");
+          setMessage("No response from server. Please check your connection.");
         } else {
-          // Something happened in setting up the request that triggered an Error
-          setMessage("Error setting up request");
+          setMessage(`Error: ${err.message}`);
         }
         setIsError(true);
         setIsLoading(false);
@@ -63,7 +61,7 @@ function ViewFSR() {
   // Show error message if there is an error
   if (isError) {
     return (
-      <div>
+      <div className="error-container">
         <h3 className="text-red-500">Error: {message}</h3>
         <BackButton url="/" />
       </div>
@@ -71,7 +69,7 @@ function ViewFSR() {
   }
 
   return (
-    <>
+    <div className="fsr-container">
       <BackButton url="/" />
       <h1>Generator Service Reports</h1>
       <div className="tickets">
@@ -101,10 +99,12 @@ function ViewFSR() {
             </div>
           ))
         ) : (
-          <p>No FSRs found.</p>
+          <div className="no-fsrs">
+            <p>No FSRs found. Please create a new FSR.</p>
+          </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
