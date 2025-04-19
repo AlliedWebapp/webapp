@@ -1069,6 +1069,7 @@ td {
   text-align: center;
   margin-bottom: 2rem;
   color: #333;
+  font-size: 1.8rem;
 }
 
 .fsr-details-container {
@@ -1076,6 +1077,7 @@ td {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 2rem;
+  overflow-x: auto;
 }
 
 .fsr-section {
@@ -1124,16 +1126,23 @@ td {
 .signature-image {
   max-width: 200px;
   max-height: 100px;
+  cursor: pointer;
+  transition: transform 0.2s;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
-  padding: 0.5rem;
+  padding: 4px;
   background: white;
+}
+
+.signature-image:hover {
+  transform: scale(1.05);
 }
 
 .work-photos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .work-photo {
@@ -1141,9 +1150,85 @@ td {
   height: 150px;
   object-fit: cover;
   border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
   border: 1px solid #e2e8f0;
+  padding: 4px;
+  background: white;
 }
 
+.work-photo:hover {
+  transform: scale(1.05);
+}
+
+/* Image Preview Modal */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.close-button {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .fsr-details {
+    padding: 1rem;
+  }
+
+  .fsr-table {
+    font-size: 0.75rem;
+  }
+
+  .fsr-table td {
+    padding: 0.5rem;
+  }
+
+  .fsr-label {
+    min-width: 100px;
+  }
+
+  .work-photos {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .signature-image {
+    max-width: 150px;
+  }
+}
+
+/* Error Message */
 .error {
   color: #e53e3e;
   text-align: center;
@@ -1154,79 +1239,167 @@ td {
   max-width: 600px;
 }
 
-/* Responsive adjustments */
+/* FSR Details Table Styles */
+.fsr-details {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.fsr-details h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 1.8rem;
+}
+
+.fsr-details-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  overflow-x: auto;
+}
+
+.fsr-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.fsr-table td {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.fsr-label {
+  background-color: #f8fafc;
+  font-weight: 500;
+  color: #4a5568;
+  width: 15%;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+/* Image Styles */
+.signature-image {
+  max-width: 200px;
+  max-height: 100px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 4px;
+  background: white;
+}
+
+.signature-image:hover {
+  transform: scale(1.05);
+}
+
+.work-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.work-photo {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid #e2e8f0;
+  padding: 4px;
+  background: white;
+}
+
+.work-photo:hover {
+  transform: scale(1.05);
+}
+
+/* Image Preview Modal */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.close-button {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .fsr-details {
     padding: 1rem;
   }
 
-  .fsr-grid {
-    grid-template-columns: 1fr;
+  .fsr-table {
+    font-size: 0.75rem;
   }
 
-  .fsr-section h2 {
-    font-size: 1.25rem;
+  .fsr-table td {
+    padding: 0.5rem;
   }
 
-  .signature-image {
-    max-width: 150px;
+  .fsr-label {
+    min-width: 100px;
   }
 
   .work-photos {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
-}
 
-/* FSR Details Image Styles */
-.image-container {
-  margin: 20px 0;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.signature-image {
-  max-width: 300px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.photo-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.photo-container {
-  background: #f8f9fa;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.work-photo {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .photo-gallery {
-    grid-template-columns: 1fr;
-  }
-  
   .signature-image {
-    max-width: 100%;
+    max-width: 150px;
   }
 }
+
+/* Error Message */
+.error {
+  color: #e53e3e;
+  text-align: center;
+  padding: 2rem;
+  background: #fff5f5;
+  border-radius: 8px;
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1262,6 +1435,7 @@ td {
   color: black;
   cursor: pointer;
 }
+
 .thumbnail-image {
   cursor: pointer;
   max-width: 120px;
@@ -1403,4 +1577,5 @@ td {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
+
 

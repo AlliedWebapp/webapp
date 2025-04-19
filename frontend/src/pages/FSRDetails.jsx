@@ -66,165 +66,139 @@ function FSRDetails() {
       <h1>Generator Service Report Details</h1>
       
       <div className="fsr-details-container">
-        <div className="fsr-section">
-          <h2>Basic Information</h2>
-          <table className="fsr-table">
-            <tbody>
-              <tr>
-                <td className="fsr-label">FSR ID:</td>
-                <td>{fsr.fsrId}</td>
-                <td className="fsr-label">Ticket ID:</td>
-                <td>{fsr.ticketId}</td>
-                <td className="fsr-label">SR No:</td>
-                <td>{fsr.srNo || "N/A"}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table className="fsr-table">
+          <tbody>
+            {/* Basic Information */}
+            <tr>
+              <td className="fsr-label">FSR ID</td>
+              <td>{fsr.fsrId}</td>
+              <td className="fsr-label">Ticket ID</td>
+              <td>{fsr.ticketId}</td>
+              <td className="fsr-label">SR No</td>
+              <td>{fsr.srNo || "N/A"}</td>
+            </tr>
 
-        <div className="fsr-section">
-          <h2>Customer Information</h2>
-          <table className="fsr-table">
-            <tbody>
-              <tr>
-                <td className="fsr-label">Customer Name:</td>
-                <td>{fsr.customerName}</td>
-                <td className="fsr-label">Site ID:</td>
-                <td>{fsr.siteId}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Installation Address:</td>
-                <td colSpan="3">{fsr.installationAddress}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Customer Contact:</td>
-                <td>{fsr.customerContact}</td>
-                <td className="fsr-label">Customer Email:</td>
-                <td>{fsr.customerEmail}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            {/* Customer Information */}
+            <tr>
+              <td className="fsr-label">Customer Name</td>
+              <td>{fsr.customerName}</td>
+              <td className="fsr-label">Site ID</td>
+              <td>{fsr.siteId}</td>
+              <td className="fsr-label">Customer Contact</td>
+              <td>{fsr.customerContact}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Installation Address</td>
+              <td colSpan="5">{fsr.installationAddress}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Customer Email</td>
+              <td colSpan="5">{fsr.customerEmail}</td>
+            </tr>
 
-        <div className="fsr-section">
-          <h2>Equipment Details</h2>
-          <table className="fsr-table">
-            <tbody>
-              <tr>
-                <td className="fsr-label">Commissioning Date:</td>
-                <td>{new Date(fsr.commissioningDate).toLocaleDateString()}</td>
-                <td className="fsr-label">Instance ID:</td>
-                <td>{fsr.instanceId}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">State:</td>
-                <td>{fsr.state}</td>
-                <td className="fsr-label">Rating:</td>
-                <td>{fsr.rating}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Engine Model:</td>
-                <td>{fsr.engineModel}</td>
-                <td className="fsr-label">Engine Serial:</td>
-                <td>{fsr.engineSerial}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Genset Serial:</td>
-                <td>{fsr.gensetSerial}</td>
-                <td className="fsr-label">Running Hours:</td>
-                <td>{fsr.runningHours}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            {/* Equipment Details */}
+            <tr>
+              <td className="fsr-label">Commissioning Date</td>
+              <td>{new Date(fsr.commissioningDate).toLocaleDateString()}</td>
+              <td className="fsr-label">Instance ID</td>
+              <td>{fsr.instanceId}</td>
+              <td className="fsr-label">State</td>
+              <td>{fsr.state}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Rating</td>
+              <td>{fsr.rating}</td>
+              <td className="fsr-label">Engine Model</td>
+              <td>{fsr.engineModel}</td>
+              <td className="fsr-label">Engine Serial</td>
+              <td>{fsr.engineSerial}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Genset Serial</td>
+              <td>{fsr.gensetSerial}</td>
+              <td className="fsr-label">Running Hours</td>
+              <td colSpan="3">{fsr.runningHours}</td>
+            </tr>
 
-        <div className="fsr-section">
-          <h2>Service Details</h2>
-          <table className="fsr-table">
-            <tbody>
-              <tr>
-                <td className="fsr-label">Task Start:</td>
-                <td>{new Date(fsr.taskStart).toLocaleString()}</td>
-                <td className="fsr-label">Task End:</td>
-                <td>{new Date(fsr.taskEnd).toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Problem Summary:</td>
-                <td colSpan="3">{fsr.problemSummary}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Nature of Failure:</td>
-                <td colSpan="3">{fsr.natureOfFailure}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Checklist:</td>
-                <td colSpan="3">{fsr.checklist}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            {/* Service Details */}
+            <tr>
+              <td className="fsr-label">Task Start</td>
+              <td>{new Date(fsr.taskStart).toLocaleString()}</td>
+              <td className="fsr-label">Task End</td>
+              <td colSpan="3">{new Date(fsr.taskEnd).toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Problem Summary</td>
+              <td colSpan="5">{fsr.problemSummary}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Nature of Failure</td>
+              <td colSpan="5">{fsr.natureOfFailure}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Checklist</td>
+              <td colSpan="5">{fsr.checklist}</td>
+            </tr>
 
-        <div className="fsr-section">
-          <h2>Remarks</h2>
-          <table className="fsr-table">
-            <tbody>
-              <tr>
-                <td className="fsr-label">Engineer Remarks:</td>
-                <td colSpan="3">{fsr.engineerRemarks}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Customer Remarks:</td>
-                <td colSpan="3">{fsr.customerRemarks}</td>
-              </tr>
-              <tr>
-                <td className="fsr-label">Engineer Name:</td>
-                <td>{fsr.engineerName}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            {/* Remarks */}
+            <tr>
+              <td className="fsr-label">Engineer Remarks</td>
+              <td colSpan="5">{fsr.engineerRemarks}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Customer Remarks</td>
+              <td colSpan="5">{fsr.customerRemarks}</td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Engineer Name</td>
+              <td colSpan="5">{fsr.engineerName}</td>
+            </tr>
 
-        <div className="fsr-section">
-          <h2>Signatures and Photos</h2>
-          <div className="signatures-container">
-            <div className="signature-item">
-              <label className="fsr-label">Customer Signature:</label>
-              {fsr.customerSignature && (
-                <img 
-                  src={imageToBase64(fsr.customerSignature)} 
-                  alt="Customer Signature" 
-                  className="signature-image"
-                  onClick={() => handleImageClick(fsr.customerSignature)}
-                />
-              )}
-            </div>
-            <div className="signature-item">
-              <label className="fsr-label">Engineer Signature:</label>
-              {fsr.engineerSignature && (
-                <img 
-                  src={imageToBase64(fsr.engineerSignature)} 
-                  alt="Engineer Signature" 
-                  className="signature-image"
-                  onClick={() => handleImageClick(fsr.engineerSignature)}
-                />
-              )}
-            </div>
-          </div>
-          <div className="work-photos-container">
-            <label className="fsr-label">Work Photos:</label>
-            <div className="work-photos">
-              {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
-                <img 
-                  key={index}
-                  src={imageToBase64(photo)} 
-                  alt={`Work Photo ${index + 1}`}
-                  className="work-photo"
-                  onClick={() => handleImageClick(photo)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+            {/* Signatures and Photos */}
+            <tr>
+              <td className="fsr-label">Customer Signature</td>
+              <td colSpan="5">
+                {fsr.customerSignature && (
+                  <img 
+                    src={imageToBase64(fsr.customerSignature)} 
+                    alt="Customer Signature" 
+                    className="signature-image"
+                    onClick={() => handleImageClick(fsr.customerSignature)}
+                  />
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Engineer Signature</td>
+              <td colSpan="5">
+                {fsr.engineerSignature && (
+                  <img 
+                    src={imageToBase64(fsr.engineerSignature)} 
+                    alt="Engineer Signature" 
+                    className="signature-image"
+                    onClick={() => handleImageClick(fsr.engineerSignature)}
+                  />
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className="fsr-label">Work Photos</td>
+              <td colSpan="5">
+                <div className="work-photos">
+                  {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
+                    <img 
+                      key={index}
+                      src={imageToBase64(photo)} 
+                      alt={`Work Photo ${index + 1}`}
+                      className="work-photo"
+                      onClick={() => handleImageClick(photo)}
+                    />
+                  ))}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       {selectedImage && (
