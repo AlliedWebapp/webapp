@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const MaintenanceReportSchema = new mongoose.Schema({
     mrId: {type: Number, required: true, unique: true},
@@ -32,4 +32,4 @@ const MaintenanceReportSchema = new mongoose.Schema({
 
 const MaintenanceReport = mongoose.model('MaintenanceReport', MaintenanceReportSchema, "maintenancereports");
 
-export default MaintenanceReport;
+module.exports = MaintenanceReport;
