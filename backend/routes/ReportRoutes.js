@@ -36,7 +36,7 @@ router.post(
 );
 
 // ✅ New GET route for improvement reports
-router.get("/api/reports/improvementreports", getAllImprovementReports);
+router.get("/api/reports/view-improvement-reports", getAllImprovementReports);
 
 // 🚧 Maintenance Report Route
 router.post(

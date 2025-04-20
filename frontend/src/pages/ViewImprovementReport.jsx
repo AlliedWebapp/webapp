@@ -22,7 +22,7 @@ function ViewImprovementReport() {
     const fetchReports = async () => {
       try {
         console.log("Fetching Improvement Reports...");
-        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/improvementreports", {
+        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/view-improvement-report", {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ function ViewImprovementReport() {
               <div>
                 <button
                   className="btn btn-sm btn-outline"
-                  onClick={() => navigate(`/improvementreports/${report._id}`)}
+                  onClick={() => navigate(`/improvement-report-details/${report._id}`)}
                 >
                   View
                 </button>
