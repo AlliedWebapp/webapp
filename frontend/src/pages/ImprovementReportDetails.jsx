@@ -76,7 +76,7 @@ const ImprovementReportDetails = () => {
       <div className="improvement-details-container">
         <div className="improvement-header">
           <h2>Improvement Report Details</h2>
-          <BackButton />
+          <BackButton url="/improvement-reports" />
         </div>
 
         <div className="improvement-section">
