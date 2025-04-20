@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import BackButton from "../components/BackButton";
 
 const Inventory = () => {
   const [selectedCollection, setSelectedCollection] = useState(() => {
@@ -137,6 +138,7 @@ const Inventory = () => {
 
   return (
     <div>
+      <BackButton url="/" />
       <h2>View Inventory</h2>
       <label>Select Project: </label>
       <select onChange={handleCollectionChange} value={selectedCollection}>

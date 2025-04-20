@@ -160,8 +160,15 @@ h3 {
   justify-content: center;
 }
 
-.btn svg {
-  margin-right: 8px;
+.btn-outline {
+  background: transparent;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.btn-outline:hover {
+  background: #000;
+  color: #fff;
 }
 
 .btn-reverse {
@@ -2037,6 +2044,54 @@ td {
   .maintenance-label {
     width: 150px;
   }
+}
+
+/* Back button styles */
+.back-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+/* Maintenance reports specific styles */
+.maintenance-reports .btn-outline {
+  background: transparent;
+  color: #000;
+  border: 1px solid #000;
+  padding: 5px 15px;
+  font-size: 13px;
+}
+
+.maintenance-reports .btn-outline:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Improvement reports specific styles */
+.improvement-reports .btn-outline {
+  background: transparent;
+  color: #000;
+  border: 1px solid #000;
+  padding: 5px 15px;
+  font-size: 13px;
+}
+
+.improvement-reports .btn-outline:hover {
+  background: #000;
+  color: #fff;
 }
 
 

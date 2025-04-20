@@ -1,6 +1,7 @@
 // form of BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT//
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import BackButton from "../components/BackButton";
 import "../index.css";
 
 const MaintenanceReport = () => {
@@ -71,6 +72,7 @@ const MaintenanceReport = () => {
   
   return (
     <div className="maintenance-report">
+      <BackButton url="/tickets" />
       <header className="header">
         <h2>BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT</h2>
         <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>

@@ -1,6 +1,7 @@
 //fomrat of form of service report form//
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import BackButton from "../components/BackButton";
 import "../index.css"; // Global styles
 
 const GeneratorServiceReport = () => {
@@ -86,6 +87,7 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="generator-service-report">
+      <BackButton url="/tickets" />
       <header className="header">
         <h2>Generator Service Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
