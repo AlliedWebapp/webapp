@@ -221,14 +221,34 @@ exports.submitImprovementReport = async (req, res, next) => {
   }
 };
 
+// Function to fetch all Improvement Reports with pagination
 exports.getAllImprovementReports = async (req, res, next) => {
   try {
-    const reports = await ImprovementReport.find().sort({ createdAt: -1 });
-    res.status(200).json({ reports });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Fetch improvement reports with pagination
+    const reports = await ImprovementReport.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination
+    const total = await ImprovementReport.countDocuments();
+
+    res.json({
+      reports,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalReports: total,
+    });
   } catch (err) {
     next(err);
   }
 };
+
+
 
 //maintenance report
 exports.submitMaintenanceReport = async (req, res, next) => {
