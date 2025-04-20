@@ -16,7 +16,7 @@ const ImprovementReportDetails = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://backend-services-theta.vercel.app/api/reports/improvementreports/${id}`,
+          `https://backend-services-theta.vercel.app/api/reports//improvement-report-details/${id}`,
           {
             headers: {
               Accept: "application/json",
@@ -130,6 +130,14 @@ const ImprovementReportDetails = () => {
               <label>Proposed Modification</label>
               <p>{report.modification}</p>
             </div>
+            <div className="improvement-field">
+  <label>Concept Date</label>
+  <p>{new Date(report.concept_date).toLocaleDateString()}</p>
+</div>
+<div className="improvement-field">
+  <label>Implementation Date</label>
+  <p>{new Date(report.implementation_date).toLocaleDateString()}</p>
+</div>
             <div className="improvement-field">
               <label>Resources Required</label>
               <p>{report.resources}</p>

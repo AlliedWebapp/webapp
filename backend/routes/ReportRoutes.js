@@ -7,7 +7,7 @@ const storage = multer.memoryStorage();  // Store file as buffer in memory
 const upload = multer({ storage: storage });
 
 // Import the controller functions
-const { submitFSR, getAllFSRs, getFSRByMongoId, getFSRById, submitImprovementReport,getAllImprovementReports, submitMaintenanceReport  } = require("../controllers/ReportController");
+const { submitFSR, getAllFSRs, getFSRByMongoId, getFSRById, submitImprovementReport,getAllImprovementReports, getImprovementReportByMongoId, submitMaintenanceReport  } = require("../controllers/ReportController");
 
 // Route to fetch all FSR reports
 router.get("/fsrs", getAllFSRs); // 👈 GET route to fetch all reports
@@ -37,6 +37,9 @@ router.post(
 
 // ✅ New GET route for improvement reports
 router.get("/view-improvement-reports", getAllImprovementReports);
+//get improvement report by id
+router.get("/improvement-report/:id", getImprovementReportByMongoId); // ✅ Correct handler
+
 
 // 🚧 Maintenance Report Route
 router.post(

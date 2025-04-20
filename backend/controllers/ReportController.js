@@ -248,6 +248,26 @@ exports.getAllImprovementReports = async (req, res, next) => {
   }
 };
 
+//to fetch one improvement report by id 
+exports.getImprovementReportByMongoId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new ErrorHandler(400, "Improvement Report ID is required");
+    }
+
+    const report = await ImprovementReport.findById(id);
+    if (!report) {
+      throw new ErrorHandler(404, "Improvement Report not found");
+    }
+
+    res.json(report);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 
 //maintenance report
