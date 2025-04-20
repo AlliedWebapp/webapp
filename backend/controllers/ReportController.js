@@ -328,3 +328,43 @@ exports.submitMaintenanceReport = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getAllMaintenanceReports = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const reports = await MaintenanceReport.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await MaintenanceReport.countDocuments();
+
+    res.json({
+      reports,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalReports: total,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getMaintenanceReportByMongoId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      throw new ErrorHandler(400, "Maintenance Report ID is required");
+    }
+    const report = await MaintenanceReport.findById(id);
+    if (!report) {
+      throw new ErrorHandler(404, "Maintenance Report not found");
+    }
+    res.json(report);
+  } catch (err) {
+    next(err);
+  }
+};
