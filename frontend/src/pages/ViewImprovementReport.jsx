@@ -22,7 +22,7 @@ function ViewImprovementReport() {
     const fetchReports = async () => {
       try {
         console.log("Fetching Improvement Reports...");
-        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/view-improvement-report", {
+        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/view-improvement-reports", {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'

@@ -28,7 +28,7 @@ const OtherReports = () => {
     </p>
   </div>
   <div className="button-wrapper">
-    <Link to="/view-improvement-report" className="report-button">
+    <Link to="/view-improvement-reports" className="report-button">
       VIEW CONTINUAL IMPROVEMENT REPORT
     </Link>
     <Link to="/view-maintenance-

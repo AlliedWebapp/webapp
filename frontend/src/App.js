@@ -45,7 +45,7 @@ function App() {
               <Route path="/maintenance-report" element={<MaintenanceReport />} />
               <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
               <Route path="/other-reports" element={<OtherReports />} />
-              <Route path="/view-improvement-report" element={<ViewImprovementReport />} />
+              <Route path="/view-improvement-reports" element={<ViewImprovementReport />} />
               <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
             </Route>
           </Routes>
