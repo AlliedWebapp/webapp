@@ -17,6 +17,8 @@ import ImprovementReport from './pages/ImprovementReport';
 import ViewImprovementReport from './pages/ViewImprovementReport'; 
 import ImprovementReportDetails from './pages/ImprovementReportDetails';   
 import MaintenanceReport from './pages/MaintenanceReport';
+import ViewMaintenanceReport from './pages/ViewMaintenanceReport';
+import MaintenanceReportDetails from './pages/MaintenanceReportDetails';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
 import OtherReports from './pages/OtherReports';  
 
@@ -47,6 +49,8 @@ function App() {
               <Route path="/other-reports" element={<OtherReports />} />
               <Route path="/view-improvement-reports" element={<ViewImprovementReport />} />
               <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
+              <Route path="/view-maintenance-reports" element={<ViewMaintenanceReport />} />
+              <Route path="/maintenance-report-details/:id" element={<MaintenanceReportDetails />} />
             </Route>
           </Routes>
         </div>
@@ -57,3 +61,4 @@ function App() {
 }
 
 export default App;
+

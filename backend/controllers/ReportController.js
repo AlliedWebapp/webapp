@@ -286,13 +286,20 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       generationLoss,
     } = req.body;
 
-    if (!unit || !outageDate || !outageTime || !defectReported) {
+    // Enhanced validation
+    if (!unit || !outageDate || !outageTime || !defectReported || !investigationOutcome || !correctiveAction) {
       throw new ErrorHandler(400, "Missing required fields");
+    }
+
+    // Check if signatures are provided
+    if (!req.files["hodSignature"] || !req.files["plantInchargeSignature"]) {
+      throw new ErrorHandler(400, "Both signatures are required");
     }
 
     const hodSignature = req.files["hodSignature"]?.[0];
     const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0];
 
+    // Generate unique ID
     const mrId = generateMRId();
 
     const newReport = new MaintenanceReport({
@@ -308,20 +315,26 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       remarks,
       generationLoss,
       hodSignature: {
-        data: hodSignature?.buffer,
-        contentType: hodSignature?.mimetype
+        data: hodSignature.buffer,
+        contentType: hodSignature.mimetype
       },
       plantInchargeSignature: {
-        data: plantInchargeSignature?.buffer,
-        contentType: plantInchargeSignature?.mimetype
+        data: plantInchargeSignature.buffer,
+        contentType: plantInchargeSignature.mimetype
       }
     });
 
     await newReport.save();
 
     res.status(201).json({
+      success: true,
       message: "Maintenance Report submitted successfully!",
-      mrId: newReport.mrId
+      data: {
+        mrId: newReport.mrId,
+        unit: newReport.unit,
+        outageDate: newReport.outageDate,
+        createdAt: newReport.createdAt
+      }
     });
 
   } catch (err) {
@@ -335,18 +348,27 @@ exports.getAllMaintenanceReports = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    // Fetch reports with pagination and sorting
     const reports = await MaintenanceReport.find()
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .select('-hodSignature -plantInchargeSignature'); // Exclude signature data for list view
 
+    // Get total count for pagination
     const total = await MaintenanceReport.countDocuments();
 
     res.json({
-      reports,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalReports: total,
+      success: true,
+      data: {
+        reports,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(total / limit),
+          totalReports: total,
+          limit
+        }
+      }
     });
   } catch (err) {
     next(err);
@@ -356,14 +378,26 @@ exports.getAllMaintenanceReports = async (req, res, next) => {
 exports.getMaintenanceReportByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
+    
     if (!id) {
       throw new ErrorHandler(400, "Maintenance Report ID is required");
     }
+
+    // Validate MongoDB ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ErrorHandler(400, "Invalid Maintenance Report ID format");
+    }
+
     const report = await MaintenanceReport.findById(id);
+    
     if (!report) {
       throw new ErrorHandler(404, "Maintenance Report not found");
     }
-    res.json(report);
+
+    res.json({
+      success: true,
+      data: report
+    });
   } catch (err) {
     next(err);
   }
