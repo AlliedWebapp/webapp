@@ -69,7 +69,7 @@ function ViewMaintenanceReport() {
           <div>MR ID</div>
           <div>Date</div>
           <div>Unit</div>
-          <div>Defect</div>
+          <div>Outage Date</div>
           <div></div>
         </div>
 
@@ -79,7 +79,7 @@ function ViewMaintenanceReport() {
               <div>{report.mrId}</div>
               <div>{new Date(report.createdAt).toLocaleDateString()}</div>
               <div>{report.unit}</div>
-              <div>{report.defectReported}</div>
+              <div>{new Date(report.outageDate).toLocaleDateString()}</div>
               <div>
                 <button
                   className="btn btn-sm btn-outline"
@@ -91,7 +91,7 @@ function ViewMaintenanceReport() {
             </div>
           ))
         ) : (
-          <div className="no-reports">
+          <div className="no-fsrs">
             <p>No maintenance reports found. Please create a new one.</p>
           </div>
         )}
