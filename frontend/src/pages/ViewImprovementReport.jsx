@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import axios from "axios"; // ✅ axios import
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
   const binary = String.fromCharCode(...new Uint8Array(buffer));
-  return `data:image/jpeg;base64,${btoa(binary)}`;      
+  return `data:image/jpeg;base64,${btoa(binary)}`;
 };
 
 const ViewImprovementReport = () => {
@@ -20,8 +21,8 @@ const ViewImprovementReport = () => {
     const fetchReports = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          "https://backend-services-theta.vercel.app/api/reports/get-improvement-reports",
+        const { data } = await axios.get(
+          "https://backend-services-theta.vercel.app/api/reports/improvement-reports",
           {
             headers: {
               Accept: "application/json",
@@ -30,11 +31,6 @@ const ViewImprovementReport = () => {
           }
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch reports");
-        }
-
-        const data = await response.json();
         console.log("Improvement Reports Data:", data);
 
         if (data.reports && Array.isArray(data.reports)) {
@@ -103,4 +99,4 @@ const ViewImprovementReport = () => {
   );
 };
 
-export default ViewImprovementReport; 
+export default ViewImprovementReport;
