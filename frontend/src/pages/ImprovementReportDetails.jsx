@@ -16,7 +16,7 @@ const ImprovementReportDetails = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://backend-services-theta.vercel.app/api/reports//improvement-report-details/${id}`,
+          `https://backend-services-theta.vercel.app/api/reports/improvement-report-details/${id}`,
           {
             headers: {
               Accept: "application/json",
