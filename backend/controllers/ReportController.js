@@ -199,11 +199,11 @@ exports.submitImprovementReport = async (req, res, next) => {
       payback,
       end_result,
       additional_info,
-      hodSignature: {
+      hod_sign: {
         data: hodSign,
         contentType: req.files["hodSign"]?.[0]?.mimetype
       },
-      plantInchargeSignature: {
+      plant_incharge_sign: {
         data: plantSign,
         contentType: req.files["plantSign"]?.[0]?.mimetype
       }

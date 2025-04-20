@@ -38,26 +38,47 @@ const ImprovementReport = () => {
     if (name === "hodSign") setHodSign(files[0]);
     if (name === "plantSign") setPlantSign(files[0]);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       data.append(key, value);
     });
-
+  
     if (hodSign) data.append("hodSign", hodSign);
     if (plantSign) data.append("plantSign", plantSign);
-
+  
     try {
       const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-improvement-report", {
         method: "POST",
         body: data,
       });
-
+  
       if (response.ok) {
         alert("Improvement Report submitted successfully!");
+        
+        // Reset the form after successful submission
+        setFormData({
+          number: "",
+          department: "",
+          equipment_no: "",
+          equipment_system: "",
+          location: "",
+          objectives: "",
+          concept_date: "",
+          implementation_date: "",
+          present_condition: "",
+          modification: "",
+          resources: "",
+          mandays: "",
+          cost: "",
+          payback: "",
+          end_result: "",
+          additional_info: "",
+        });
+        setHodSign(null);
+        setPlantSign(null);
       } else {
         const errData = await response.json();
         console.error("Submit failed:", errData);
@@ -68,6 +89,7 @@ const ImprovementReport = () => {
       alert("Something went wrong.");
     }
   };
+  
 
   return (
     <div className="improvement-report">
