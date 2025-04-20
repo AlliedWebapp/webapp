@@ -24,8 +24,8 @@ function ViewMaintenanceReport() {
 
         console.log("Maintenance Reports Response:", res.data);
 
-        if (res.data && Array.isArray(res.data.reports)) {
-          setReports(res.data.reports);
+        if (res.data && res.data.success && Array.isArray(res.data.data.reports)) {
+          setReports(res.data.data.reports);
         } else {
           console.warn("Unexpected response format:", res.data);
           setReports([]);

@@ -45,11 +45,11 @@ const MaintenanceReportDetails = () => {
         const data = await response.json();
         console.log("Maintenance Report Data:", data);
 
-        if (!data) {
+        if (!data || !data.success || !data.data) {
           throw new Error("Report not found");
         }
 
-        setReport(data);
+        setReport(data.data);
       } catch (err) {
         console.error("Error fetching report:", err);
         setError(err.message);
