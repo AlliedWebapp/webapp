@@ -352,23 +352,16 @@ exports.getAllMaintenanceReports = async (req, res, next) => {
     const reports = await MaintenanceReport.find()
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit)
-      .select('-hodSignature -plantInchargeSignature'); // Exclude signature data for list view
-
+      .limit(limit);
+      
     // Get total count for pagination
     const total = await MaintenanceReport.countDocuments();
 
     res.json({
-      success: true,
-      data: {
         reports,
-        pagination: {
           currentPage: page,
           totalPages: Math.ceil(total / limit),
-          totalReports: total,
-          limit
-        }
-      }
+
     });
   } catch (err) {
     next(err);
@@ -394,11 +387,9 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
       throw new ErrorHandler(404, "Maintenance Report not found");
     }
 
-    res.json({
-      success: true,
-      data: report
-    });
+    res.json(report);
   } catch (err) {
     next(err);
   }
 };
+

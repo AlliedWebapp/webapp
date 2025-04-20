@@ -28,6 +28,7 @@ const MaintenanceReport = () => {
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
+    
     setFormData((prev) => ({ ...prev, [name]: files[0] }));
   };
   
