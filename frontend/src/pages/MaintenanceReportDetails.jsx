@@ -141,9 +141,9 @@ const MaintenanceReportDetails = () => {
             <tr>
               <td className="maintenance-label">HOD Signature</td>
               <td colSpan="5">
-                {report.hodSignature && (
+                {report.hodSignature && report.hodSignature.data && (
                   <img
-                    src={imageToBase64(report.hodSignature)}
+                    src={report.hodSignature.data}
                     alt="HOD Signature"
                     className="signature-image"
                     onClick={() => handleImageClick(report.hodSignature)}
@@ -154,9 +154,9 @@ const MaintenanceReportDetails = () => {
             <tr>
               <td className="maintenance-label">Plant Incharge Signature</td>
               <td colSpan="5">
-                {report.plantInchargeSignature && (
+                {report.plantInchargeSignature && report.plantInchargeSignature.data && (
                   <img
-                    src={imageToBase64(report.plantInchargeSignature)}
+                    src={report.plantInchargeSignature.data}
                     alt="Plant Incharge Signature"
                     className="signature-image"
                     onClick={() => handleImageClick(report.plantInchargeSignature)}
@@ -171,8 +171,8 @@ const MaintenanceReportDetails = () => {
           <div className="image-modal" onClick={closeImageModal}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <img
-                src={imageToBase64(selectedImage)}
-                alt="Preview"
+                src={selectedImage.data}
+                alt="Signature Preview"
                 className="preview-image"
               />
               <button className="close-button" onClick={closeImageModal}>

@@ -372,26 +372,49 @@ exports.getAllMaintenanceReports = async (req, res, next) => {
   }
 };
 
+// Helper function to convert buffer to base64
+const bufferToBase64 = (buffer) => {
+  if (!buffer || !buffer.data) return null;
+  return `data:image/jpeg;base64,${Buffer.from(buffer.data).toString('base64')}`;
+};
+
 exports.getMaintenanceReportByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
     
-    if (!id) {
-      throw new ErrorHandler(400, "Maintenance Report ID is required");
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      throw new ErrorHandler(400, "Invalid maintenance report ID");
     }
 
-    // Validate MongoDB ID format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new ErrorHandler(400, "Invalid Maintenance Report ID format");
-    }
-
-    const report = await MaintenanceReport.findById(id);
-    
+    const report = await MaintenanceReport.findById(id).lean();
     if (!report) {
-      throw new ErrorHandler(404, "Maintenance Report not found");
+      throw new ErrorHandler(404, "Maintenance report not found");
     }
 
-    res.json(report);
+    // Convert signature buffers to base64 strings
+    if (report.hodSignature && report.hodSignature.data) {
+      const base64String = Buffer.from(report.hodSignature.data).toString('base64');
+      report.hodSignature = {
+        data: `data:${report.hodSignature.contentType || 'image/jpeg'};base64,${base64String}`,
+        contentType: report.hodSignature.contentType || 'image/jpeg'
+      };
+    }
+    if (report.plantInchargeSignature && report.plantInchargeSignature.data) {
+      const base64String = Buffer.from(report.plantInchargeSignature.data).toString('base64');
+      report.plantInchargeSignature = {
+        data: `data:${report.plantInchargeSignature.contentType || 'image/jpeg'};base64,${base64String}`,
+        contentType: report.plantInchargeSignature.contentType || 'image/jpeg'
+      };
+    }
+
+    // Format dates
+    report.outageDate = new Date(report.outageDate).toLocaleDateString();
+    report.createdAt = new Date(report.createdAt).toLocaleDateString();
+
+    res.json({
+      success: true,
+      data: report
+    });
   } catch (err) {
     next(err);
   }
