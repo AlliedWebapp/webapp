@@ -4,10 +4,23 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 
+// Helper function to convert buffer data to a base64 string
+const imageToBase64 = (buffer) => {
+  try {
+    if (!buffer || !buffer.data) return null;
+    const binary = String.fromCharCode(...new Uint8Array(buffer.data));
+    return `data:image/jpeg;base64,${btoa(binary)}`;
+  } catch (error) {
+    console.error("Error converting image to base64:", error);
+    return null;
+  }
+};
+
 const ImprovementReportDetails = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -49,6 +62,14 @@ const ImprovementReportDetails = () => {
     fetchReport();
   }, [id]);
 
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
   if (loading) {
     return <Spinner />;
   }
@@ -84,103 +105,100 @@ const ImprovementReportDetails = () => {
             <tr>
               <td className="improvement-label">Report ID</td>
               <td>{report.irId}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Department</td>
               <td>{report.department}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Equipment Number</td>
               <td>{report.equipment_no}</td>
             </tr>
             <tr>
               <td className="improvement-label">Equipment System</td>
               <td>{report.equipment_system}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Location</td>
               <td>{report.location}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Area</td>
               <td>{report.area}</td>
             </tr>
             <tr>
               <td className="improvement-label">Objectives</td>
-              <td>{report.objectives}</td>
+              <td colSpan="5">{report.objectives}</td>
             </tr>
             <tr>
               <td className="improvement-label">Present Condition</td>
-              <td>{report.present_condition}</td>
+              <td colSpan="5">{report.present_condition}</td>
             </tr>
             <tr>
               <td className="improvement-label">Proposed Modification</td>
-              <td>{report.modification}</td>
+              <td colSpan="5">{report.modification}</td>
             </tr>
             <tr>
               <td className="improvement-label">Concept Date</td>
               <td>{new Date(report.concept_date).toLocaleDateString()}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Implementation Date</td>
-              <td>{new Date(report.implementation_date).toLocaleDateString()}</td>
+              <td colSpan="3">{new Date(report.implementation_date).toLocaleDateString()}</td>
             </tr>
             <tr>
               <td className="improvement-label">Resources Required</td>
               <td>{report.resources}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Mandays</td>
               <td>{report.mandays}</td>
-            </tr>
-            <tr>
               <td className="improvement-label">Cost</td>
               <td>{report.cost}</td>
             </tr>
             <tr>
               <td className="improvement-label">Payback Period</td>
-              <td>{report.payback}</td>
+              <td colSpan="5">{report.payback}</td>
             </tr>
             <tr>
               <td className="improvement-label">Expected End Result</td>
-              <td>{report.end_result}</td>
+              <td colSpan="5">{report.end_result}</td>
             </tr>
             <tr>
               <td className="improvement-label">Additional Information</td>
-              <td>{report.additional_info}</td>
+              <td colSpan="5">{report.additional_info}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">HOD Signature</td>
+              <td colSpan="5">
+                {report.hodSignature && (
+                  <img
+                    src={imageToBase64(report.hodSignature)}
+                    alt="HOD Signature"
+                    className="signature-image"
+                    onClick={() => handleImageClick(report.hodSignature)}
+                  />
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Plant Head Signature</td>
+              <td colSpan="5">
+                {report.plantInchargeSignature && (
+                  <img
+                    src={imageToBase64(report.plantInchargeSignature)}
+                    alt="Plant Head Signature"
+                    className="signature-image"
+                    onClick={() => handleImageClick(report.plantInchargeSignature)}
+                  />
+                )}
+              </td>
             </tr>
           </tbody>
         </table>
 
-        <div className="improvement-section">
-          <h3>Signatures</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>HOD Signature</label>
-              {report.hodSignature ? (
-                <img
-                  src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
-                  alt="HOD Signature"
-                  className="signature-image"
-                />
-              ) : (
-                <p>No HOD Signature</p>
-              )}
-            </div>
-            <div className="improvement-field">
-              <label>Plant Head Signature</label>
-              {report.plantInchargeSignature ? (
-                <img
-                  src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
-                  alt="Plant Head Signature"
-                  className="signature-image"
-                />
-              ) : (
-                <p>No Plant Head Signature</p>
-              )}
+        {selectedImage && (
+          <div className="image-modal" onClick={closeImageModal}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <img
+                src={imageToBase64(selectedImage)}
+                alt="Preview"
+                className="preview-image"
+              />
+              <button className="close-button" onClick={closeImageModal}>
+                ×
+              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
