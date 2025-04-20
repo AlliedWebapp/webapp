@@ -1852,77 +1852,93 @@ td {
   color: #333;
 }
 
-.maintenance-reports .ticket {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr auto;
-  gap: 20px;
-  padding: 15px;
-  border: 1px solid #e6e6e6;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background: #fff;
-  align-items: center;
+.maintenance-reports .tickets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .maintenance-reports .ticket-headings {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr auto;
-  gap: 20px;
+  gap: 10px;
   padding: 15px;
-  background: #f8f9fa;
+  background-color: #f8f9fa;
   border-radius: 5px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.maintenance-reports .ticket {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  gap: 10px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  align-items: center;
+}
+
+.maintenance-reports .ticket:hover {
+  background-color: #f8f9fa;
 }
 
 .maintenance-reports .btn {
   padding: 8px 16px;
-  background: #000;
-  color: #fff;
+  background-color: #000;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .maintenance-reports .btn:hover {
-  background: #333;
+  background-color: #333;
 }
 
 .maintenance-reports .btn-outline {
-  background: transparent;
-  color: #000;
+  background-color: transparent;
   border: 1px solid #000;
+  color: #000;
 }
 
 .maintenance-reports .btn-outline:hover {
-  background: #000;
-  color: #fff;
+  background-color: #000;
+  color: white;
 }
 
 .maintenance-reports .btn-sm {
-  padding: 5px 10px;
+  padding: 4px 8px;
   font-size: 0.875rem;
 }
 
-/* Maintenance Report Details Styles */
 .maintenance-details {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.maintenance-details h1 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-}
-
 .maintenance-details-container {
-  background: #fff;
+  background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
+}
+
+.maintenance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.maintenance-header h2 {
+  color: #333;
+  margin: 0;
 }
 
 .maintenance-table {
@@ -1933,7 +1949,7 @@ td {
 
 .maintenance-table td {
   padding: 12px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid #dee2e6;
 }
 
 .maintenance-table tr:nth-child(even) {
@@ -1946,7 +1962,6 @@ td {
 
 .maintenance-label {
   font-weight: 600;
-  color: #333;
   background-color: #f8f9fa;
   width: 200px;
 }
@@ -1955,7 +1970,7 @@ td {
   max-width: 200px;
   max-height: 100px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s;
 }
 
 .signature-image:hover {
@@ -1968,44 +1983,59 @@ td {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-.modal-image {
+.modal-content {
+  position: relative;
   max-width: 90%;
+  max-height: 90%;
+}
+
+.preview-image {
+  max-width: 100%;
   max-height: 90vh;
   object-fit: contain;
+}
+
+.close-button {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.close-button:hover {
+  color: #ccc;
 }
 
 @media (max-width: 768px) {
   .maintenance-reports .ticket,
   .maintenance-reports .ticket-headings {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 5px;
   }
 
-  .maintenance-reports .ticket > div,
-  .maintenance-reports .ticket-headings > div {
-    text-align: center;
+  .maintenance-reports .ticket > div {
+    padding: 5px;
   }
 
   .maintenance-table td {
-    display: block;
-    width: 100%;
-    text-align: left;
     padding: 8px;
+    font-size: 0.9rem;
   }
 
   .maintenance-label {
-    width: 100%;
-    display: block;
-    background-color: #f8f9fa;
-    padding: 8px;
-    margin-bottom: 5px;
+    width: 150px;
   }
 }
 
