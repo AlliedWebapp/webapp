@@ -1590,42 +1590,41 @@ td {
   color: #333;
 }
 
-.tickets {
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 2rem;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
 }
 
-.ticket-headings {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  gap: 1rem;
+.improvement-reports table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.improvement-reports th {
+  background-color: #f8fafc;
   padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+  text-align: left;
   font-weight: 600;
   color: #4a5568;
-  margin-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
 }
 
-.ticket {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  gap: 1rem;
+.improvement-reports td {
   padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  color: #2d3748;
 }
 
-.ticket:hover {
-  background: #f8f9fa;
+.improvement-reports tr:hover {
+  background-color: #f7fafc;
 }
 
-.btn {
+.improvement-reports .view-btn {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -1635,30 +1634,8 @@ td {
   transition: background-color 0.2s ease;
 }
 
-.btn:hover {
+.improvement-reports .view-btn:hover {
   background-color: #45a049;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-}
-
-.btn-outline {
-  background-color: transparent;
-  border: 1px solid #4CAF50;
-  color: #4CAF50;
-}
-
-.btn-outline:hover {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.no-fsrs {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
 }
 
 @media (max-width: 768px) {
@@ -1666,14 +1643,119 @@ td {
     padding: 1rem;
   }
 
-  .ticket-headings,
-  .ticket {
+  .improvement-reports table {
+    font-size: 0.8rem;
+  }
+
+  .improvement-reports th,
+  .improvement-reports td {
+    padding: 0.75rem;
+  }
+}
+
+/* Status styles for improvement reports */
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-approved {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-in-progress {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-completed {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+/* Improvement Reports Table Styles */
+.improvement-reports {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.improvement-reports h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.improvement-reports .ticket {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.improvement-reports .ticket-headings {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.improvement-reports .btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.improvement-reports .btn:hover {
+  background-color: #45a049;
+}
+
+.improvement-reports .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .improvement-reports {
+    padding: 1rem;
+  }
+
+  .improvement-reports .ticket,
+  .improvement-reports .ticket-headings {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
 
-  .ticket-headings > div,
-  .ticket > div {
+  .improvement-reports .ticket > div,
+  .improvement-reports .ticket-headings > div {
     padding: 0.5rem;
     border-bottom: 1px solid #e2e8f0;
   }

@@ -14,8 +14,8 @@ import FSR from './pages/FSR'; // Import the FSR component
 import FSRDetails from './pages/FSRDetails';
 import Monthly from './pages/monthly';
 import ImprovementReport from './pages/ImprovementReport';
-import ViewImprovementReport from './pages/ViewImprovementReport';
-import ImprovementReportDetails from './pages/ImprovementReportDetails';
+import ViewImprovementReport from './pages/ViewImprovementReport'; 
+import ImporovementReportDetails from './pages/ImporovementReportDetails';   
 import MaintenanceReport from './pages/MaintenanceReport';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
 import OtherReports from './pages/OtherReports';  
@@ -42,11 +42,11 @@ function App() {
               <Route path="/fsr/:id" element={<FSRDetails />} />
               <Route path="/monthly" element={<Monthly />} />
               <Route path="/improvement-report" element={<ImprovementReport />} />
-              <Route path="/improvementreports" element={<ViewImprovementReport />} />
-              <Route path="/improvementreports/:id" element={<ImprovementReportDetails />} />
               <Route path="/maintenance-report" element={<MaintenanceReport />} />
               <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
               <Route path="/other-reports" element={<OtherReports />} />
+              <Route path="/view-improvement-report" element={<ViewImprovementReport />} />
+              <Route path="/improvement-report-details/:id" element={<ImporovementReportDetails />} />
             </Route>
           </Routes>
         </div>
