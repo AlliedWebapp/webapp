@@ -76,123 +76,109 @@ const ImprovementReportDetails = () => {
       <div className="improvement-details-container">
         <div className="improvement-header">
           <h2>Improvement Report Details</h2>
-          <BackButton url="/improvement-reports" />
+          <BackButton url="/view-improvement-reports" />
         </div>
 
-        <div className="improvement-section">
-          <h3>Basic Information</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>Report ID</label>
-              <p>{report.irId}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Department</label>
-              <p>{report.department}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Equipment Number</label>
-              <p>{report.equipment_no}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Equipment System</label>
-              <p>{report.equipment_system}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="improvement-section">
-          <h3>Location Details</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>Location</label>
-              <p>{report.location}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Area</label>
-              <p>{report.area}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="improvement-section">
-          <h3>Improvement Details</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>Objectives</label>
-              <p>{report.objectives}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Present Condition</label>
-              <p>{report.present_condition}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Proposed Modification</label>
-              <p>{report.modification}</p>
-            </div>
-            <div className="improvement-field">
-  <label>Concept Date</label>
-  <p>{new Date(report.concept_date).toLocaleDateString()}</p>
-</div>
-<div className="improvement-field">
-  <label>Implementation Date</label>
-  <p>{new Date(report.implementation_date).toLocaleDateString()}</p>
-</div>
-            <div className="improvement-field">
-              <label>Resources Required</label>
-              <p>{report.resources}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Mandays</label>
-              <p>{report.mandays}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Cost</label>
-              <p>{report.cost}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Payback Period</label>
-              <p>{report.payback}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Expected End Result</label>
-              <p>{report.end_result}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Additional Information</label>
-              <p>{report.additional_info}</p>
-            </div>
-          </div>
-        </div>
+        <table className="improvement-table">
+          <tbody>
+            <tr>
+              <td className="improvement-label">Report ID</td>
+              <td>{report.irId}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Department</td>
+              <td>{report.department}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Equipment Number</td>
+              <td>{report.equipment_no}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Equipment System</td>
+              <td>{report.equipment_system}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Location</td>
+              <td>{report.location}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Area</td>
+              <td>{report.area}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Objectives</td>
+              <td>{report.objectives}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Present Condition</td>
+              <td>{report.present_condition}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Proposed Modification</td>
+              <td>{report.modification}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Concept Date</td>
+              <td>{new Date(report.concept_date).toLocaleDateString()}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Implementation Date</td>
+              <td>{new Date(report.implementation_date).toLocaleDateString()}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Resources Required</td>
+              <td>{report.resources}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Mandays</td>
+              <td>{report.mandays}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Cost</td>
+              <td>{report.cost}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Payback Period</td>
+              <td>{report.payback}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Expected End Result</td>
+              <td>{report.end_result}</td>
+            </tr>
+            <tr>
+              <td className="improvement-label">Additional Information</td>
+              <td>{report.additional_info}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <div className="improvement-section">
           <h3>Signatures</h3>
           <div className="improvement-grid">
-          <div className="improvement-field">
-  <label>HOD Signature</label>
-  {report.hodSignature ? (
-    <img
-      src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
-      alt="HOD Signature"
-      className="signature-image"
-    />
-  ) : (
-    <p>No HOD Signature</p>
-  )}
-</div>
-<div className="improvement-field">
-  <label>Plant Head Signature</label>
-  {report.plantInchargeSignature ? (
-    <img
-      src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
-      alt="Plant Head Signature"
-      className="signature-image"
-    />
-  ) : (
-    <p>No Plant Head Signature</p>
-  )}
-</div>
-
+            <div className="improvement-field">
+              <label>HOD Signature</label>
+              {report.hodSignature ? (
+                <img
+                  src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
+                  alt="HOD Signature"
+                  className="signature-image"
+                />
+              ) : (
+                <p>No HOD Signature</p>
+              )}
+            </div>
+            <div className="improvement-field">
+              <label>Plant Head Signature</label>
+              {report.plantInchargeSignature ? (
+                <img
+                  src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
+                  alt="Plant Head Signature"
+                  className="signature-image"
+                />
+              ) : (
+                <p>No Plant Head Signature</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

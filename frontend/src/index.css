@@ -1725,7 +1725,7 @@ td {
 }
 
 .improvement-reports .btn {
-  background-color: #4CAF50;
+  background-color: #000;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -1735,7 +1735,18 @@ td {
 }
 
 .improvement-reports .btn:hover {
-  background-color: #45a049;
+  background-color: #333;
+}
+
+.improvement-reports .btn-outline {
+  background-color: transparent;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.improvement-reports .btn-outline:hover {
+  background-color: #000;
+  color: white;
 }
 
 .improvement-reports .btn-sm {
@@ -1941,6 +1952,37 @@ td {
   .improvement-reports-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Improvement Report Table Styles */
+.improvement-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.improvement-table tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.improvement-table tr:last-child {
+  border-bottom: none;
+}
+
+.improvement-table td {
+  padding: 1rem;
+  vertical-align: top;
+}
+
+.improvement-label {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #4a5568;
+  width: 20%;
+  min-width: 150px;
+  white-space: nowrap;
 }
 
 
