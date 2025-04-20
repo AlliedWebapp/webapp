@@ -1761,4 +1761,93 @@ td {
   }
 }
 
+/* Improvement Report Details Styles */
+.improvement-details {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.improvement-details-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.improvement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.improvement-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.improvement-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.improvement-section h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+.improvement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.improvement-field {
+  background: white;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.improvement-field label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.improvement-field p {
+  margin: 0;
+  color: #212529;
+  line-height: 1.5;
+}
+
+.signature-image {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .improvement-details {
+    padding: 1rem;
+  }
+
+  .improvement-details-container {
+    padding: 1rem;
+  }
+
+  .improvement-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
