@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 
@@ -10,97 +10,97 @@ const imageToBase64 = (buffer) => {
   return `data:image/jpeg;base64,${btoa(binary)}`;      
 };
 
-function ViewImprovementReport() {
+const ViewImprovementReport = () => {
   const [reports, setReports] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        console.log("Starting to fetch improvement reports...");
-        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/improvement-reports", {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+        setLoading(true);
+        const response = await fetch(
+          "https://backend-services-theta.vercel.app/api/reports/improvement-reports",
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
 
-        console.log("Raw API Response:", res);
-        console.log("Response Data:", res.data);
+        if (!response.ok) {
+          throw new Error("Failed to fetch reports");
+        }
 
-        if (res.data) {
-          if (Array.isArray(res.data.reports)) {
-            console.log("Reports found:", res.data.reports);
-            setReports(res.data.reports);
-          } else if (Array.isArray(res.data)) {
-            console.log("Reports array found directly:", res.data);
-            setReports(res.data);
-          } else {
-            console.warn("Unexpected response format:", res.data);
-            setReports([]);
-          }
+        const data = await response.json();
+        console.log("Improvement Reports Data:", data);
+
+        if (data.reports && Array.isArray(data.reports)) {
+          setReports(data.reports);
         } else {
-          console.warn("No data in response");
           setReports([]);
         }
-        setIsLoading(false);
       } catch (err) {
-        console.error("Error fetching improvement reports:", err);
-        console.error("Error details:", {
-          message: err.message,
-          response: err.response?.data,
-          status: err.response?.status
-        });
-        setError(err.response?.data?.message || "Failed to fetch reports");
-        setIsLoading(false);
+        console.error("Error fetching reports:", err);
+        setError(err.message);
+        toast.error("Failed to load improvement reports");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchReports();
   }, []);
 
-  if (isLoading) return <Spinner />;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="error">
+        <p>{error}</p>
+        <button onClick={() => navigate(-1)}>Go Back</button>
+      </div>
+    );
+  }
 
   return (
-    <div className="ticket-page">
-      <BackButton url="/other-reports" />
-      <h2 className="ticket-heading">Improvement Reports</h2>
+    <div className="improvement-reports">
+      <div className="improvement-reports-container">
+        <div className="improvement-reports-header">
+          <h2>Improvement Reports</h2>
+          <BackButton />
+        </div>
 
-      {reports.length === 0 ? (
-        <p>No improvement reports found</p>
-      ) : (
-        <div className="ticket">
-          <div className="ticket-headings">
-            <div>IR ID</div>
-            <div>Date</div>
-            <div>Department</div>
-            <div>Location</div>
-            <div>Actions</div>
+        {reports.length === 0 ? (
+          <p>No improvement reports found</p>
+        ) : (
+          <div className="improvement-reports-grid">
+            {reports.map((report) => (
+              <div key={report._id} className="improvement-report-card">
+                <div className="improvement-report-info">
+                  <h3>Report ID: {report.irId}</h3>
+                  <p><strong>Department:</strong> {report.department}</p>
+                  <p><strong>Equipment Number:</strong> {report.equipment_no}</p>
+                  <p><strong>Location:</strong> {report.location}</p>
+                  <p><strong>Objectives:</strong> {report.objectives}</p>
+                </div>
+                <button
+                  className="view-btn"
+                  onClick={() => navigate(`/improvement-reports/${report._id}`)}
+                >
+                  View Details
+                </button>
+              </div>
+            ))}
           </div>
-          {reports.map((report) => (
-  <div key={report._id} className="ticket-row">
-    <div>{report.irId || 'N/A'}</div>
-    <div>{report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'N/A'}</div>
-    <div>{report.department || 'N/A'}</div>
-    <div>{report.location || 'N/A'}</div>
-    <div>
-      <button
-        onClick={() => navigate(`/improvement-report/${report._id}`)}
-        className="btn btn-sm"
-      >
-        View Details
-      </button>
-    </div>
-  </div>
-))}
-        </div>      
-      )}
+        )}
+      </div>
     </div>
   );
-
-}
+};
 
 export default ViewImprovementReport; 
