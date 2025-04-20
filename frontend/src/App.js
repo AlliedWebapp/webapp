@@ -15,7 +15,7 @@ import FSRDetails from './pages/FSRDetails';
 import Monthly from './pages/monthly';
 import ImprovementReport from './pages/ImprovementReport';
 import ViewImprovementReport from './pages/ViewImprovementReport'; 
-import ImporovementReportDetails from './pages/ImporovementReportDetails';   
+import ImprovementReportDetails from './pages/ImprovementReportDetails';   
 import MaintenanceReport from './pages/MaintenanceReport';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
 import OtherReports from './pages/OtherReports';  
@@ -46,7 +46,7 @@ function App() {
               <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
               <Route path="/other-reports" element={<OtherReports />} />
               <Route path="/view-improvement-report" element={<ViewImprovementReport />} />
-              <Route path="/improvement-report-details/:id" element={<ImporovementReportDetails />} />
+              <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
             </Route>
           </Routes>
         </div>
