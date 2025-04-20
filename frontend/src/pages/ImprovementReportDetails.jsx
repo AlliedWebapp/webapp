@@ -159,12 +159,12 @@ const ImprovementReportDetails = () => {
             <tr>
               <td className="improvement-label">HOD Signature</td>
               <td colSpan="5">
-                {report.hodSignature && (
+                {report.hod_sign && (
                   <img
-                    src={imageToBase64(report.hodSignature)}
+                    src={imageToBase64(report.hod_sign)}
                     alt="HOD Signature"
                     className="signature-image"
-                    onClick={() => handleImageClick(report.hodSignature)}
+                    onClick={() => handleImageClick(report.hod_sign)}
                   />
                 )}
               </td>
@@ -172,12 +172,12 @@ const ImprovementReportDetails = () => {
             <tr>
               <td className="improvement-label">Plant Head Signature</td>
               <td colSpan="5">
-                {report.plantInchargeSignature && (
+                {report.plant_incharge_sign && (
                   <img
-                    src={imageToBase64(report.plantInchargeSignature)}
+                    src={imageToBase64(report.plant_incharge_sign)}
                     alt="Plant Head Signature"
                     className="signature-image"
-                    onClick={() => handleImageClick(report.plantInchargeSignature)}
+                    onClick={() => handleImageClick(report.plant_incharge_sign)}
                   />
                 )}
               </td>
