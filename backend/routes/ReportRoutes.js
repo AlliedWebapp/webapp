@@ -38,7 +38,7 @@ router.post(
 // ✅ New GET route for improvement reports
 router.get("/view-improvement-reports", getAllImprovementReports);
 //get improvement report by id
-router.get("/improvement-report/:id", getImprovementReportByMongoId); // ✅ Correct handler
+router.get("/improvement-report-details/:id", getImprovementReportByMongoId); // ✅ Correct handler
 
 
 // 🚧 Maintenance Report Route

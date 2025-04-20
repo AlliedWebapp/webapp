@@ -66,6 +66,7 @@ function ViewImprovementReport() {
       </div>
     );
   }
+  
 
   return (
     <div className="improvement-reports">

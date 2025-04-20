@@ -46,6 +46,7 @@ const ImprovementReport = () => {
       data.append(key, value);
     });
   
+    // Append files only if they exist
     if (hodSign) data.append("hodSign", hodSign);
     if (plantSign) data.append("plantSign", plantSign);
   
@@ -57,7 +58,7 @@ const ImprovementReport = () => {
   
       if (response.ok) {
         alert("Improvement Report submitted successfully!");
-        
+  
         // Reset the form after successful submission
         setFormData({
           number: "",

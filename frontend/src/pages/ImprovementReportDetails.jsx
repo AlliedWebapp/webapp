@@ -168,26 +168,27 @@ const ImprovementReportDetails = () => {
         <div className="improvement-section">
           <h3>Signatures</h3>
           <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>HOD Signature</label>
-              {report.hodSignature && (
-                <img
-                  src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
-                  alt="HOD Signature"
-                  className="signature-image"
-                />
-              )}
-            </div>
-            <div className="improvement-field">
-              <label>Plant Head Signature</label>
-              {report.plantInchargeSignature && (
-                <img
-                  src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
-                  alt="Plant Head Signature"
-                  className="signature-image"
-                />
-              )}
-            </div>
+          <div className="improvement-field">
+  <label>HOD Signature</label>
+  {report.hodSignature && (
+    <img
+      src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
+      alt="HOD Signature"
+      className="signature-image"
+    />
+  )}
+</div>
+<div className="improvement-field">
+  <label>Plant Head Signature</label>
+  {report.plantInchargeSignature && (
+    <img
+      src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
+      alt="Plant Head Signature"
+      className="signature-image"
+    />
+  )}
+</div>
+
           </div>
         </div>
       </div>
