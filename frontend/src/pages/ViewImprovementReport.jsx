@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+// ViewImprovementReport.jsx
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
-import axios from "axios"; // ✅ axios import
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -11,92 +11,100 @@ const imageToBase64 = (buffer) => {
   return `data:image/jpeg;base64,${btoa(binary)}`;
 };
 
-const ViewImprovementReport = () => {
+function ViewImprovementReport() {
   const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        setLoading(true);
-        const { data } = await axios.get(
-          "https://backend-services-theta.vercel.app/api/reports/improvement-reports",
-          {
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
+        console.log("Fetching Improvement Reports...");
+        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/improvement-reports", {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
           }
-        );
+        });
 
-        console.log("Improvement Reports Data:", data);
+        console.log("Improvement Reports Response:", res.data);
 
-        if (data.reports && Array.isArray(data.reports)) {
-          setReports(data.reports);
+        if (res.data && Array.isArray(res.data.reports)) {
+          setReports(res.data.reports);
         } else {
+          console.warn("Unexpected response format:", res.data);
           setReports([]);
         }
+
+        setIsLoading(false);
       } catch (err) {
-        console.error("Error fetching reports:", err);
-        setError(err.message);
-        toast.error("Failed to load improvement reports");
-      } finally {
-        setLoading(false);
+        console.error("Failed to fetch Improvement Reports:", err);
+        if (err.response) {
+          setMessage(`Server error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
+        } else if (err.request) {
+          setMessage("No response from server. Please check your connection.");
+        } else {
+          setMessage(`Error: ${err.message}`);
+        }
+        setIsError(true);
+        setIsLoading(false);
       }
     };
 
     fetchReports();
   }, []);
 
-  if (loading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
 
-  if (error) {
+  if (isError) {
     return (
-      <div className="error">
-        <p>{error}</p>
-        <button onClick={() => navigate(-1)}>Go Back</button>
+      <div className="error-container">
+        <h3 className="text-red-500">Error: {message}</h3>
+        <BackButton url="/" />
       </div>
     );
   }
 
   return (
     <div className="improvement-reports">
-      <div className="improvement-reports-container">
-        <div className="improvement-reports-header">
-          <h2>Improvement Reports</h2>
-          <BackButton />
+      <BackButton url="/" />
+      <h1>Improvement Reports</h1>
+      <div className="tickets">
+        <div className="ticket-headings">
+          <div>IR ID</div>
+          <div>Date</div>
+          <div>Department</div>
+          <div>Location</div>
+          <div></div>
         </div>
 
-        {reports.length === 0 ? (
-          <p>No improvement reports found</p>
-        ) : (
-          <div className="improvement-reports-grid">
-            {reports.map((report) => (
-              <div key={report._id} className="improvement-report-card">
-                <div className="improvement-report-info">
-                  <h3>Report ID: {report.irId}</h3>
-                  <p><strong>Department:</strong> {report.department}</p>
-                  <p><strong>Equipment Number:</strong> {report.equipment_no}</p>
-                  <p><strong>Location:</strong> {report.location}</p>
-                  <p><strong>Objectives:</strong> {report.objectives}</p>
-                </div>
+        {reports.length > 0 ? (
+          reports.map((report) => (
+            <div className="ticket" key={report._id}>
+              <div>{report.irId}</div>
+              <div>{new Date(report.createdAt).toLocaleDateString()}</div>
+              <div>{report.department}</div>
+              <div>{report.location}</div>
+              <div>
                 <button
-                  className="view-btn"
+                  className="btn btn-sm btn-outline"
                   onClick={() => navigate(`/improvement-reports/${report._id}`)}
                 >
-                  View Details
+                  View
                 </button>
               </div>
-            ))}
+            </div>
+          ))
+        ) : (
+          <div className="no-fsrs">
+            <p>No improvement reports found. Please create a new one.</p>
           </div>
         )}
       </div>
     </div>
   );
-};
+}
 
 export default ViewImprovementReport;
