@@ -62,7 +62,7 @@ function ViewMaintenanceReport() {
 
   return (
     <div className="maintenance-reports">
-      <BackButton url="/" />
+      <BackButton url="/other-reports" />
       <h1>Maintenance Reports</h1>
       <div className="tickets">
         <div className="ticket-headings">

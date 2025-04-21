@@ -72,7 +72,7 @@ const MaintenanceReport = () => {
   
   return (
     <div className="maintenance-report">
-      <BackButton url="/tickets" />
+      <BackButton url="/other-reports" />
       <header className="header">
         <h2>BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT</h2>
         <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
