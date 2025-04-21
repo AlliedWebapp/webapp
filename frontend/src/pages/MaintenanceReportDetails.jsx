@@ -7,29 +7,9 @@ import BackButton from "../components/BackButton";
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
   try {
-    if (!buffer) {
-      console.error("No image data provided");
-      return null;
-    }
-
-    // If the data is already a base64 string, return it directly
-    if (typeof buffer === 'string' && buffer.startsWith('data:image')) {
-      return buffer;
-    }
-
-    // If the data is an object with a base64 string
-    if (buffer.data && typeof buffer.data === 'string' && buffer.data.startsWith('data:image')) {
-      return buffer.data;
-    }
-
-    // If the data is a buffer that needs conversion
-    if (buffer.data && Array.isArray(buffer.data)) {
-      const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-      return `data:image/jpeg;base64,${btoa(binary)}`;
-    }
-
-    console.error("Invalid image format:", buffer);
-    return null;
+    if (!buffer || !buffer.data) return null;
+    const binary = String.fromCharCode(...new Uint8Array(buffer.data));
+    return `data:image/jpeg;base64,${btoa(binary)}`;
   } catch (error) {
     console.error("Error converting image to base64:", error);
     return null;
@@ -161,40 +141,26 @@ const MaintenanceReportDetails = () => {
             <tr>
               <td className="maintenance-label">HOD Signature</td>
               <td colSpan="5">
-                {report.hodSignature && report.hodSignature.data && report.hodSignature.data.length > 20 ? (
+                {report.hodSignature && (
                   <img
                     src={imageToBase64(report.hodSignature)}
                     alt="HOD Signature"
                     className="signature-image"
                     onClick={() => handleImageClick(report.hodSignature)}
-                    onError={(e) => {
-                      console.error("Error loading HOD signature image");
-                      e.target.style.display = 'none';
-                      e.target.parentElement.textContent = 'Signature not available';
-                    }}
                   />
-                ) : (
-                  <span className="no-signature">No signature available</span>
                 )}
               </td>
             </tr>
             <tr>
               <td className="maintenance-label">Plant Incharge Signature</td>
               <td colSpan="5">
-                {report.plantInchargeSignature && report.plantInchargeSignature.data && report.plantInchargeSignature.data.length > 20 ? (
+                {report.plantInchargeSignature && (
                   <img
                     src={imageToBase64(report.plantInchargeSignature)}
                     alt="Plant Incharge Signature"
                     className="signature-image"
                     onClick={() => handleImageClick(report.plantInchargeSignature)}
-                    onError={(e) => {
-                      console.error("Error loading Plant Incharge signature image");
-                      e.target.style.display = 'none';
-                      e.target.parentElement.textContent = 'Signature not available';
-                    }}
                   />
-                ) : (
-                  <span className="no-signature">No signature available</span>
                 )}
               </td>
             </tr>
