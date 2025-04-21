@@ -94,10 +94,12 @@ const ImprovementReportDetails = () => {
 
   return (
     <div className="improvement-details">
+      <div className="back-button-container">
+        <BackButton url="/view-improvement-reports" className="black-back-button" />
+      </div>
       <div className="improvement-details-container">
         <div className="improvement-header">
-          <h2>Improvement Report Details</h2>
-          <BackButton url="/view-improvement-reports" />
+          <h2 className="small-centered-title">Improvement Report Details</h2>
         </div>
 
         <table className="improvement-table">

@@ -94,10 +94,12 @@ const MaintenanceReportDetails = () => {
 
   return (
     <div className="maintenance-details">
+      <div className="back-button-container">
+        <BackButton url="/view-maintenance-reports" className="black-back-button" />
+      </div>
       <div className="maintenance-details-container">
         <div className="maintenance-header">
-          <h2>Maintenance Report Details</h2>
-          <BackButton url="/view-maintenance-reports" />
+          <h2 className="small-centered-title">Maintenance Report Details</h2>
         </div>
 
         <table className="maintenance-table">

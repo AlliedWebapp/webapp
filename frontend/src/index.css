@@ -2095,26 +2095,28 @@ td {
 }
 
 .back-button-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
 }
 
-.black-back-button {
-  background-color: black;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+.small-centered-title {
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 20px 0;
 }
 
-.black-back-button:hover {
-  background-color: #333;
+.improvement-header,
+.maintenance-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.improvement-details,
+.maintenance-details {
+  position: relative;
+  padding-top: 60px;
 }
 
 
