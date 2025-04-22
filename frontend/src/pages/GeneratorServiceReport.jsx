@@ -239,9 +239,9 @@ const GeneratorServiceReport = () => {
       <label>Spare Used</label>
       <select name="spareused" value={formData.spareused} onChange={handleChange}>
         <option value="">Select a spare part</option>
-        {spareOptions.map((spare, index) => (
-          <option key={spare.id} value={spare.description}>
-            {spare.description} {spare.quantity > 0 ? `(Quantity: ${spare.quantity})` : ''}
+        {spareOptions.map((spare) => (
+          <option key={spare._id} value={spare["Spare Discription"]}>
+            {spare["Spare Discription"]} {spare["CLOSING STOCK ( NOS )"] ? `(Quantity: ${spare["CLOSING STOCK ( NOS )"]})` : ''}
           </option>
         ))}
       </select>
