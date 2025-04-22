@@ -100,12 +100,16 @@ const GeneratorServiceReport = () => {
   };
 
   // Fetch spare options based on ticketId
-  
-  // Fetch spare options based on ticketId
   useEffect(() => {
     const fetchSpareOptions = async () => {
       try {
-        const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`);
+        const token = localStorage.getItem('token');
+        const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (!res.ok) {
           console.error("Failed to fetch spare options, status:", res.status);
           return;
