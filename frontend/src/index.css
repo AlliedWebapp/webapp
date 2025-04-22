@@ -484,6 +484,7 @@ h3 {
 .inventory-page {
   font-family: 'Poppins', sans-serif;
   padding: 20px;
+  background-color: #f8f9fa;
 }
 
 h2 {
@@ -2127,6 +2128,7 @@ td {
   border: 1px solid #ffeeba;
   border-radius: 10px;
   padding: 1rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .low-stock-toggle {
@@ -2137,14 +2139,19 @@ td {
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .low-stock-toggle:hover {
-  background-color: #79031d;
+  background-color: #e67e22;
 }
 
 .low-stock-table {
   margin-top: 1rem;
+}
+/* New style to highlight low stock rows in the table */
+.low-stock-table tr.low-stock {
+  background-color: #f8d7da; /* Light red background to indicate urgency */
 }
 
 .low-stock-table h3 {

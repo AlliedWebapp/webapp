@@ -149,13 +149,21 @@ const Inventory = () => {
         ))}
       </select>
 
+      {/* ✅ Project Name Below Dropdown */}
+      {selectedCollection && (
+        <p style={{ marginTop: "0.5rem", fontSize: "1rem", fontWeight: "normal" }}>
+          {getCollectionDetails(selectedCollection)?.name} Project
+        </p>
+      )}
+
+      {/* Low Stock Toggle Button */}
       {selectedCollection && (
         <div style={{ margin: "1rem 0" }}>
           <button
             onClick={() => setShowLowStock(!showLowStock)}
             style={{
               padding: "8px 12px",
-              backgroundColor: "#e74c3c", // red
+              backgroundColor: "#e74c3c",
               color: "#fff",
               border: "none",
               cursor: "pointer",
@@ -172,9 +180,7 @@ const Inventory = () => {
 
       {selectedCollection && !loading && !error && (
         <div>
-          <h3>Inventory for {getCollectionDetails(selectedCollection)?.name}</h3>
-
-          {/* Low Stock Table appears first */}
+          {/* ✅ Show Low Stock Items Table with clean heading */}
           {showLowStock && lowStockItems.length > 0 && (
             <div style={{ marginBottom: "2rem" }}>
               <h3 style={{ color: "#e74c3c" }}>Low Stock Items</h3>
@@ -202,6 +208,11 @@ const Inventory = () => {
               </table>
             </div>
           )}
+
+          {/* ✅ Inventory Title Now After Low Stock Section */}
+          <h3 style={{ color: "#2c3e50", marginTop: "1.5rem" }}>
+            Inventory for {getCollectionDetails(selectedCollection)?.name}
+          </h3>
 
           {/* Main Inventory Table */}
           <table border="1">
