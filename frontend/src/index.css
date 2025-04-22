@@ -2151,12 +2151,13 @@ td {
 }
 /* New style to highlight low stock rows in the table */
 .low-stock-table tr.low-stock {
-  background-color: #f8d7da; /* Light red background to indicate urgency */
+  background-color: #d46b74; /* Light red background to indicate urgency */
 }
 
 .low-stock-table h3 {
   margin-bottom: 0.5rem;
   color: #79031d;
 }
+
 
 

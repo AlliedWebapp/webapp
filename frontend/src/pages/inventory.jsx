@@ -151,7 +151,7 @@ const Inventory = () => {
 
       {/* ✅ Project Name Below Dropdown */}
       {selectedCollection && (
-        <p style={{ marginTop: "0.5rem", fontSize: "1rem", fontWeight: "normal" }}>
+        <p style={{ marginTop: "0.5rem", fontSize: "1.5rem", fontWeight: "bold" }}>
           {getCollectionDetails(selectedCollection)?.name} Project
         </p>
       )}
