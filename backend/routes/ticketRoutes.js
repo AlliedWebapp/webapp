@@ -74,47 +74,72 @@ router.get("/:ticketId/spare-description", protect, async (req, res) => {
       });
     }
 
+    // Mapping of collections to their models and field names
+    const collectionMapping = {
+      'jogini': { 
+        model: require("../models/Jogini"),
+        field: 'spareDescription'
+      },
+      'jogini-ii': { 
+        model: require("../models/Jogini"),
+        field: 'spareDescription'
+      },
+      'kuwarsi': { 
+        model: require("../models/Kuwarsi"),
+        field: 'nameOfMaterials'
+      },
+      'kuwarsi-ii': { 
+        model: require("../models/Kuwarsi"),
+        field: 'nameOfMaterials'
+      },
+      'jhp kuwarsi-ii': { 
+        model: require("../models/Kuwarsi"),
+        field: 'nameOfMaterials'
+      },
+      'sdllp salun': { 
+        model: require("../models/SDLLPsalun"),
+        field: 'nameOfMaterials'
+      },
+      'sdllpsalun': { 
+        model: require("../models/SDLLPsalun"),
+        field: 'nameOfMaterials'
+      },
+      'shong': { 
+        model: require("../models/Shong"),
+        field: 'descriptionOfMaterial'
+      },
+      'solding': { 
+        model: require("../models/Solding"),
+        field: 'descriptionOfMaterial'
+      }
+    };
+
     const project = ticket.projectname.toLowerCase();
-    
-    // Validate project name
-    const validProjects = ['jogini', 'solding', 'shong', 'sdllpsalun', 'kuwarsi'];
-    if (!validProjects.includes(project)) {
+    const collectionInfo = collectionMapping[project];
+
+    if (!collectionInfo) {
       return res.status(400).json({ 
         msg: "Invalid project",
-        error: `Project '${project}' is not supported`
+        error: `Project '${project}' is not supported. Valid projects are: ${Object.keys(collectionMapping).join(', ')}`
       });
     }
 
-    // Fetch spare descriptions from the spares route
-    const response = await fetch(`https://backend-services-theta.vercel.app/api/spares/spares/${project}`);
+    // Fetch spares directly from the collection
+    const spares = await collectionInfo.model.find({}, `${collectionInfo.field} _id quantity`);
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Error from spares API: ${errorText}`);
-      return res.status(response.status).json({ 
-        msg: `Error fetching spare descriptions for ${project}`,
-        error: errorText
+    if (!spares || spares.length === 0) {
+      return res.status(404).json({ 
+        msg: "No spares found",
+        error: `No spares found for project ${project}`
       });
     }
 
-    const spareDescriptions = await response.json();
-    
-    // Map the response to a consistent format based on the project
-    const mappedDescriptions = spareDescriptions.map(spare => {
-      const fieldMapping = {
-        jogini: spare.spareDescription,
-        solding: spare.descriptionOfMaterial,
-        shong: spare.descriptionOfMaterial,
-        sdllpsalun: spare.nameOfMaterials,
-        kuwarsi: spare.nameOfMaterials
-      };
-      
-      return {
-        id: spare._id,
-        description: fieldMapping[project] || spare.description || spare.name || 'Unknown',
-        quantity: spare.quantity || 0
-      };
-    });
+    // Map the response to a consistent format
+    const mappedDescriptions = spares.map(spare => ({
+      id: spare._id,
+      description: spare[collectionInfo.field] || 'Unknown',
+      quantity: spare.quantity || 0
+    }));
 
     return res.status(200).json(mappedDescriptions);
   } catch (err) {

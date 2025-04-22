@@ -233,8 +233,8 @@ const GeneratorServiceReport = () => {
       <select name="spareused" value={formData.spareused} onChange={handleChange}>
         <option value="">Select a spare part</option>
         {spareOptions.map((spare, index) => (
-          <option key={index} value={spare.spareDescription || spare.descriptionOfMaterial || spare.nameOfMaterials}>
-            {spare.spareDescription || spare.descriptionOfMaterial || spare.nameOfMaterials}
+          <option key={spare.id} value={spare.description}>
+            {spare.description} {spare.quantity > 0 ? `(Quantity: ${spare.quantity})` : ''}
           </option>
         ))}
       </select>
