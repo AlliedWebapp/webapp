@@ -1,19 +1,19 @@
-//fomrat of form of service report form//
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
-import "../index.css"; // Global styles;
+import "../index.css"; // Global styles
 import axios from "axios";
 
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
+  console.log("Ticket ID:", ticketId);
 
   const [formData, setFormData] = useState({
     srNo: "",
     customerName: "",
-    installationAddress: "",  // updated from "address"
+    installationAddress: "",
     siteId: "",
-    commissioningDate: "",    // updated from "dateOfCommissioning"
+    commissioningDate: "",
     instanceId: "",
     state: "",
     rating: "",
@@ -21,10 +21,10 @@ const GeneratorServiceReport = () => {
     engineSerial: "",
     gensetSerial: "",
     runningHours: "",
-    taskStart: "",            // updated from "startTime"
-    taskEnd: "",              // updated from "endTime"
+    taskStart: "",
+    taskEnd: "",
     problemSummary: "",
-    natureOfFailure: "",      // updated from "failureNature"
+    natureOfFailure: "",
     checklist: "",
     engineerRemarks: "",
     customerRemarks: "",
@@ -34,9 +34,9 @@ const GeneratorServiceReport = () => {
     spareused: "",
     customerSignature: null,
     engineerSignature: null,
-    workPhotos: []
+    workPhotos: [],
   });
-  
+
   const [spareOptions, setSpareOptions] = useState([]);
   const [spareField, setSpareField] = useState("");
 
@@ -48,77 +48,84 @@ const GeneratorServiceReport = () => {
     kuwarsi: "nameOfMaterials",
   };
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prev) => ({ ...prev, [name]: value }));
-};
+  // Handle change in form fields
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-const handleFileChange = (e) => {
-  const { name, files } = e.target;
-  if (name === "workPhotos") {
-    setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
-  } else {
-    setFormData((prev) => ({ ...prev, [name]: files[0] }));
-  }
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const data = new FormData();
-  data.append("ticketId", ticketId);
-
-  Object.entries(formData).forEach(([key, value]) => {
-    if (key === "workPhotos") {
-      value.forEach((file) => data.append("workPhotos", file));
+  // Handle file uploads
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (name === "workPhotos") {
+      setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
     } else {
-      data.append(key, value);
-    }
-  });
-
-  try {
-    const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
-      method: "POST",
-      body: data,
-    });
-
-    if (response.ok) {
-      alert("Report submitted successfully!");
-    } else {
-      const errorData = await response.json();
-      console.error("Submit failed:", errorData);
-      alert("Failed to submit. Please try again.");
-    }
-  } catch (err) {
-    console.error("Error submitting form:", err);
-    alert("Something went wrong.");
-  }
-};
-useEffect(() => {
-  const fetchSpareOptions = async () => {
-    try {
-      const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/getProjectByTicketId/${ticketId}`);
-      const { project } = await res.json();
-
-      const collection = project?.toLowerCase();
-      const field = collectionToFieldMapping[collection];
-      setSpareField(field);
-
-      if (!field) {
-        console.warn("No mapping for project:", project);
-        return;
-      }
-
-      const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/inventory/${project}`);
-      const spares = await spareRes.json();
-      setSpareOptions(spares);
-    } catch (err) {
-      console.error("Error fetching spare options:", err);
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
     }
   };
 
-  fetchSpareOptions();
-}, [ticketId]);
+  // Submit form data
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append("ticketId", ticketId);
+
+    // Append form data
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "workPhotos") {
+        value.forEach((file) => data.append("workPhotos", file));
+      } else {
+        data.append(key, value);
+      }
+    });
+
+    try {
+      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
+        method: "POST",
+        body: data,
+      });
+
+      if (response.ok) {
+        alert("Report submitted successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Submit failed:", errorData);
+        alert("Failed to submit. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      alert("Something went wrong.");
+    }
+  };
+
+  // Fetch spare options based on ticketId
+  useEffect(() => {
+    const fetchSpareOptions = async () => {
+      try {
+        const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/getProjectByTicketId/${ticketId}`);
+        const { project } = await res.json();
+
+        const collection = project?.toLowerCase();
+        const field = collectionToFieldMapping[collection];
+        setSpareField(field);
+
+        if (!field) {
+          console.warn("No mapping for project:", project);
+          return;
+        }
+
+        // Fetch spare parts for the specific project
+        const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/inventory/${project}`);
+        const spares = await spareRes.json();
+        setSpareOptions(spares);
+      } catch (err) {
+        console.error("Error fetching spare options:", err);
+      }
+    };
+
+    if (ticketId) fetchSpareOptions();
+  }, [ticketId]);
 
 
   return (
@@ -220,7 +227,6 @@ useEffect(() => {
       <label>Customer Email</label>
       <input type="email" name="customerEmail" value={formData.customerEmail} onChange={handleChange} />
     </div>
-
     <div className="form-group">
             <label>Spare Used</label>
             <select name="spareused" value={formData.spareused} onChange={handleChange}>
@@ -232,7 +238,7 @@ useEffect(() => {
               ))}
             </select>
           </div>
-          
+
     <div className="form-group">
       <label>Upload Customer Signature</label>
       <input type="file" name="customerSignature" accept="image/*" onChange={handleFileChange} />
