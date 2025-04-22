@@ -197,6 +197,17 @@ const GeneratorServiceReport = () => {
       <input type="text" name="natureOfFailure" value={formData.natureOfFailure} onChange={handleChange} />
     </div>
     <div className="form-group">
+      <label>Spare Used</label>
+      <select name="spareused" value={formData.spareused} onChange={handleChange}>
+        <option value="">Select a spare part</option>
+        {spareOptions.map((spare, index) => (
+          <option key={index} value={spare.spareDescription || spare.descriptionOfMaterial || spare.nameOfMaterials}>
+            {spare.spareDescription || spare.descriptionOfMaterial || spare.nameOfMaterials}
+          </option>
+        ))}
+      </select>
+    </div>
+    <div className="form-group">
       <label>Checklist/Action Taken</label>
       <textarea name="checklist" rows="4" value={formData.checklist} onChange={handleChange} />
     </div>
@@ -220,18 +231,6 @@ const GeneratorServiceReport = () => {
       <label>Customer Email</label>
       <input type="email" name="customerEmail" value={formData.customerEmail} onChange={handleChange} />
     </div>
-    <div className="form-group">
-            <label>Spare Used</label>
-            <select name="spareused" value={formData.spareused} onChange={handleChange}>
-              <option value="">Select Spare</option>
-              {spareOptions.map((spare, index) => (
-                <option key={index} value={spare}>
-                  {spare}
-                  </option>
-              ))}
-            </select>
-          </div>
-
     <div className="form-group">
       <label>Upload Customer Signature</label>
       <input type="file" name="customerSignature" accept="image/*" onChange={handleFileChange} />
