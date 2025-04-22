@@ -77,39 +77,39 @@ router.get("/:ticketId/spare-description", protect, async (req, res) => {
     // Mapping of collections to their models and field names
     const collectionMapping = {
       'jogini': { 
-        model: require("../models/Jogini"),
+        model: 'Jogini',
         field: 'spareDescription'
       },
       'jogini-ii': { 
-        model: require("../models/Jogini"),
+        model: 'Jogini',
         field: 'spareDescription'
       },
       'kuwarsi': { 
-        model: require("../models/Kuwarsi"),
+        model: 'Kuwarsi',
         field: 'nameOfMaterials'
       },
       'kuwarsi-ii': { 
-        model: require("../models/Kuwarsi"),
+        model: 'Kuwarsi',
         field: 'nameOfMaterials'
       },
       'jhp kuwarsi-ii': { 
-        model: require("../models/Kuwarsi"),
+        model: 'Kuwarsi',
         field: 'nameOfMaterials'
       },
       'sdllp salun': { 
-        model: require("../models/SDLLPsalun"),
+        model: 'SDLLPsalun',
         field: 'nameOfMaterials'
       },
       'sdllpsalun': { 
-        model: require("../models/SDLLPsalun"),
+        model: 'SDLLPsalun',
         field: 'nameOfMaterials'
       },
       'shong': { 
-        model: require("../models/Shong"),
+        model: 'Shong',
         field: 'descriptionOfMaterial'
       },
       'solding': { 
-        model: require("../models/Solding"),
+        model: 'Solding',
         field: 'descriptionOfMaterial'
       }
     };
@@ -124,8 +124,33 @@ router.get("/:ticketId/spare-description", protect, async (req, res) => {
       });
     }
 
-    // Fetch spares directly from the collection
-    const spares = await collectionInfo.model.find({}, `${collectionInfo.field} _id quantity`);
+    // Get the appropriate controller function based on the collection
+    let getSparesFunction;
+    switch (collectionInfo.model) {
+      case 'Jogini':
+        getSparesFunction = require("../controllers/sparesController").getAllJogini;
+        break;
+      case 'Kuwarsi':
+        getSparesFunction = require("../controllers/sparesController").getAllKuwarsi;
+        break;
+      case 'SDLLPsalun':
+        getSparesFunction = require("../controllers/sparesController").getAllSDLLPsalun;
+        break;
+      case 'Shong':
+        getSparesFunction = require("../controllers/sparesController").getAllShong;
+        break;
+      case 'Solding':
+        getSparesFunction = require("../controllers/sparesController").getAllSolding;
+        break;
+      default:
+        return res.status(400).json({ 
+          msg: "Invalid collection",
+          error: `Collection '${collectionInfo.model}' is not supported`
+        });
+    }
+
+    // Call the appropriate controller function
+    const spares = await getSparesFunction(req, res, true); // true to indicate we want the raw data
     
     if (!spares || spares.length === 0) {
       return res.status(404).json({ 

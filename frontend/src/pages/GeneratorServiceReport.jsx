@@ -143,7 +143,14 @@ const GeneratorServiceReport = () => {
 
         const spareDescriptions = await res.json();
         console.log('Successfully fetched spare options:', spareDescriptions);
-        setSpareOptions(spareDescriptions);
+        
+        // Check if the response has the expected format
+        if (spareDescriptions.success && Array.isArray(spareDescriptions.data)) {
+          setSpareOptions(spareDescriptions.data);
+        } else {
+          console.error('Invalid response format:', spareDescriptions);
+          alert('Invalid response format from server');
+        }
       } catch (err) {
         console.error("Error fetching spare options:", err.message || err);
         alert('Failed to load spare options. Please try again later.');
