@@ -100,38 +100,26 @@ const GeneratorServiceReport = () => {
   };
 
   // Fetch spare options based on ticketId
+  
+  // Fetch spare options based on ticketId
   useEffect(() => {
     const fetchSpareOptions = async () => {
       try {
-        const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/getProjectByTicketId/${ticketId}`);
+        const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`);
         if (!res.ok) {
-          console.error("Failed to fetch project data, status:", res.status);
+          console.error("Failed to fetch spare options, status:", res.status);
           return;
         }
-  
-        const { collectionName } = await res.json(); // Destructure the collectionName
-        console.log("Fetched Collection Name:", collectionName);
-  
-        const collection = collectionName?.toLowerCase(); // Ensure collection is lowercase for consistency
-        const field = collectionToFieldMapping[collection];
-        setSpareField(field);
-  
-        if (!field) {
-          console.warn("No mapping for collection:", collection);
-          return;
-        }
-  
-        const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/inventory/${collection}`);
-        const spares = await spareRes.json();
-        setSpareOptions(spares);
+
+        const spareDescriptions = await res.json();
+        setSpareOptions(spareDescriptions);
       } catch (err) {
         console.error("Error fetching spare options:", err);
       }
     };
-  
+
     fetchSpareOptions();
   }, [ticketId]);
-  
 
   return (
     <div className="generator-service-report">
@@ -236,10 +224,10 @@ const GeneratorServiceReport = () => {
             <label>Spare Used</label>
             <select name="spareused" value={formData.spareused} onChange={handleChange}>
               <option value="">Select Spare</option>
-              {spareOptions.map((item, index) => (
-                <option key={index} value={item[spareField]}>
-                  {item[spareField]} — {item.SparesCount} pcs
-                </option>
+              {spareOptions.map((spare, index) => (
+                <option key={index} value={spare}>
+                  {spare}
+                  </option>
               ))}
             </select>
           </div>
