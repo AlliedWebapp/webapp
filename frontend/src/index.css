@@ -2155,7 +2155,7 @@ td {
 }
 /* New style to highlight low stock rows in the table */
 .low-stock td {
-  background-color: #cca2a6; /* Light red background to indicate urgency */
+  background-color: #F08080; /* Light red background to indicate urgency */
 }
 
 
