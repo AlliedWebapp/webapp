@@ -51,25 +51,78 @@ router.get("/:ticketId/spare-description", protect, async (req, res) => {
   const { ticketId } = req.params;
 
   try {
+    // Validate ticketId format
+    if (!ticketId || !/^[0-9a-fA-F]{24}$/.test(ticketId)) {
+      return res.status(400).json({ 
+        msg: "Invalid ticket ID format",
+        error: "Ticket ID must be a valid MongoDB ObjectId"
+      });
+    }
+
     const ticket = await require("../models/ticketModel").findById(ticketId);
     if (!ticket) {
-      return res.status(404).json({ msg: "Ticket not found" });
+      return res.status(404).json({ 
+        msg: "Ticket not found",
+        error: `No ticket found with ID: ${ticketId}`
+      });
     }
 
-    const project = ticket.projectname.toLowerCase();  // Get the project name (e.g., 'jogini')
+    if (!ticket.projectname) {
+      return res.status(400).json({ 
+        msg: "Invalid ticket data",
+        error: "Ticket does not have a project name"
+      });
+    }
 
-    // Fetch spare descriptions from the spares route (using the project/collection name)
+    const project = ticket.projectname.toLowerCase();
+    
+    // Validate project name
+    const validProjects = ['jogini', 'solding', 'shong', 'sdllpsalun', 'kuwarsi'];
+    if (!validProjects.includes(project)) {
+      return res.status(400).json({ 
+        msg: "Invalid project",
+        error: `Project '${project}' is not supported`
+      });
+    }
+
+    // Fetch spare descriptions from the spares route
     const response = await fetch(`https://backend-services-theta.vercel.app/api/spares/spares/${project}`);
-    const spareDescriptions = await response.json();
-
-    if (response.ok) {
-      return res.status(200).json(spareDescriptions);  // Send the spare descriptions back to frontend
-    } else {
-      return res.status(400).json({ msg: `Error fetching spare descriptions for ${project}` });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error from spares API: ${errorText}`);
+      return res.status(response.status).json({ 
+        msg: `Error fetching spare descriptions for ${project}`,
+        error: errorText
+      });
     }
+
+    const spareDescriptions = await response.json();
+    
+    // Map the response to a consistent format based on the project
+    const mappedDescriptions = spareDescriptions.map(spare => {
+      const fieldMapping = {
+        jogini: spare.spareDescription,
+        solding: spare.descriptionOfMaterial,
+        shong: spare.descriptionOfMaterial,
+        sdllpsalun: spare.nameOfMaterials,
+        kuwarsi: spare.nameOfMaterials
+      };
+      
+      return {
+        id: spare._id,
+        description: fieldMapping[project] || spare.description || spare.name || 'Unknown',
+        quantity: spare.quantity || 0
+      };
+    });
+
+    return res.status(200).json(mappedDescriptions);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: "Server Error", error: err.message });
+    console.error("Error in spare-description route:", err);
+    return res.status(500).json({ 
+      msg: "Server Error", 
+      error: err.message 
+    });
   }
 });
 

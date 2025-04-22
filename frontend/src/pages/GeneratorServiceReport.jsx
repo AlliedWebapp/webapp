@@ -110,6 +110,11 @@ const GeneratorServiceReport = () => {
           return;
         }
 
+        if (!ticketId) {
+          console.error('No ticket ID provided');
+          return;
+        }
+
         const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
@@ -118,19 +123,21 @@ const GeneratorServiceReport = () => {
         });
 
         if (!res.ok) {
-          let errorMessage;
+          let errorData;
           try {
-            const errorData = await res.json();
-            errorMessage = errorData.message || 'Unknown error occurred';
+            errorData = await res.json();
           } catch (e) {
-            // If response is not JSON, get the text
-            errorMessage = await res.text();
+            errorData = { msg: 'Unknown error occurred', error: await res.text() };
           }
+          
           console.error("Failed to fetch spare options:", {
             status: res.status,
             statusText: res.statusText,
-            error: errorMessage
+            ...errorData
           });
+          
+          // Show user-friendly error message
+          alert(`Error loading spare options: ${errorData.msg}\n${errorData.error || ''}`);
           return;
         }
 
@@ -139,6 +146,7 @@ const GeneratorServiceReport = () => {
         setSpareOptions(spareDescriptions);
       } catch (err) {
         console.error("Error fetching spare options:", err.message || err);
+        alert('Failed to load spare options. Please try again later.');
       }
     };
 
