@@ -2158,6 +2158,11 @@ td {
   margin-bottom: 0.5rem;
   color: #79031d;
 }
+/* New style to highlight low stock rows in the table */
+.low-stock {
+  background-color: #d4555f; /* Light red background to indicate urgency */
+}
+
 
 
 
