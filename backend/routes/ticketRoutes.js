@@ -56,10 +56,10 @@ router.get("/:ticketId/spare-description", protect, async (req, res) => {
       return res.status(404).json({ msg: "Ticket not found" });
     }
 
-    const project = ticket.project.toLowerCase();  // Get the project name (e.g., 'jogini')
+    const project = ticket.projectname.toLowerCase();  // Get the project name (e.g., 'jogini')
 
     // Fetch spare descriptions from the spares route (using the project/collection name)
-    const response = await fetch(`http://your-backend-url/api/spares/spares/${project}`);
+    const response = await fetch(`https://backend-services-theta.vercel.app/api/spares/spares/${project}`);
     const spareDescriptions = await response.json();
 
     if (response.ok) {
@@ -69,7 +69,7 @@ router.get("/:ticketId/spare-description", protect, async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).json({ msg: "Server Error", error: err.message });
   }
 });
 

@@ -118,11 +118,18 @@ const GeneratorServiceReport = () => {
         });
 
         if (!res.ok) {
-          const errorData = await res.json();
+          let errorMessage;
+          try {
+            const errorData = await res.json();
+            errorMessage = errorData.message || 'Unknown error occurred';
+          } catch (e) {
+            // If response is not JSON, get the text
+            errorMessage = await res.text();
+          }
           console.error("Failed to fetch spare options:", {
             status: res.status,
             statusText: res.statusText,
-            error: errorData
+            error: errorMessage
           });
           return;
         }
@@ -131,7 +138,7 @@ const GeneratorServiceReport = () => {
         console.log('Successfully fetched spare options:', spareDescriptions);
         setSpareOptions(spareDescriptions);
       } catch (err) {
-        console.error("Error fetching spare options:", err);
+        console.error("Error fetching spare options:", err.message || err);
       }
     };
 
