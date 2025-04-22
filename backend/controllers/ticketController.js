@@ -75,14 +75,13 @@ const createTicket = asyncHandler(async (req, res) => {
       date, 
       spare, 
       rating,
-      spareuse,
     } = req.body
 
    // Get uploaded files from multer
   const imageFiles = req.files;
   const imagePaths = imageFiles.map((file) => file.path); // save path to DB
 
-    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating || !spareuse) {
+    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
       res.status(400)
       throw new Error('Please provide all required fields')
     }
@@ -111,7 +110,6 @@ const createTicket = asyncHandler(async (req, res) => {
       date,
       spare,
       rating,
-      spareuse,
       images,
       user: req.user.id,
       status: 'new'

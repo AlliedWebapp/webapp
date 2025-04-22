@@ -46,6 +46,32 @@ router.get("/:ticketId/images/:index", protect, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+// **New Route** to fetch spare descriptions (based on collection)
+router.get("/:ticketId/spare-description", protect, async (req, res) => {
+  const { ticketId } = req.params;
 
+  try {
+    const ticket = await require("../models/ticketModel").findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({ msg: "Ticket not found" });
+    }
+
+    const project = ticket.project.toLowerCase();  // Get the project name (e.g., 'jogini')
+
+    // Fetch spare descriptions from the spares route (using the project/collection name)
+    const response = await fetch(`http://your-backend-url/api/spares/spares/${project}`);
+    const spareDescriptions = await response.json();
+
+    if (response.ok) {
+      return res.status(200).json(spareDescriptions);  // Send the spare descriptions back to frontend
+    } else {
+      return res.status(400).json({ msg: `Error fetching spare descriptions for ${project}` });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router;
+
