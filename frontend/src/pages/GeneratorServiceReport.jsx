@@ -46,24 +46,19 @@ const GeneratorServiceReport = () => {
   // Mapping of project names to their field names
   const projectFieldMapping = {
     'jogini': {
-      description: 'Spare Discription',
-      quantity: 'CLOSING STOCK ( NOS )'
+      description: 'Spare Discription'
     },
     'solding': {
-      description: 'Description of Material',
-      quantity: 'In Stock'
+      description: 'Description of Material'
     },
     'sdllpsalun': {
-      description: 'NAME OF MATERIALS',
-      quantity: 'CLOSING BALANCE'
+      description: 'NAME OF MATERIALS'
     },
     'kuwarsi': {
-      description: 'NAME OF MATERIALS',
-      quantity: 'CLOSING BALANCE'
+      description: 'NAME OF MATERIALS'
     },
     'shong': {
-      description: 'Description of Material',
-      quantity: 'In Stock'
+      description: 'Description of Material'
     }
   };
 
@@ -274,11 +269,10 @@ const GeneratorServiceReport = () => {
         {spareOptions.map((spare) => {
           const fields = projectFieldMapping[projectName] || projectFieldMapping['jogini'];
           const description = spare[fields.description] || 'Unknown';
-          const quantity = spare[fields.quantity] || '';
           
           return (
             <option key={spare._id} value={description}>
-              {description} {quantity ? `(Quantity: ${quantity})` : ''}
+              {description}
             </option>
           );
         })}
