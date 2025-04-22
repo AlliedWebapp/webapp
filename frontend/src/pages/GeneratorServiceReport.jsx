@@ -41,13 +41,30 @@ const GeneratorServiceReport = () => {
 
   const [spareOptions, setSpareOptions] = useState([]);
   const [spareField, setSpareField] = useState("");
+  const [projectName, setProjectName] = useState("");
 
-  const collectionToFieldMapping = {
-    jogini: "spareDescription",
-    solding: "descriptionOfMaterial",
-    shong: "descriptionOfMaterial",
-    sdllpsalun: "nameOfMaterials",
-    kuwarsi: "nameOfMaterials",
+  // Mapping of project names to their field names
+  const projectFieldMapping = {
+    'jogini': {
+      description: 'Spare Discription',
+      quantity: 'CLOSING STOCK ( NOS )'
+    },
+    'solding': {
+      description: 'Description of Material',
+      quantity: 'In Stock'
+    },
+    'sdllpsalun': {
+      description: 'NAME OF MATERIALS',
+      quantity: 'CLOSING BALANCE'
+    },
+    'kuwarsi': {
+      description: 'NAME OF MATERIALS',
+      quantity: 'CLOSING BALANCE'
+    },
+    'shong': {
+      description: 'Description of Material',
+      quantity: 'In Stock'
+    }
   };
 
   // Handle change in form fields
@@ -115,6 +132,23 @@ const GeneratorServiceReport = () => {
           return;
         }
 
+        // First fetch the ticket to get the project name
+        const ticketRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!ticketRes.ok) {
+          throw new Error('Failed to fetch ticket details');
+        }
+
+        const ticketData = await ticketRes.json();
+        const project = ticketData.projectname.toLowerCase();
+        setProjectName(project);
+
+        // Then fetch the spare descriptions
         const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
@@ -136,7 +170,6 @@ const GeneratorServiceReport = () => {
             ...errorData
           });
           
-          // Show user-friendly error message
           alert(`Error loading spare options: ${errorData.msg}\n${errorData.error || ''}`);
           return;
         }
@@ -144,7 +177,6 @@ const GeneratorServiceReport = () => {
         const spareDescriptions = await res.json();
         console.log('Successfully fetched spare options:', spareDescriptions);
         
-        // Check if the response has the expected format
         if (spareDescriptions.success && Array.isArray(spareDescriptions.data)) {
           setSpareOptions(spareDescriptions.data);
         } else {
@@ -239,11 +271,17 @@ const GeneratorServiceReport = () => {
       <label>Spare Used</label>
       <select name="spareused" value={formData.spareused} onChange={handleChange}>
         <option value="">Select a spare part</option>
-        {spareOptions.map((spare) => (
-          <option key={spare._id} value={spare["Spare Discription"]}>
-            {spare["Spare Discription"]} {spare["CLOSING STOCK ( NOS )"] ? `(Quantity: ${spare["CLOSING STOCK ( NOS )"]})` : ''}
-          </option>
-        ))}
+        {spareOptions.map((spare) => {
+          const fields = projectFieldMapping[projectName] || projectFieldMapping['jogini'];
+          const description = spare[fields.description] || 'Unknown';
+          const quantity = spare[fields.quantity] || '';
+          
+          return (
+            <option key={spare._id} value={description}>
+              {description} {quantity ? `(Quantity: ${quantity})` : ''}
+            </option>
+          );
+        })}
       </select>
     </div>
     <div className="form-group">
