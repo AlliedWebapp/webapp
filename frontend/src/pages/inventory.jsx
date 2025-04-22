@@ -64,15 +64,12 @@ const Inventory = () => {
       }
 
       const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/api/${selectedCollection}`;
-      console.log(`Fetching inventory from: ${apiUrl}`);
-
       const response = await axios.get(apiUrl, {
         headers: {
           'Authorization': `Bearer ${user.token}`,
           'Content-Type': 'application/json'
         }
       });
-      console.log("Fetched Inventory Data:", response.data);
 
       const collectionDetails = getCollectionDetails(selectedCollection);
       const items = response.data.data || [];
@@ -143,6 +140,7 @@ const Inventory = () => {
     <div>
       <BackButton url="/" />
       <h2>View Inventory</h2>
+
       <label>Select Project: </label>
       <select onChange={handleCollectionChange} value={selectedCollection}>
         <option value="">Select a Project</option>
@@ -151,14 +149,13 @@ const Inventory = () => {
         ))}
       </select>
 
-      {/* Show Low Stock Toggle Button placed directly below Select Project */}
       {selectedCollection && (
         <div style={{ margin: "1rem 0" }}>
           <button
             onClick={() => setShowLowStock(!showLowStock)}
             style={{
               padding: "8px 12px",
-              backgroundColor: "#f39c12",
+              backgroundColor: "#e74c3c", // red
               color: "#fff",
               border: "none",
               cursor: "pointer",
@@ -176,6 +173,37 @@ const Inventory = () => {
       {selectedCollection && !loading && !error && (
         <div>
           <h3>Inventory for {getCollectionDetails(selectedCollection)?.name}</h3>
+
+          {/* Low Stock Table appears first */}
+          {showLowStock && lowStockItems.length > 0 && (
+            <div style={{ marginBottom: "2rem" }}>
+              <h3 style={{ color: "#e74c3c" }}>Low Stock Items</h3>
+              <table border="1">
+                <thead>
+                  <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
+                </thead>
+                <tbody>
+                  {lowStockItems.map((item, index) => (
+                    <tr key={index}>
+                      {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
+                        let value = field.includes(".")
+                          ? field.split(".").reduce((obj, key) => obj?.[key], item)
+                          : item?.[field] ?? "N/A";
+                        if (Array.isArray(value)) value = value.join(", ");
+                        return <td key={idx}>{value ?? "N/A"}</td>;
+                      })}
+                      <td className="spares-btn-container">
+                        <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
+                        <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Main Inventory Table */}
           <table border="1">
             <thead>
               <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
@@ -202,34 +230,6 @@ const Inventory = () => {
               )}
             </tbody>
           </table>
-
-          {showLowStock && lowStockItems.length > 0 && (
-            <div style={{ marginTop: "1rem" }}>
-              <h3>Low Stock Items</h3>
-              <table border="1">
-                <thead>
-                  <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
-                </thead>
-                <tbody>
-                  {lowStockItems.map((item, index) => (
-                    <tr key={index}>
-                      {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
-                        let value = field.includes(".")
-                          ? field.split(".").reduce((obj, key) => obj?.[key], item)
-                          : item?.[field] ?? "N/A";
-                        if (Array.isArray(value)) value = value.join(", ");
-                        return <td key={idx}>{value ?? "N/A"}</td>;
-                      })}
-                      <td className="spares-btn-container">
-                        <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
-                        <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       )}
     </div>
