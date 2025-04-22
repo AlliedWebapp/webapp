@@ -105,22 +105,23 @@ const GeneratorServiceReport = () => {
       try {
         const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/getProjectByTicketId/${ticketId}`);
         if (!res.ok) {
-          console.error("Failed to fetch project data");
+          console.error("Failed to fetch project data, status:", res.status);
           return;
         }
-        const { project } = await res.json();
-        console.log("Fetched Project:", project);  // Log the project value
   
-        const collection = project?.toLowerCase();  // Ensure the project value is properly fetched
+        const { collectionName } = await res.json(); // Destructure the collectionName
+        console.log("Fetched Collection Name:", collectionName);
+  
+        const collection = collectionName?.toLowerCase(); // Ensure collection is lowercase for consistency
         const field = collectionToFieldMapping[collection];
         setSpareField(field);
   
         if (!field) {
-          console.warn("No mapping for project:", project);
+          console.warn("No mapping for collection:", collection);
           return;
         }
   
-        const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/inventory/${project}`);
+        const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/inventory/${collection}`);
         const spares = await spareRes.json();
         setSpareOptions(spares);
       } catch (err) {
