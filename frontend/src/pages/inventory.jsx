@@ -189,22 +189,22 @@ const Inventory = () => {
                   <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
                 </thead>
                 <tbody>
-                  {lowStockItems.map((item, index) => (
-                    <tr key={index}>
-                      {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
-                        let value = field.includes(".")
-                          ? field.split(".").reduce((obj, key) => obj?.[key], item)
-                          : item?.[field] ?? "N/A";
-                        if (Array.isArray(value)) value = value.join(", ");
-                        return <td key={idx}>{value ?? "N/A"}</td>;
-                      })}
-                      <td className="spares-btn-container">
-                        <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
-                        <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {lowStockItems.map((item, index) => (
+    <tr key={index} className={item.spareCount < 10 ? "low-stock" : ""}>
+      {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
+        let value = field.includes(".")
+          ? field.split(".").reduce((obj, key) => obj?.[key], item)
+          : item?.[field] ?? "N/A";
+        if (Array.isArray(value)) value = value.join(", ");
+        return <td key={idx}>{value ?? "N/A"}</td>;
+      })}
+      <td className="spares-btn-container">
+        <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
+        <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
+      </td>
+    </tr>
+  ))}
+</tbody>
               </table>
             </div>
           )}
