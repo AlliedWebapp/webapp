@@ -50,6 +50,12 @@ const ticketSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please enter DG rating']
     },
+
+    spareuse: {
+      type: String,
+      required: [true, 'Please enter spare used']
+    },
+
     images: [
       {
         data: Buffer,

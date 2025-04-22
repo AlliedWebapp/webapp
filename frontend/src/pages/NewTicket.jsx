@@ -21,7 +21,9 @@ function NewTicket() {
   const [date, setdate] = useState("");
   const [spare, setspare] = useState("");
   const [rating, setrating] = useState("");
+  const [spareuse, setspareuse] = useState("");
   const [images, setImages] = useState([]);
+
   
  
 
@@ -43,7 +45,7 @@ function NewTicket() {
     e.preventDefault();
     
     // Validate required fields
-    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
+    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating || !spareuse) {
       toast.error('Please fill in all fields');
       return;
     }
@@ -58,6 +60,7 @@ function NewTicket() {
     formData.append("date", date);
     formData.append("spare", spare);
     formData.append("rating", rating);
+    formData.append("spareuse", spareuse);
   
     images.forEach((image) => {
       formData.append("images", image);
@@ -218,6 +221,22 @@ function NewTicket() {
               ></textarea>
           </div>
         </section>
+
+        <section className="form">
+         <div className="form-group">
+          <label htmlFor="spareuse">Spare Use</label>
+          <textarea
+               className="form-control"
+               placeholder=""
+               value={spareuse}
+               name="Spare Use"
+               id="spareuse"
+               onChange={(e) => setspareuse(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+           ></textarea>
+         </div>
+       </section>
+
 
         <section className="form">
             <div className="form-group">
