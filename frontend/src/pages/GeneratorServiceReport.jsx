@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import "../index.css"; // Global styles
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
+  const { user } = useSelector((state) => state.auth);
   console.log("Ticket ID:", ticketId);
 
   const [formData, setFormData] = useState({
@@ -103,17 +105,14 @@ const GeneratorServiceReport = () => {
   useEffect(() => {
     const fetchSpareOptions = async () => {
       try {
-        const token = localStorage.getItem('token');
-        console.log('Token from localStorage:', token ? 'exists' : 'missing');
-        
-        if (!token) {
+        if (!user || !user.token) {
           console.error('No authentication token found. Please log in.');
           return;
         }
 
         const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json'
           }
         });
@@ -137,7 +136,7 @@ const GeneratorServiceReport = () => {
     };
 
     fetchSpareOptions();
-  }, [ticketId]);
+  }, [ticketId, user]);
 
   return (
     <div className="generator-service-report">
