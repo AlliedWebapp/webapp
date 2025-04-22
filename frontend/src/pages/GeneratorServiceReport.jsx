@@ -104,18 +104,22 @@ const GeneratorServiceReport = () => {
     const fetchSpareOptions = async () => {
       try {
         const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/getProjectByTicketId/${ticketId}`);
+        if (!res.ok) {
+          console.error("Failed to fetch project data");
+          return;
+        }
         const { project } = await res.json();
-
-        const collection = project?.toLowerCase();
+        console.log("Fetched Project:", project);  // Log the project value
+  
+        const collection = project?.toLowerCase();  // Ensure the project value is properly fetched
         const field = collectionToFieldMapping[collection];
         setSpareField(field);
-
+  
         if (!field) {
           console.warn("No mapping for project:", project);
           return;
         }
-
-        // Fetch spare parts for the specific project
+  
         const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/inventory/${project}`);
         const spares = await spareRes.json();
         setSpareOptions(spares);
@@ -123,10 +127,10 @@ const GeneratorServiceReport = () => {
         console.error("Error fetching spare options:", err);
       }
     };
-
-    if (ticketId) fetchSpareOptions();
+  
+    fetchSpareOptions();
   }, [ticketId]);
-
+  
 
   return (
     <div className="generator-service-report">
