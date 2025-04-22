@@ -104,18 +104,32 @@ const GeneratorServiceReport = () => {
     const fetchSpareOptions = async () => {
       try {
         const token = localStorage.getItem('token');
+        console.log('Token from localStorage:', token ? 'exists' : 'missing');
+        
+        if (!token) {
+          console.error('No authentication token found. Please log in.');
+          return;
+        }
+
         const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
+
         if (!res.ok) {
-          console.error("Failed to fetch spare options, status:", res.status);
+          const errorData = await res.json();
+          console.error("Failed to fetch spare options:", {
+            status: res.status,
+            statusText: res.statusText,
+            error: errorData
+          });
           return;
         }
 
         const spareDescriptions = await res.json();
+        console.log('Successfully fetched spare options:', spareDescriptions);
         setSpareOptions(spareDescriptions);
       } catch (err) {
         console.error("Error fetching spare options:", err);
