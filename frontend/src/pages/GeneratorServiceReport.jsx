@@ -54,7 +54,16 @@ const GeneratorServiceReport = () => {
     'sdllpsalun': {
       description: 'NAME OF MATERIALS'
     },
+    'sdllp salun': {
+      description: 'NAME OF MATERIALS'
+    },
     'kuwarsi': {
+      description: 'NAME OF MATERIALS'
+    },
+    'kuwarsi-ii': {
+      description: 'NAME OF MATERIALS'
+    },
+    'jhp kuwarsi-ii': {
       description: 'NAME OF MATERIALS'
     },
     'shong': {
@@ -141,6 +150,7 @@ const GeneratorServiceReport = () => {
 
         const ticketData = await ticketRes.json();
         const project = ticketData.projectname.toLowerCase();
+        console.log('Project name:', project); // Debug log
         setProjectName(project);
 
         // Then fetch the spare descriptions
@@ -268,7 +278,10 @@ const GeneratorServiceReport = () => {
         <option value="">Select a spare part</option>
         {spareOptions.map((spare) => {
           const fields = projectFieldMapping[projectName] || projectFieldMapping['jogini'];
-          const description = spare[fields.description] || 'Unknown';
+          const description = spare[fields.description] || spare['NAME OF MATERIALS'] || 'Unknown';
+          console.log('Spare item:', spare); // Debug log
+          console.log('Description field:', fields.description); // Debug log
+          console.log('Description value:', description); // Debug log
           
           return (
             <option key={spare._id} value={description}>
