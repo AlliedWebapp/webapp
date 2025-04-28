@@ -20,6 +20,7 @@ const fsrSchema = new mongoose.Schema({
   taskEnd: Date,
   problemSummary: String,
   natureOfFailure: String,
+  spareused: String,
   checklist: String,
   engineerRemarks: String,
   customerRemarks: String,

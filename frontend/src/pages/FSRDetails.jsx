@@ -136,6 +136,10 @@ function FSRDetails() {
               <td colSpan="5">{fsr.natureOfFailure}</td>
             </tr>
             <tr>
+              <td className="fsr-label">Spare Used</td>
+              <td colSpan="5">{fsr.spareused || "N/A"}</td>
+            </tr>
+            <tr>
               <td className="fsr-label">Checklist</td>
               <td colSpan="5">{fsr.checklist}</td>
             </tr>
