@@ -105,12 +105,22 @@ const Inventory = () => {
         return;
       }
 
+      // Get the description field based on the selected collection
+      const descriptionField = {
+        'Jogini': 'spareDescription',
+        'solding': 'descriptionOfMaterial',
+        'Shong': 'descriptionOfMaterial',
+        'SDLLPsalun': 'nameOfMaterials',
+        'Kuwarsi': 'nameOfMaterials'
+      }[selectedCollection];
+
       const response = await axios.patch(
         `${process.env.REACT_APP_API_BASE_URL}/api/update-spare-count`,
         {
-          collectionName: selectedCollection,
-          id,
-          increment,
+          projectName: selectedCollection.toLowerCase(),
+          descriptionField: descriptionField,
+          spareName: inventory.find(item => item._id === id)?.[descriptionField],
+          action: increment > 0 ? "increment" : "decrement"
         },
         {
           headers: {
