@@ -192,63 +192,45 @@ const GeneratorServiceReport = () => {
         // Ensure user and token are available
         if (!user || !user.token) {
           console.error('No authentication token found. Please log in.');
-          setIsLoading(false);
           return;
         }
-  
+
         if (!ticketId) {
           console.error('No ticket ID provided');
           alert('No ticket ID provided. Please try again.');
-          window.location.href = '/tickets'; // Redirect to tickets page
+          window.location.href = '/tickets';
           return;
         }
-  
+
         // Check if the report already exists
-        const reportRes = await fetch(`https://backend-services-theta.vercel.app/api/reports/check-fsr/${ticketId}`, {
+        const reportRes = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/check/${ticketId}`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json',
           },
         });
-  
+
         if (!reportRes.ok) {
           const errorData = await reportRes.json();
           throw new Error(errorData.message || 'Failed to check existing service report');
         }
-  
+
         const reportData = await reportRes.json();
-  
+
         if (reportData.exists) {
-          setReportExists(true);
           alert('A Generator Service Report has already been submitted for this ticket.');
-          window.location.href = '/tickets'; // Redirect back to tickets
+          window.location.href = '/tickets';
           return;
         }
-  
+
         // If no report exists, proceed to fetch the spare options
-        const ticketRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}`, {
-          headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-  
-        if (!ticketRes.ok) {
-          throw new Error('Failed to fetch ticket details');
-        }
-  
-        const ticketData = await ticketRes.json();
-        const project = ticketData.projectname?.toLowerCase(); // Optional chaining
-        setProjectName(project);
-  
-        // Fetch spare descriptions based on the project name
         const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json',
           },
         });
-  
+
         if (!spareRes.ok) {
           let errorData;
           try {
@@ -256,17 +238,17 @@ const GeneratorServiceReport = () => {
           } catch (e) {
             errorData = { msg: 'Unknown error occurred', error: await spareRes.text() };
           }
-  
+          
           console.error('Failed to fetch spare options:', {
             status: spareRes.status,
             statusText: spareRes.statusText,
             ...errorData,
           });
-  
+          
           alert(`Error loading spare options: ${errorData.msg}\n${errorData.error || ''}`);
-          return; // Exit if spare options fetch fails
+          return;
         }
-  
+
         const spareDescriptions = await spareRes.json();
         if (spareDescriptions.success && Array.isArray(spareDescriptions.data)) {
           setSpareOptions(spareDescriptions.data);
@@ -281,24 +263,17 @@ const GeneratorServiceReport = () => {
         setIsLoading(false);
       }
     };
-  
+
     if (ticketId && user) {
-      setIsLoading(true); // Set loading state before starting async operations
+      setIsLoading(true);
       checkIfReportExistsAndFetchSpareOptions();
     }
-  }, [ticketId, user]); // Trigger when either ticketId or user changes
-  
-  // Render loading message while checking
+  }, [ticketId, user]);
+
   if (isLoading) {
-    return <div className="loading">Checking if report exists...</div>;
+    return <div className="loading">Loading...</div>;
   }
-  
-  // Render nothing if the report exists
-  if (reportExists) {
-    return null; // Don't render the form if report exists
-  }
-  
-  
+
   return (
     <div className="generator-service-report">
       <BackButton url="/tickets" />
