@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
   const { user } = useSelector((state) => state.auth);
+  const [previousSpare, setPreviousSpare] = useState(null);
   console.log("Ticket ID:", ticketId);
 
   const [formData, setFormData] = useState({
@@ -72,57 +73,69 @@ const GeneratorServiceReport = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [reportExists, setReportExists] = useState(false);
 
+  const updateSpareCount = async (spareName, action) => {
+    try {
+      if (!user || !user.token) {
+        console.error('No authentication token found. Please log in.');
+        return;
+      }
+
+      const projectMapping = projectFieldMapping[projectName];
+      if (!projectMapping) {
+        console.error('Project mapping not found for:', projectName);
+        return;
+      }
+
+      const descriptionField = projectMapping.description;
+
+      const response = await axios.patch(
+        `https://backend-services-theta.vercel.app/api/inventory/update-spare-count`,
+        {
+          projectName: projectName,
+          descriptionField: descriptionField,
+          spareName: spareName,
+          action: action,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (response.data.success) {
+        console.log(`Spare count ${action}ed successfully.`);
+      } else {
+        console.error(`Failed to ${action} spare count:`, response.data.message);
+        alert(`Failed to update spare count. Please try again.`);
+      }
+    } catch (err) {
+      console.error(`Error ${action}ing spare count:`, err);
+      alert(`Error updating spare count. Please try again.`);
+    }
+  };
+
   // Handle change in form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  
-    if (name === "spareused" && value) {
-      const decrementSpareCount = async () => {
-        try {
-          if (!user || !user.token) {
-            console.error('No authentication token found. Please log in.');
-            return;
-          }
-  
-          const projectMapping = projectFieldMapping[projectName];
-          if (!projectMapping) {
-            console.error('Project mapping not found for:', projectName);
-            return;
-          }
-  
-          const descriptionField = projectMapping.description;
-  
-          const response = await axios.patch(
-            `https://backend-services-theta.vercel.app/api/inventory/update-spare-count`,
-            {
-              projectName: projectName,
-              descriptionField: descriptionField,
-              spareName: value,
-              action: "decrement",
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${user.token}`,
-                'Content-Type': 'application/json',
-              }
-            }
-          );
-  
-          if (response.data.success) {
-            console.log('Spare count decremented successfully.');
-          } else {
-            console.error('Failed to decrement spare count:', response.data.message);
-            alert('Failed to update spare count. Please try again.');
-          }
-        } catch (err) {
-          console.error('Error decrementing spare count:', err);
-          alert('Error updating spare count. Please try again.');
-        }
-      };
-  
-      decrementSpareCount(); // <-- call the helper function
+    
+    if (name === "spareused") {
+      // If there was a previous selection, increment its count
+      if (previousSpare) {
+        updateSpareCount(previousSpare, "increment");
+      }
+      
+      // If a new spare is selected, decrement its count
+      if (value) {
+        updateSpareCount(value, "decrement");
+      }
+      
+      // Update the previous spare
+      setPreviousSpare(value);
     }
+    
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
   
 
@@ -356,10 +369,7 @@ const GeneratorServiceReport = () => {
         {spareOptions.map((spare) => {
           const fields = projectFieldMapping[projectName] || projectFieldMapping['jogini'];
           const description = spare[fields.description] || spare['NAME OF MATERIALS'] || 'Unknown';
-          const spareCount = spare.SparesCount || 0;
-          console.log('Spare item:', spare); // Debug log
-          console.log('Description field:', fields.description); // Debug log
-          console.log('Description value:', description); // Debug log
+          const spareCount = spare.spareCount || spare.SparesCount || 0;
           
           return (
             <option key={spare._id} value={description}>

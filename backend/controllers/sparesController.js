@@ -239,69 +239,78 @@ const getAllKuwarsi = async (req, res) => {
 // Function to update SpareCount
 const updatespareCount = async (req, res) => {
     try {
-        const { collectionName, id, increment } = req.body;
-        const userId = req.user._id; // Get user ID from authenticated request
-        const userName = req.user.name; // Get user name
-        const userEmail = req.user.email; // Get user email
+        const { projectName, descriptionField, spareName, action } = req.body;
+        const userId = req.user._id;
+        const userName = req.user.name;
+        const userEmail = req.user.email;
 
         // Debug logging
-        console.log("User details from request:", {
+        console.log("Update spare count request:", {
+            projectName,
+            descriptionField,
+            spareName,
+            action,
             userId,
             userName,
-            userEmail,
-            user: req.user
+            userEmail
         });
 
-        // Convert collectionName to lowercase for consistency
-        const normalizedCollectionName = collectionName.toLowerCase();
-        console.log(`Updating spare count for user ${userName} (${userEmail}) in collection ${normalizedCollectionName} for item ${id}`);
+        // Get the appropriate collection model based on projectName
+        let collection;
+        switch (projectName.toLowerCase()) {
+            case 'jogini':
+                collection = Jogini;
+                break;
+            case 'solding':
+                collection = solding;
+                break;
+            case 'shong':
+                collection = Shong;
+                break;
+            case 'sdllpsalun':
+                collection = SDLLPsalun;
+                break;
+            case 'kuwarsi':
+                collection = Kuwarsi;
+                break;
+            default:
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Invalid project name" 
+                });
+        }
+
+        // Find the spare item by its description
+        const spareItem = await collection.findOne({ [descriptionField]: spareName });
+        if (!spareItem) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Spare item not found" 
+            });
+        }
 
         // Find or create user-specific SpareCount
         let userSpareCount = await UserSpareCount.findOne({
             userId,
-            collectionName: normalizedCollectionName,
-            itemId: id
+            collectionName: projectName.toLowerCase(),
+            itemId: spareItem._id
         });
 
         if (!userSpareCount) {
-            console.log(`Creating new user-specific spare count for user ${userName} (${userEmail})`);
-            // Create new user-specific SpareCount starting at 0
             userSpareCount = await UserSpareCount.create({
                 userId,
                 userName,
                 userEmail,
-                collectionName: normalizedCollectionName,
-                itemId: id,
+                collectionName: projectName.toLowerCase(),
+                itemId: spareItem._id,
                 spareCount: 0
             });
-            console.log("Created new spare count:", userSpareCount);
-        } else {
-            // Update user info in case it has changed
-            userSpareCount.userName = userName;
-            userSpareCount.userEmail = userEmail;
-            await userSpareCount.save(); // Save the updated user info
-            console.log("Updated existing spare count:", userSpareCount);
         }
 
-        // Update the spareCount
-        const oldCount = userSpareCount.spareCount;
+        // Update the spareCount based on the action
+        const increment = action === "increment" ? 1 : -1;
         userSpareCount.spareCount = Math.max(0, userSpareCount.spareCount + increment);
         await userSpareCount.save();
-
-        console.log(`Updated spare count for user ${userName} (${userEmail}): ${oldCount} -> ${userSpareCount.spareCount}`);
-        console.log("Final spare count document:", userSpareCount);
-
-        // Format the date and time
-        const updatedAt = new Date(userSpareCount.updatedAt);
-        const formattedDate = updatedAt.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        });
 
         res.json({ 
             success: true, 
@@ -309,12 +318,15 @@ const updatespareCount = async (req, res) => {
             userDetails: {
                 name: userSpareCount.userName,
                 email: userSpareCount.userEmail
-            },
-            updatedAt: formattedDate
+            }
         });
     } catch (error) {
         console.error("Error updating SpareCount:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: "Server error", 
+            error: error.message 
+        });
     }
 };
 

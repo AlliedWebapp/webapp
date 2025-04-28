@@ -88,7 +88,7 @@ router.get("/debug", (req, res) => {
 });
 
 // Update spares count (protected route)
-router.put("/update-spare", protect, updatespareCount);
+router.patch("/update-spare-count", protect, updatespareCount);
 
 // Get user-specific SpareCounts for a collection (protected route)
 router.get("/spare-counts/:collectionName", protect, getUserSpareCounts);
