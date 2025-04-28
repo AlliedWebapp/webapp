@@ -40,9 +40,7 @@ const GeneratorServiceReport = () => {
   });
 
   const [spareOptions, setSpareOptions] = useState([]);
-  const [spareField, setSpareField] = useState("");
   const [projectName, setProjectName] = useState("");
-
   // Mapping of project names to their field names
   const projectFieldMapping = {
     'jogini': {
@@ -71,11 +69,62 @@ const GeneratorServiceReport = () => {
     }
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [reportExists, setReportExists] = useState(false);
+
   // Handle change in form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  
+    if (name === "spareused" && value) {
+      const decrementSpareCount = async () => {
+        try {
+          if (!user || !user.token) {
+            console.error('No authentication token found. Please log in.');
+            return;
+          }
+  
+          const projectMapping = projectFieldMapping[projectName];
+          if (!projectMapping) {
+            console.error('Project mapping not found for:', projectName);
+            return;
+          }
+  
+          const descriptionField = projectMapping.description;
+  
+          const response = await axios.patch(
+            `https://backend-services-theta.vercel.app/api/inventory/update-spare-count`,
+            {
+              projectName: projectName,
+              descriptionField: descriptionField,
+              spareName: value,
+              action: "decrement",
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${user.token}`,
+                'Content-Type': 'application/json',
+              }
+            }
+          );
+  
+          if (response.data.success) {
+            console.log('Spare count decremented successfully.');
+          } else {
+            console.error('Failed to decrement spare count:', response.data.message);
+            alert('Failed to update spare count. Please try again.');
+          }
+        } catch (err) {
+          console.error('Error decrementing spare count:', err);
+          alert('Error updating spare count. Please try again.');
+        }
+      };
+  
+      decrementSpareCount(); // <-- call the helper function
+    }
   };
+  
 
   // Handle file uploads
   const handleFileChange = (e) => {
@@ -91,6 +140,11 @@ const GeneratorServiceReport = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!user || !user.token) {
+      alert("Please log in to submit the report.");
+      return;
+    }
+
     const data = new FormData();
     data.append("ticketId", ticketId);
 
@@ -98,7 +152,7 @@ const GeneratorServiceReport = () => {
     Object.entries(formData).forEach(([key, value]) => {
       if (key === "workPhotos") {
         value.forEach((file) => data.append("workPhotos", file));
-      } else {
+      } else if (value !== null && value !== undefined) {
         data.append(key, value);
       }
     });
@@ -106,82 +160,114 @@ const GeneratorServiceReport = () => {
     try {
       const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        },
         body: data,
       });
 
+      const responseData = await response.json();
+
       if (response.ok) {
         alert("Report submitted successfully!");
+        window.location.href = "/tickets";
       } else {
-        const errorData = await response.json();
-        console.error("Submit failed:", errorData);
-        alert("Failed to submit. Please try again.");
+        if (responseData.error && responseData.error.includes("already been submitted")) {
+          alert("A service report has already been submitted for this ticket. Only one service report is allowed per ticket.");
+          window.location.href = "/tickets";
+        } else {
+          console.error("Submit failed:", responseData);
+          alert(responseData.message || "Failed to submit. Please try again.");
+        }
       }
     } catch (err) {
       console.error("Error submitting form:", err);
-      alert("Something went wrong.");
+      alert(err.message || "Something went wrong. Please try again.");
     }
   };
 
-  // Fetch spare options based on ticketId
   useEffect(() => {
-    const fetchSpareOptions = async () => {
+    const checkIfReportExistsAndFetchSpareOptions = async () => {
       try {
+        // Ensure user and token are available
         if (!user || !user.token) {
           console.error('No authentication token found. Please log in.');
+          setIsLoading(false);
           return;
         }
-
+  
         if (!ticketId) {
           console.error('No ticket ID provided');
+          alert('No ticket ID provided. Please try again.');
+          window.location.href = '/tickets'; // Redirect to tickets page
           return;
         }
-
-        // First fetch the ticket to get the project name
+  
+        // Check if the report already exists
+        const reportRes = await fetch(`https://backend-services-theta.vercel.app/api/reports/check-fsr/${ticketId}`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        if (!reportRes.ok) {
+          const errorData = await reportRes.json();
+          throw new Error(errorData.message || 'Failed to check existing service report');
+        }
+  
+        const reportData = await reportRes.json();
+  
+        if (reportData.exists) {
+          setReportExists(true);
+          alert('A Generator Service Report has already been submitted for this ticket.');
+          window.location.href = '/tickets'; // Redirect back to tickets
+          return;
+        }
+  
+        // If no report exists, proceed to fetch the spare options
         const ticketRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
-
+  
         if (!ticketRes.ok) {
           throw new Error('Failed to fetch ticket details');
         }
-
+  
         const ticketData = await ticketRes.json();
-        const project = ticketData.projectname.toLowerCase();
-        console.log('Project name:', project); // Debug log
+        const project = ticketData.projectname?.toLowerCase(); // Optional chaining
         setProjectName(project);
-
-        // Then fetch the spare descriptions
-        const res = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
+  
+        // Fetch spare descriptions based on the project name
+        const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
-
-        if (!res.ok) {
+  
+        if (!spareRes.ok) {
           let errorData;
           try {
-            errorData = await res.json();
+            errorData = await spareRes.json();
           } catch (e) {
-            errorData = { msg: 'Unknown error occurred', error: await res.text() };
+            errorData = { msg: 'Unknown error occurred', error: await spareRes.text() };
           }
-          
-          console.error("Failed to fetch spare options:", {
-            status: res.status,
-            statusText: res.statusText,
-            ...errorData
+  
+          console.error('Failed to fetch spare options:', {
+            status: spareRes.status,
+            statusText: spareRes.statusText,
+            ...errorData,
           });
-          
+  
           alert(`Error loading spare options: ${errorData.msg}\n${errorData.error || ''}`);
-          return;
+          return; // Exit if spare options fetch fails
         }
-
-        const spareDescriptions = await res.json();
-        console.log('Successfully fetched spare options:', spareDescriptions);
-        
+  
+        const spareDescriptions = await spareRes.json();
         if (spareDescriptions.success && Array.isArray(spareDescriptions.data)) {
           setSpareOptions(spareDescriptions.data);
         } else {
@@ -189,14 +275,30 @@ const GeneratorServiceReport = () => {
           alert('Invalid response format from server');
         }
       } catch (err) {
-        console.error("Error fetching spare options:", err.message || err);
-        alert('Failed to load spare options. Please try again later.');
+        console.error('Error:', err.message || err);
+        alert('Something went wrong. Please try again later.');
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    fetchSpareOptions();
-  }, [ticketId, user]);
-
+  
+    if (ticketId && user) {
+      setIsLoading(true); // Set loading state before starting async operations
+      checkIfReportExistsAndFetchSpareOptions();
+    }
+  }, [ticketId, user]); // Trigger when either ticketId or user changes
+  
+  // Render loading message while checking
+  if (isLoading) {
+    return <div className="loading">Checking if report exists...</div>;
+  }
+  
+  // Render nothing if the report exists
+  if (reportExists) {
+    return null; // Don't render the form if report exists
+  }
+  
+  
   return (
     <div className="generator-service-report">
       <BackButton url="/tickets" />
@@ -279,13 +381,14 @@ const GeneratorServiceReport = () => {
         {spareOptions.map((spare) => {
           const fields = projectFieldMapping[projectName] || projectFieldMapping['jogini'];
           const description = spare[fields.description] || spare['NAME OF MATERIALS'] || 'Unknown';
+          const spareCount = spare.SparesCount || 0;
           console.log('Spare item:', spare); // Debug log
           console.log('Description field:', fields.description); // Debug log
           console.log('Description value:', description); // Debug log
           
           return (
             <option key={spare._id} value={description}>
-              {description}
+              {description} (Available: {spareCount})
             </option>
           );
         })}

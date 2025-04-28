@@ -16,7 +16,7 @@ function Tickets() {
     dispatch(getTickets()).then(() => setHasFetched(true));
 
     return () => {
-      dispatch(reset());
+        dispatch(reset());
     };
   }, [dispatch]);
 
@@ -45,7 +45,7 @@ function Tickets() {
         </div>
         {tickets && tickets.length > 0 ? (
           tickets.map((ticket) => (
-            <TicketItem key={ticket._id} ticket={ticket} />
+          <TicketItem key={ticket._id} ticket={ticket} />
           ))
         ) : (
           <p>No tickets found.</p>
