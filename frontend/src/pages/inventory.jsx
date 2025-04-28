@@ -114,17 +114,31 @@ const Inventory = () => {
         'Kuwarsi': 'nameOfMaterials'
       }[selectedCollection];
 
+      // Find the spare item
+      const spareItem = inventory.find(item => item._id === id);
+      if (!spareItem) {
+        console.error("Spare item not found");
+        return;
+      }
+
+      const spareName = spareItem[descriptionField];
+      if (!spareName) {
+        console.error("Spare description not found");
+        return;
+      }
+
       const response = await axios.patch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/update-spare-count`,
+        `https://backend-services-theta.vercel.app/api/update-spare-count`,
         {
           projectName: selectedCollection.toLowerCase(),
           descriptionField: descriptionField,
-          spareName: inventory.find(item => item._id === id)?.[descriptionField],
+          spareName: spareName,
           action: increment > 0 ? "increment" : "decrement"
         },
         {
           headers: {
-            'Authorization': `Bearer ${user.token}`
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json'
           }
         }
       );
@@ -144,6 +158,19 @@ const Inventory = () => {
       }
     } catch (error) {
       console.error("Error updating spares count:", error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response:", error.response.data);
+        console.error("Error status:", error.response.status);
+        console.error("Error headers:", error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Error request:", error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", error.message);
+      }
       if (error.response?.status === 401) {
         console.error("Please log in again");
       }
