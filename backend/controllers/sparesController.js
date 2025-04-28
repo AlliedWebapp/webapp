@@ -239,25 +239,23 @@ const getAllKuwarsi = async (req, res) => {
 // Function to update SpareCount
 const updatespareCount = async (req, res) => {
     try {
-        const { projectName, descriptionField, spareName, action } = req.body;
+        const { collectionName, id, increment } = req.body;
         const userId = req.user._id;
         const userName = req.user.name;
         const userEmail = req.user.email;
 
-        // Debug logging
         console.log("Update spare count request:", {
-            projectName,
-            descriptionField,
-            spareName,
-            action,
+            collectionName,
+            id,
+            increment,
             userId,
             userName,
             userEmail
         });
 
-        // Get the appropriate collection model based on projectName
+        // Get the appropriate collection model based on collectionName
         let collection;
-        switch (projectName.toLowerCase()) {
+        switch (collectionName.toLowerCase()) {
             case 'jogini':
                 collection = Jogini;
                 break;
@@ -276,12 +274,12 @@ const updatespareCount = async (req, res) => {
             default:
                 return res.status(400).json({ 
                     success: false, 
-                    message: "Invalid project name" 
+                    message: "Invalid collection name" 
                 });
         }
 
-        // Find the spare item by its description
-        const spareItem = await collection.findOne({ [descriptionField]: spareName });
+        // Find the spare item by ID
+        const spareItem = await collection.findById(id);
         if (!spareItem) {
             return res.status(404).json({ 
                 success: false, 
@@ -292,8 +290,8 @@ const updatespareCount = async (req, res) => {
         // Find or create user-specific SpareCount
         let userSpareCount = await UserSpareCount.findOne({
             userId,
-            collectionName: projectName.toLowerCase(),
-            itemId: spareItem._id
+            collectionName: collectionName.toLowerCase(),
+            itemId: id
         });
 
         if (!userSpareCount) {
@@ -301,14 +299,13 @@ const updatespareCount = async (req, res) => {
                 userId,
                 userName,
                 userEmail,
-                collectionName: projectName.toLowerCase(),
-                itemId: spareItem._id,
+                collectionName: collectionName.toLowerCase(),
+                itemId: id,
                 spareCount: 0
             });
         }
 
-        // Update the spareCount based on the action
-        const increment = action === "increment" ? 1 : -1;
+        // Update the spareCount
         userSpareCount.spareCount = Math.max(0, userSpareCount.spareCount + increment);
         await userSpareCount.save();
 
