@@ -105,15 +105,19 @@ const Inventory = () => {
         return;
       }
 
-      const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/update-spare/`, {
-        collectionName: selectedCollection,
-        id,
-        increment,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`
+      const response = await axios.patch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/update-spare-count`,
+        {
+          collectionName: selectedCollection,
+          id,
+          increment,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
         }
-      });
+      );
 
       if (response.data.success) {
         setInventory((prevInventory) =>
