@@ -88,7 +88,7 @@ const GeneratorServiceReport = () => {
 
       const descriptionField = projectMapping.description;
 
-      const response = await axios.patch(
+      const response = await axios.put(
         `https://backend-services-theta.vercel.app/api/inventory/update-spare-count`,
         {
           projectName: projectName,

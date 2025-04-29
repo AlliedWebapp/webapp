@@ -88,7 +88,7 @@ router.get("/debug", (req, res) => {
 });
 
 // Update spares count (protected route)
-router.patch("/update-spare-count", protect, updatespareCount);
+router.put("/update-spare-count", protect, updatespareCount);
 
 
 // Data routes (protected)
