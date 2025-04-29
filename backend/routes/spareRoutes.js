@@ -38,19 +38,19 @@ router.get("/spares/:collectionName", protect, async (req, res) => {
       let collection;
       switch (normalizedCollectionName) {
         case 'jogini':
-          collection = require("../models/Jogini");
+          collection = require("../models/JoginiModel");
           break;
         case 'solding':
-          collection = require("../models/Solding");
+          collection = require("../models/soldingModel");
           break;
         case 'shong':
-          collection = require("../models/Shong");
+          collection = require("../models/ShongModel");
           break;
         case 'sdllpsalun':
-          collection = require("../models/SDLLPsalun");
+          collection = require("../models/SDLLPsalunModel");
           break;
         case 'kuwarsi':
-          collection = require("../models/Kuwarsi");
+          collection = require("../models/KuwarsiModel");
           break;
         default:
           return res.status(400).json({ msg: "Invalid collection name" });
@@ -90,8 +90,6 @@ router.get("/debug", (req, res) => {
 // Update spares count (protected route)
 router.patch("/update-spare-count", protect, updatespareCount);
 
-// Get user-specific SpareCounts for a collection (protected route)
-router.get("/spare-counts/:collectionName", protect, getUserSpareCounts);
 
 // Data routes (protected)
 router.get("/jogini", protect, getAllJogini);
@@ -150,7 +148,5 @@ router.get("/spares/:collectionName", protect, async (req, res) => {
     }
 });
 
-// Inventory route (you already have this, no change required)
-router.get("/inventory", protect, getSpareInventory);
 
 module.exports = router;

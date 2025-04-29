@@ -106,7 +106,7 @@ const Inventory = () => {
       }
 
       const response = await axios.patch(
-        `https://backend-services-theta.vercel.app/api/update-spare-count`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/update-spare-count`,
         {
           collectionName: selectedCollection,
           id: id,
@@ -121,16 +121,13 @@ const Inventory = () => {
       );
 
       if (response.data.success) {
-        setInventory((prevInventory) =>
-          prevInventory.map((item) =>
-            item._id === id ? { ...item, spareCount: response.data.spareCount } : item
-          )
-        );
-        setLowStockItems((prevLowStock) => {
-          const updated = inventory.map((item) =>
+        setInventory((prevInventory) => {
+          const updatedInventory = prevInventory.map((item) =>
             item._id === id ? { ...item, spareCount: response.data.spareCount } : item
           );
-          return updated.filter(item => item.spareCount < 10);
+          // Correctly update low stock items after inventory update
+          setLowStockItems(updatedInventory.filter(item => item.spareCount < 10));
+          return updatedInventory;
         });
       }
     } catch (error) {
