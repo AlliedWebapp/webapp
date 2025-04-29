@@ -1,10 +1,22 @@
-const Jogini = require("../models/JoginiModel");
-const Shong = require("../models/ShongModel");
-const solding = require("../models/soldingModel");
-const SDLLPsalun = require("../models/SDLLPsalunModel");
-const Kuwarsi = require("../models/KuwarsiModel");
+const JoginiModel = require("../models/JoginiModel");
+const ShongModel = require("../models/ShongModel");
+const soldingModel = require("../models/soldingModel");
+const SDLLPsalunModel = require("../models/SDLLPsalunModel");
+const KuwarsiModel = require("../models/KuwarsiModel");
 const UserSpareCount = require("../models/UserSpareCount");
 const mongoose = require("mongoose");
+
+// map the exact collectionName strings → your Mongoose models
+const MODEL_MAP = {
+    jogini:     JoginiModel,
+    solding:    SoldingModel,
+    shong:      ShongModel,
+    sdllpsalun: SDLLPSalunModel,
+    kuwarsi:    KuwarsiModel,
+  };
+
+
+
 const getSpareInventory = async (req, res) => {
     try {
         res.status(200).json({ message: 'Spare inventory endpoint' });
@@ -238,137 +250,122 @@ const getAllKuwarsi = async (req, res) => {
 
 // Function to update SpareCount
 const updatespareCount = async (req, res) => {
-    try {
-        const { collectionName, id, increment } = req.body;
-        const userId = req.user._id;
-        const userName = req.user.name;
-        const userEmail = req.user.email;
+  const { collectionName, id, increment } = req.body;
+  const userId   = req.user._id;
+  const userName = req.user.name;
+  const userEmail= req.user.email;
 
-        console.log("Update spare count request:", {
-            collectionName,
-            id,
-            increment,
-            userId,
-            userName,
-            userEmail
-        });
+  if (
+    typeof collectionName !== "string" ||
+    typeof id             !== "string" ||
+    typeof increment      !== "number"
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid payload" });
+  }
 
-        // Get the appropriate collection model based on collectionName
-        let collection;
-        switch (collectionName.toLowerCase()) {
-            case 'jogini':
-                collection = Jogini;
-                break;
-            case 'solding':
-                collection = solding;
-                break;
-            case 'shong':
-                collection = Shong;
-                break;
-            case 'sdllpsalun':
-                collection = SDLLPsalun;
-                break;
-            case 'kuwarsi':
-                collection = Kuwarsi;
-                break;
-            default:
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Invalid collection name" 
-                });
-        }
+  const Model = MODEL_MAP[collectionName.toLowerCase()];
+  if (!Model) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Unknown collection" });
+  }
 
-        // Find the spare item by ID
-        const spareItem = await collection.findById(id);
-        if (!spareItem) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Spare item not found" 
-            });
-        }
-
-        // Find or create user-specific SpareCount
-        let userSpareCount = await UserSpareCount.findOne({
-            userId,
-            collectionName: collectionName.toLowerCase(),
-            itemId: id
-        });
-
-        if (!userSpareCount) {
-            userSpareCount = await UserSpareCount.create({
-                userId,
-                userName,
-                userEmail,
-                collectionName: collectionName.toLowerCase(),
-                itemId: id,
-                spareCount: 0
-            });
-        }
-
-        // Update the spareCount
-        userSpareCount.spareCount = Math.max(0, userSpareCount.spareCount + increment);
-        await userSpareCount.save();
-
-        res.json({ 
-            success: true, 
-            spareCount: userSpareCount.spareCount,
-            userDetails: {
-                name: userSpareCount.userName,
-                email: userSpareCount.userEmail
-            }
-        });
-    } catch (error) {
-        console.error("Error updating SpareCount:", error);
-        res.status(500).json({ 
-            success: false,
-            message: "Server error", 
-            error: error.message 
-        });
+  try {
+    const spareItem = await Model.findById(id);
+    if (!spareItem) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Spare item not found" });
     }
+
+    let userSpareCount = await UserSpareCount.findOne({
+      userId,
+      collectionName: collectionName.toLowerCase(),
+      itemId: id
+    });
+
+    if (!userSpareCount) {
+      userSpareCount = new UserSpareCount({
+        userId,
+        userName,
+        userEmail,
+        collectionName: collectionName.toLowerCase(),
+        itemId: id,
+        spareCount: 0
+      });
+    }
+
+    userSpareCount.spareCount = Math.max(0, userSpareCount.spareCount + increment);
+    await userSpareCount.save();
+
+    res.json({
+      success:    true,
+      spareCount: userSpareCount.spareCount,
+      userDetails: {
+        name:  userSpareCount.userName,
+        email: userSpareCount.userEmail
+      }
+    });
+  } catch (error) {
+    console.error("Error updating SpareCount:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
 };
 
-// Function to get user-specific SpareCounts for a collection
 const getUserSpareCounts = async (req, res) => {
-    try {
-        const { collectionName } = req.params;
-        const userId = req.user._id;
+  try {
+    const { collectionName } = req.params;
+    const userId = req.user._id;
 
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: collectionName.toLowerCase()
-        });
+    const userSpareCounts = await UserSpareCount.find({
+      userId,
+      collectionName: collectionName.toLowerCase()
+    });
 
-        // Convert to a map for easier lookup
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = {
-                spareCount: item.spareCount,
-                userName: item.userName,
-                userEmail: item.userEmail
-            };
-            return map;
-        }, {});
+    const spareCountMap = userSpareCounts.reduce((map, item) => {
+      map[item.itemId.toString()] = {
+        spareCount: item.spareCount,
+        userName:   item.userName,
+        userEmail:  item.userEmail
+      };
+      return map;
+    }, {});
 
-        res.json({ 
-            success: true, 
-            spareCounts: spareCountMap,
-            userDetails: {
-                name: req.user.name,
-                email: req.user.email
-            }
-        });
-    } catch (error) {
-        console.error("Error fetching user SpareCounts:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
+    res.json({
+      success:     true,
+      spareCounts: spareCountMap,
+      userDetails: {
+        name:  req.user.name,
+        email: req.user.email
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching user SpareCounts:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
 };
 
 module.exports = {
-    getSpareInventory,
-    getAllSolding,
-    getAllShong,
-    getAllJogini,
-    getAllSDLLPsalun,
-    getAllKuwarsi,
-    updatespareCount,
-    getUserSpareCounts
+  getSpareInventory,
+  getAllSolding,
+  getAllShong,
+  getAllJogini,
+  getAllSDLLPsalun,
+  getAllKuwarsi,
+  updatespareCount,
+  getUserSpareCounts
 };
+
+
+
+

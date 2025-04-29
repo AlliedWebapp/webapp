@@ -1,6 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import BackButton from "../components/BackButton";
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const Inventory = () => {
   const [selectedCollection, setSelectedCollection] = useState(() => {
@@ -19,6 +21,7 @@ const Inventory = () => {
     }
   }, [selectedCollection]);
 
+  //data for each collection with fields
   const getCollectionDetails = (collection) => {
     const collections = {
       Jogini: {
@@ -57,84 +60,72 @@ const Inventory = () => {
     setError(null);
 
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user || !user.token) {
-        console.error("No user token found. Please log in.");
-        return;
-      }
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!userData?.token) throw new Error("No user token found");
 
-      const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/api/${selectedCollection}`;
-      const response = await axios.get(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
+      const res = await axios.get(
+        `${API_BASE_URL}/api/${selectedCollection}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userData.token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
-
-      const collectionDetails = getCollectionDetails(selectedCollection);
-      const items = response.data.data || [];
+      );
+      const items = res.data.data || [];
+      const details = getCollectionDetails(selectedCollection);
       setInventory(items);
-      setHeaders(collectionDetails.headers || []);
-      setLowStockItems(items.filter(item => item.spareCount < 10));
+      setHeaders(details.headers);
+      setLowStockItems(items.filter((it) => it.spareCount < 10));
     } catch (err) {
-      console.error("Error fetching inventory:", err);
-      setInventory([]);
+      console.error(err);
       setError(err.message);
+      setInventory([]);
     } finally {
       setLoading(false);
     }
   }, [selectedCollection]);
 
   useEffect(() => {
-    if (selectedCollection) {
-      fetchInventory();
-    }
+    fetchInventory();
   }, [selectedCollection, fetchInventory]);
 
-  const handleCollectionChange = useCallback((e) => {
-    const collection = e.target.value;
-    setSelectedCollection(collection);
-    localStorage.setItem("selectedCollection", collection);
-  }, []);
+  const handleCollectionChange = (e) => {
+    const col = e.target.value;
+    setSelectedCollection(col);
+    localStorage.setItem("selectedCollection", col);
+  };
 
-  const updatespareCount = async (id, increment) => {
+  // unified update endpoint
+  const updateSpareCount = async (id, delta) => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user || !user.token) {
-        console.error("No user token found. Please log in.");
-        return;
-      }
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!userData?.token) throw new Error("No auth token");
 
-      const response = await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/api/update-spare-count`,
-        {
-          collectionName: selectedCollection,
-          id: id,
-          increment: increment
-        },
+      const res = await axios.put(
+        `${API_BASE_URL}/api/update-spare-count`,
+        { collectionName: selectedCollection, id, increment: delta },
         {
           headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${userData.token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      if (response.data.success) {
-        setInventory((prevInventory) => {
-          const updatedInventory = prevInventory.map((item) =>
-            item._id === id ? { ...item, spareCount: response.data.spareCount } : item
+      if (res.data.success) {
+        setInventory((prev) => {
+          const updated = prev.map((it) =>
+            it._id === id ? { ...it, spareCount: res.data.spareCount } : it
           );
-          // Correctly update low stock items after inventory update
-          setLowStockItems(updatedInventory.filter(item => item.spareCount < 10));
-          return updatedInventory;
+          setLowStockItems(updated.filter((it) => it.spareCount < 10));
+          return updated;
         });
+      } else {
+        console.error("Update failed:", res.data.message);
       }
-    } catch (error) {
-      console.error("Error updating spares count:", error);
-      if (error.response?.status === 401) {
-        console.error("Please log in again");
-      }
+    } catch (err) {
+      console.error("Error updating spare count:", err);
     }
   };
 
@@ -143,33 +134,43 @@ const Inventory = () => {
       <BackButton url="/" />
       <h2>View Inventory</h2>
 
-      <label>Select Project: </label>
-      <select onChange={handleCollectionChange} value={selectedCollection}>
+      <label htmlFor="project-select">Select Project: </label>
+      <select
+        id="project-select"
+        onChange={handleCollectionChange}
+        value={selectedCollection}
+      >
         <option value="">Select a Project</option>
         {["Jogini", "Shong", "solding", "SDLLPsalun", "Kuwarsi"].map((key) => (
-          <option key={key} value={key}>{getCollectionDetails(key).name}</option>
+          <option key={key} value={key}>
+            {getCollectionDetails(key).name}
+          </option>
         ))}
       </select>
 
-      {/* ✅ Project Name Below Dropdown */}
       {selectedCollection && (
-        <p style={{ marginTop: "0.5rem", fontSize: "1.5rem", fontWeight: "bold" }}>
-          {getCollectionDetails(selectedCollection)?.name} Project
+        <p
+          style={{
+            marginTop: "0.5rem",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+          }}
+        >
+          {getCollectionDetails(selectedCollection).name} Project
         </p>
       )}
 
-      {/* Low Stock Toggle Button */}
       {selectedCollection && (
         <div style={{ margin: "1rem 0" }}>
           <button
-            onClick={() => setShowLowStock(!showLowStock)}
+            onClick={() => setShowLowStock((s) => !s)}
             style={{
               padding: "8px 12px",
               backgroundColor: "#e74c3c",
               color: "#fff",
               border: "none",
               cursor: "pointer",
-              borderRadius: "5px"
+              borderRadius: "5px",
             }}
           >
             {showLowStock ? "Hide" : "Show"} Low Stock Items
@@ -181,72 +182,95 @@ const Inventory = () => {
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
       {selectedCollection && !loading && !error && (
-        <div>
-          {/* ✅ Show Low Stock Items Table with clean heading */}
+        <>
           {showLowStock && lowStockItems.length > 0 && (
             <div style={{ marginBottom: "2rem" }}>
               <h3 style={{ color: "#e74c3c" }}>Low Stock Items</h3>
               <table border="1">
                 <thead>
-                  <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
+                  <tr>
+                    {headers.map((header, i) => (
+                      <th key={i}>{header}</th>
+                    ))}
+                    <th>Adjust</th>
+                  </tr>
                 </thead>
                 <tbody>
-  {lowStockItems.map((item, index) => (
-    <tr key={index} className={item.spareCount < 10 ? "low-stock" : ""}>
-      {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
-        let value = field.includes(".")
-          ? field.split(".").reduce((obj, key) => obj?.[key], item)
-          : item?.[field] ?? "N/A";
-        if (Array.isArray(value)) value = value.join(", ");
-        return <td key={idx}>{value ?? "N/A"}</td>;
-      })}
-      <td className="spares-btn-container">
-        <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
-        <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
-      </td>
-    </tr>
-  ))}
-</tbody>
+                  {lowStockItems.map((item) => (
+                    <tr
+                      key={item._id}
+                      className={item.spareCount < 10 ? "low-stock" : ""}
+                    >
+                      {getCollectionDetails(selectedCollection).dbFields.map(
+                        (field, idx) => {
+                          let value = field.includes(".")
+                            ? field.split(".").reduce((o, k) => o?.[k], item)
+                            : item?.[field];
+                          if (Array.isArray(value)) value = value.join(", ");
+                          return <td key={idx}>{value ?? "N/A"}</td>;
+                        }
+                      )}
+                      <td>
+                        <button onClick={() => updateSpareCount(item._id, 1)}>
+                          ➕
+                        </button>
+                        <button onClick={() => updateSpareCount(item._id, -1)}>
+                          ➖
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </div>
           )}
 
-          {/* ✅ Inventory Title Now After Low Stock Section */}
           <h3 style={{ color: "#2c3e50", marginTop: "1.5rem" }}>
-            Inventory for {getCollectionDetails(selectedCollection)?.name}
+            Inventory for {getCollectionDetails(selectedCollection).name}
           </h3>
-
-          {/* Main Inventory Table */}
           <table border="1">
             <thead>
-              <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
+              <tr>
+                {headers.map((header, i) => (
+                  <th key={i}>{header}</th>
+                ))}
+                <th>Adjust</th>
+              </tr>
             </thead>
             <tbody>
               {inventory.length > 0 ? (
-                inventory.map((item, index) => (
-                  <tr key={index}>
-                    {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
-                      let value = field.includes(".")
-                        ? field.split(".").reduce((obj, key) => obj?.[key], item)
-                        : item?.[field] ?? "N/A";
-                      if (Array.isArray(value)) value = value.join(", ");
-                      return <td key={idx}>{value ?? "N/A"}</td>;
-                    })}
-                    <td className="spares-btn-container">
-                      <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
-                      <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
+                inventory.map((item) => (
+                  <tr key={item._id}>
+                    {getCollectionDetails(selectedCollection).dbFields.map(
+                      (field, idx) => {
+                        let value = field.includes(".")
+                          ? field.split(".").reduce((o, k) => o?.[k], item)
+                          : item?.[field];
+                        if (Array.isArray(value)) value = value.join(", ");
+                        return <td key={idx}>{value ?? "N/A"}</td>;
+                      }
+                    )}
+                    <td>
+                      <button onClick={() => updateSpareCount(item._id, 1)}>
+                        ➕
+                      </button>
+                      <button onClick={() => updateSpareCount(item._id, -1)}>
+                        ➖
+                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={headers.length}>No inventory data available</td></tr>
+                <tr>
+                  <td colSpan={headers.length + 1}>
+                    No inventory data available
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
-        </div>
+        </>
       )}
     </div>
   );
-};
-
-export default Inventory;
+}

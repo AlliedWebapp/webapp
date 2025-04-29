@@ -5,10 +5,24 @@ import "../index.css"; // Global styles
 import axios from "axios";
 import { useSelector } from "react-redux";
 
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+// Map your project keys (lowercased) → the field name that holds the description
+const projectFieldMapping = {
+  jogini:        { description: "Spare Discription" },
+  solding:       { description: "Description of Material" },
+  sdllpsalun:    { description: "NAME OF MATERIALS" },
+  "sdllp salun": { description: "NAME OF MATERIALS" },
+  kuwarsi:       { description: "NAME OF MATERIALS" },
+  "kuwarsi-ii":  { description: "NAME OF MATERIALS" },
+  "jhp kuwarsi-ii": { description: "NAME OF MATERIALS" },
+  shong:         { description: "Description of Material" },
+};
+
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
   const { user } = useSelector((state) => state.auth);
-  const [previousSpare, setPreviousSpare] = useState(null);
   console.log("Ticket ID:", ticketId);
 
   const [formData, setFormData] = useState({
@@ -41,105 +55,53 @@ const GeneratorServiceReport = () => {
   });
 
   const [spareOptions, setSpareOptions] = useState([]);
-  const [projectName, setProjectName] = useState("");
-  // Mapping of project names to their field names
-  const projectFieldMapping = {
-    'jogini': {
-      description: 'Spare Discription'
-    },
-    'solding': {
-      description: 'Description of Material'
-    },
-    'sdllpsalun': {
-      description: 'NAME OF MATERIALS'
-    },
-    'sdllp salun': {
-      description: 'NAME OF MATERIALS'
-    },
-    'kuwarsi': {
-      description: 'NAME OF MATERIALS'
-    },
-    'kuwarsi-ii': {
-      description: 'NAME OF MATERIALS'
-    },
-    'jhp kuwarsi-ii': {
-      description: 'NAME OF MATERIALS'
-    },
-    'shong': {
-      description: 'Description of Material'
-    }
-  };
-
   const [isLoading, setIsLoading] = useState(true);
-  const [reportExists, setReportExists] = useState(false);
+  const [previousSpare, setPreviousSpare] = useState(null);
 
-  const updateSpareCount = async (spareName, action) => {
-    try {
-      if (!user || !user.token) {
-        console.error('No authentication token found. Please log in.');
-        return;
-      }
+   // Which inventory collection are we talking to?
+   const collectionName = localStorage.getItem("selectedCollection") || "";
+   const projectKey = collectionName.toLowerCase();
 
-      const projectMapping = projectFieldMapping[projectName];
-      if (!projectMapping) {
-        console.error('Project mapping not found for:', projectName);
-        return;
-      }
+ // decrement or increment by calling your shared endpoint
+ const updateSpareCount = async (id, delta) => {
+  try {
+    const token = user?.token || JSON.parse(localStorage.getItem("user"))?.token;
+    if (!token) throw new Error("No auth token");
 
-      const descriptionField = projectMapping.description;
+    const res = await axios.put(
+      `${API_BASE_URL}/api/update-spare-count`,
+      { collectionName, id, increment: delta },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      const response = await axios.put(
-        `https://backend-services-theta.vercel.app/api/inventory/update-spare-count`,
-        {
-          projectName: projectName,
-          descriptionField: descriptionField,
-          spareName: spareName,
-          action: action,
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      if (response.data.success) {
-        console.log(`Spare count ${action}ed successfully.`);
-      } else {
-        console.error(`Failed to ${action} spare count:`, response.data.message);
-        alert(`Failed to update spare count. Please try again.`);
-      }
-    } catch (err) {
-      console.error(`Error ${action}ing spare count:`, err);
-      alert(`Error updating spare count. Please try again.`);
+    if (!res.data.success) {
+      throw new Error(res.data.message || "Unknown error");
     }
-  };
+    console.log("Updated spareCount:", res.data.spareCount);
+  } catch (err) {
+    console.error("Error updating spare count:", err);
+    alert("Could not update spare count. Please try again.");
+  }
+};
+
 
   // Handle change in form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === "spareused") {
-      // If there was a previous selection, increment its count
-      if (previousSpare) {
-        updateSpareCount(previousSpare, "increment");
-      }
-      
-      // If a new spare is selected, decrement its count
-      if (value) {
-        updateSpareCount(value, "decrement");
-      }
-      
-      // Update the previous spare
+      // give back the old one
+      if (previousSpare) updateSpareCount(previousSpare, +1);
+      // take one of the new one
+      if (value)         updateSpareCount(value, -1);
       setPreviousSpare(value);
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   
 
-  // Handle file uploads
+  // Handle file uploads  
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     if (name === "workPhotos") {
@@ -152,141 +114,79 @@ const GeneratorServiceReport = () => {
   // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!user || !user.token) {
+    if (!user?.token) {
       alert("Please log in to submit the report.");
       return;
     }
 
     const data = new FormData();
     data.append("ticketId", ticketId);
-
-    // Append form data
     Object.entries(formData).forEach(([key, value]) => {
       if (key === "workPhotos") {
         value.forEach((file) => data.append("workPhotos", file));
-      } else if (value !== null && value !== undefined) {
+      } else if (value != null) {
         data.append(key, value);
       }
     });
 
     try {
-      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
+      const res = await fetch(`${API_BASE_URL}/api/reports/submit-fsr`, {
         method: "POST",
-        headers: {
-          'Authorization': `Bearer ${user.token}`
-        },
+        headers: { Authorization: `Bearer ${user.token}` },
         body: data,
       });
-
-      const responseData = await response.json();
-
-      if (response.ok) {
+      const json = await res.json();
+      if (res.ok) {
         alert("Report submitted successfully!");
         window.location.href = "/tickets";
       } else {
-        if (responseData.error && responseData.error.includes("already been submitted")) {
-          alert("A service report has already been submitted for this ticket. Only one service report is allowed per ticket.");
-          window.location.href = "/tickets";
-        } else {
-          console.error("Submit failed:", responseData);
-          alert(responseData.message || "Failed to submit. Please try again.");
-        }
+        throw new Error(json.message || json.error || "Submit failed");
       }
     } catch (err) {
-      console.error("Error submitting form:", err);
-      alert(err.message || "Something went wrong. Please try again.");
+      console.error(err);
+      alert(err.message);
     }
   };
 
   useEffect(() => {
-    const checkIfReportExistsAndFetchSpareOptions = async () => {
+    const load = async () => {
+      if (!user?.token || !ticketId) return;
       try {
-        // Ensure user and token are available
-        if (!user || !user.token) {
-          console.error('No authentication token found. Please log in.');
-          return;
+        // 1) prevent double-submits
+        let r = await fetch(
+          `${API_BASE_URL}/api/reports/fsr/check/${ticketId}`,
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        let jr = await r.json();
+        if (jr.exists) {
+          alert("A report has already been submitted for this ticket.");
+          return void (window.location.href = "/tickets");
         }
 
-        if (!ticketId) {
-          console.error('No ticket ID provided');
-          alert('No ticket ID provided. Please try again.');
-          window.location.href = '/tickets';
-          return;
-        }
-
-        // Check if the report already exists
-        const reportRes = await fetch(`https://backend-services-theta.vercel.app/api/reports/fsr/check/${ticketId}`, {
-          headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!reportRes.ok) {
-          const errorData = await reportRes.json();
-          throw new Error(errorData.message || 'Failed to check existing service report');
-        }
-
-        const reportData = await reportRes.json();
-
-        if (reportData.exists) {
-          alert('A Generator Service Report has already been submitted for this ticket.');
-          window.location.href = '/tickets';
-          return;
-        }
-
-        // If no report exists, proceed to fetch the spare options
-        const spareRes = await fetch(`https://backend-services-theta.vercel.app/api/tickets/${ticketId}/spare-description`, {
-          headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!spareRes.ok) {
-          let errorData;
-          try {
-            errorData = await spareRes.json();
-          } catch (e) {
-            errorData = { msg: 'Unknown error occurred', error: await spareRes.text() };
-          }
-          
-          console.error('Failed to fetch spare options:', {
-            status: spareRes.status,
-            statusText: spareRes.statusText,
-            ...errorData,
-          });
-          
-          alert(`Error loading spare options: ${errorData.msg}\n${errorData.error || ''}`);
-          return;
-        }
-
-        const spareDescriptions = await spareRes.json();
-        if (spareDescriptions.success && Array.isArray(spareDescriptions.data)) {
-          setSpareOptions(spareDescriptions.data);
+        // 2) fetch the spare descriptions
+        let s = await fetch(
+          `${API_BASE_URL}/api/tickets/${ticketId}/spare-description`,
+          { headers: { Authorization: `Bearer ${user.token}` } }
+        );
+        let js = await s.json();
+        if (js.success && Array.isArray(js.data)) {
+          setSpareOptions(js.data);
         } else {
-          console.error('Invalid response format:', spareDescriptions);
-          alert('Invalid response format from server');
+          throw new Error(js.message || "Invalid spare data");
         }
       } catch (err) {
-        console.error('Error:', err.message || err);
-        alert('Something went wrong. Please try again later.');
+        console.error(err);
+        alert("Error loading form data.");
       } finally {
         setIsLoading(false);
       }
     };
-
-    if (ticketId && user) {
-      setIsLoading(true);
-      checkIfReportExistsAndFetchSpareOptions();
-    }
+    load();
   }, [ticketId, user]);
 
   if (isLoading) {
-    return <div className="loading">Loading...</div>;
-  }
-
+   return <div className="loading">Loading...</div>;
+     }
   return (
     <div className="generator-service-report">
       <BackButton url="/tickets" />
@@ -367,18 +267,18 @@ const GeneratorServiceReport = () => {
       <select name="spareused" value={formData.spareused} onChange={handleChange}>
         <option value="">Select a spare part</option>
         {spareOptions.map((spare) => {
-          const fields = projectFieldMapping[projectName] || projectFieldMapping['jogini'];
-          const description = spare[fields.description] || spare['NAME OF MATERIALS'] || 'Unknown';
-          const spareCount = spare.spareCount || spare.SparesCount || 0;
-          
-          return (
-            <option key={spare._id} value={description}>
-              {description} (Available: {spareCount})
-            </option>
-          );
-        })}
-      </select>
-    </div>
+         const descField = projectFieldMapping[projectKey]?.description
+         || "Spare Discription";
+const description = spare[descField] || spare["NAME OF MATERIALS"] || "Unknown";
+const spareCount  = spare.spareCount || 0;
+return (
+<option key={spare._id} value={spare._id}>
+{description} (Available: {spareCount})
+</option>
+);
+})}
+</select>
+</div>
     <div className="form-group">
       <label>Checklist/Action Taken</label>
       <textarea name="checklist" rows="4" value={formData.checklist} onChange={handleChange} />
@@ -423,5 +323,6 @@ const GeneratorServiceReport = () => {
     </div>
   );
 };
+
 
 export default GeneratorServiceReport;

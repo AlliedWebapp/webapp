@@ -63,7 +63,7 @@ function FSRDetails() {
   return (
     <div className="fsr-details">
       <BackButton url="/fsr" />
-      <h1>Generator Service Report Details</h1>
+      <h1>Service Report Details</h1>
       
       <div className="fsr-details-container">
         <table className="fsr-table">
