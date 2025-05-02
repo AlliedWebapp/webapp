@@ -4,23 +4,10 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 
-// Helper function to convert buffer data to a base64 string
-const imageToBase64 = (buffer) => {
-  try {
-    if (!buffer || !buffer.data) return null;
-    const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-    return `data:image/jpeg;base64,${btoa(binary)}`;
-  } catch (error) {
-    console.error("Error converting image to base64:", error);
-    return null;
-  }
-};
-
 const ImprovementReportDetails = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -29,7 +16,7 @@ const ImprovementReportDetails = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://backend-services-theta.vercel.app/api/reports/improvement-report-details/${id}`,
+          `https://backend-services-theta.vercel.app/api/reports/improvementreports/${id}`,
           {
             headers: {
               Accept: "application/json",
@@ -62,14 +49,6 @@ const ImprovementReportDetails = () => {
     fetchReport();
   }, [id]);
 
-  const handleImageClick = (image) => {
-    setSelectedImage(image);
-  };
-
-  const closeImageModal = () => {
-    setSelectedImage(null);
-  };
-
   if (loading) {
     return <Spinner />;
   }
@@ -94,113 +73,115 @@ const ImprovementReportDetails = () => {
 
   return (
     <div className="improvement-details">
-      <div className="back-button-container">
-        <BackButton url="/view-improvement-reports" className="black-back-button" />
-      </div>
       <div className="improvement-details-container">
         <div className="improvement-header">
-          <h2 className="small-centered-title">Improvement Report Details</h2>
+          <h2>Improvement Report Details</h2>
+          <BackButton />
         </div>
 
-        <table className="improvement-table">
-          <tbody>
-            <tr>
-              <td className="improvement-label">Report ID</td>
-              <td>{report.irId}</td>
-              <td className="improvement-label">Department</td>
-              <td>{report.department}</td>
-              <td className="improvement-label">Equipment Number</td>
-              <td>{report.equipment_no}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Equipment System</td>
-              <td>{report.equipment_system}</td>
-              <td className="improvement-label">Location</td>
-              <td>{report.location}</td>
-              <td className="improvement-label">Area</td>
-              <td>{report.area}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Objectives</td>
-              <td colSpan="5">{report.objectives}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Present Condition</td>
-              <td colSpan="5">{report.present_condition}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Proposed Modification</td>
-              <td colSpan="5">{report.modification}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Concept Date</td>
-              <td>{new Date(report.concept_date).toLocaleDateString()}</td>
-              <td className="improvement-label">Implementation Date</td>
-              <td colSpan="3">{new Date(report.implementation_date).toLocaleDateString()}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Resources Required</td>
-              <td>{report.resources}</td>
-              <td className="improvement-label">Mandays</td>
-              <td>{report.mandays}</td>
-              <td className="improvement-label">Cost</td>
-              <td>{report.cost}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Payback Period</td>
-              <td colSpan="5">{report.payback}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Expected End Result</td>
-              <td colSpan="5">{report.end_result}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Additional Information</td>
-              <td colSpan="5">{report.additional_info}</td>
-            </tr>
-            <tr>
-              <td className="improvement-label">HOD Signature</td>
-              <td colSpan="5">
-                {report.hod_sign && (
-                  <img
-                    src={imageToBase64(report.hod_sign)}
-                    alt="HOD Signature"
-                    className="signature-image"
-                    onClick={() => handleImageClick(report.hod_sign)}
-                  />
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td className="improvement-label">Plant Head Signature</td>
-              <td colSpan="5">
-                {report.plant_incharge_sign && (
-                  <img
-                    src={imageToBase64(report.plant_incharge_sign)}
-                    alt="Plant Head Signature"
-                    className="signature-image"
-                    onClick={() => handleImageClick(report.plant_incharge_sign)}
-                  />
-                )}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        {selectedImage && (
-          <div className="image-modal" onClick={closeImageModal}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <img
-                src={imageToBase64(selectedImage)}
-                alt="Preview"
-                className="preview-image"
-              />
-              <button className="close-button" onClick={closeImageModal}>
-                ×
-              </button>
+        <div className="improvement-section">
+          <h3>Basic Information</h3>
+          <div className="improvement-grid">
+            <div className="improvement-field">
+              <label>Report ID</label>
+              <p>{report.irId}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Department</label>
+              <p>{report.department}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Equipment Number</label>
+              <p>{report.equipment_no}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Equipment System</label>
+              <p>{report.equipment_system}</p>
             </div>
           </div>
-        )}
+        </div>
+
+        <div className="improvement-section">
+          <h3>Location Details</h3>
+          <div className="improvement-grid">
+            <div className="improvement-field">
+              <label>Location</label>
+              <p>{report.location}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Area</label>
+              <p>{report.area}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="improvement-section">
+          <h3>Improvement Details</h3>
+          <div className="improvement-grid">
+            <div className="improvement-field">
+              <label>Objectives</label>
+              <p>{report.objectives}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Present Condition</label>
+              <p>{report.present_condition}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Proposed Modification</label>
+              <p>{report.modification}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Resources Required</label>
+              <p>{report.resources}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Mandays</label>
+              <p>{report.mandays}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Cost</label>
+              <p>{report.cost}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Payback Period</label>
+              <p>{report.payback}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Expected End Result</label>
+              <p>{report.end_result}</p>
+            </div>
+            <div className="improvement-field">
+              <label>Additional Information</label>
+              <p>{report.additional_info}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="improvement-section">
+          <h3>Signatures</h3>
+          <div className="improvement-grid">
+            <div className="improvement-field">
+              <label>HOD Signature</label>
+              {report.hodSignature && (
+                <img
+                  src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
+                  alt="HOD Signature"
+                  className="signature-image"
+                />
+              )}
+            </div>
+            <div className="improvement-field">
+              <label>Plant Head Signature</label>
+              {report.plantInchargeSignature && (
+                <img
+                  src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
+                  alt="Plant Head Signature"
+                  className="signature-image"
+                />
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ function FSRDetails() {
   return (
     <div className="fsr-details">
       <BackButton url="/fsr" />
-      <h1>Service Report Details</h1>
+      <h1>Generator Service Report Details</h1>
       
       <div className="fsr-details-container">
         <table className="fsr-table">
@@ -134,10 +134,6 @@ function FSRDetails() {
             <tr>
               <td className="fsr-label">Nature of Failure</td>
               <td colSpan="5">{fsr.natureOfFailure}</td>
-            </tr>
-            <tr>
-              <td className="fsr-label">Spare Used</td>
-              <td colSpan="5">{fsr.spareused || "N/A"}</td>
             </tr>
             <tr>
               <td className="fsr-label">Checklist</td>
@@ -222,4 +218,3 @@ function FSRDetails() {
 }
 
 export default FSRDetails;
- 

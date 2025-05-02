@@ -1,13 +1,11 @@
 //view other report list//
 import React from "react";
 import { Link } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import "../index.css"; // Reusing global styles
 
 const OtherReports = () => {
     return (
       <div className="report-container">
-        <BackButton url="/" />
         <div className="other-reports-header">
           <h2 className="other-reports-heading">Other Reports</h2>
           <p className="other-reports-subheading">
@@ -30,10 +28,11 @@ const OtherReports = () => {
     </p>
   </div>
   <div className="button-wrapper">
-    <Link to="/view-improvement-reports" className="report-button">
+    <Link to="/view-improvement-report" className="report-button">
       VIEW CONTINUAL IMPROVEMENT REPORT
     </Link>
-    <Link to="/view-maintenance-reports" className="report-button">
+    <Link to="/view-maintenance-
+    report" className="report-button">
       VIEW BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT
     </Link>
   </div>

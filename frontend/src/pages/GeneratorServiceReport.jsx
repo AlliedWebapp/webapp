@@ -1,36 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import BackButton from "../components/BackButton";
+//fomrat of form of service report form//
+import React, { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import "../index.css"; // Global styles
-import axios from "axios";
-import { useSelector } from "react-redux";
-
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-
-// Map your project keys (lowercased) → the field name that holds the description
-const projectFieldMapping = {
-  jogini:        { description: "Spare Discription" },
-  solding:       { description: "Description of Material" },
-  sdllpsalun:    { description: "NAME OF MATERIALS" },
-  "sdllp salun": { description: "NAME OF MATERIALS" },
-  kuwarsi:       { description: "NAME OF MATERIALS" },
-  "kuwarsi-ii":  { description: "NAME OF MATERIALS" },
-  "jhp kuwarsi-ii": { description: "NAME OF MATERIALS" },
-  shong:         { description: "Description of Material" },
-};
 
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
-  const { user } = useSelector((state) => state.auth);
-  console.log("Ticket ID:", ticketId);
 
   const [formData, setFormData] = useState({
     srNo: "",
     customerName: "",
-    installationAddress: "",
+    installationAddress: "",  // updated from "address"
     siteId: "",
-    commissioningDate: "",
+    commissioningDate: "",    // updated from "dateOfCommissioning"
     instanceId: "",
     state: "",
     rating: "",
@@ -38,158 +19,73 @@ const GeneratorServiceReport = () => {
     engineSerial: "",
     gensetSerial: "",
     runningHours: "",
-    taskStart: "",
-    taskEnd: "",
+    taskStart: "",            // updated from "startTime"
+    taskEnd: "",              // updated from "endTime"
     problemSummary: "",
-    natureOfFailure: "",
+    natureOfFailure: "",      // updated from "failureNature"
     checklist: "",
     engineerRemarks: "",
     customerRemarks: "",
     engineerName: "",
     customerContact: "",
     customerEmail: "",
-    spareused: "",
     customerSignature: null,
     engineerSignature: null,
-    workPhotos: [],
+    workPhotos: []
+  });
+  
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
+
+const handleFileChange = (e) => {
+  const { name, files } = e.target;
+  if (name === "workPhotos") {
+    setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: files[0] }));
+  }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const data = new FormData();
+  data.append("ticketId", ticketId);
+
+  Object.entries(formData).forEach(([key, value]) => {
+    if (key === "workPhotos") {
+      value.forEach((file) => data.append("workPhotos", file));
+    } else {
+      data.append(key, value);
+    }
   });
 
-  const [spareOptions, setSpareOptions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [previousSpare, setPreviousSpare] = useState(null);
-
-   // Which inventory collection are we talking to?
-   const collectionName = localStorage.getItem("selectedCollection") || "";
-   const projectKey = collectionName.toLowerCase();
-
- // decrement or increment by calling your shared endpoint
- const updateSpareCount = async (id, delta) => {
   try {
-    const token = user?.token || JSON.parse(localStorage.getItem("user"))?.token;
-    if (!token) throw new Error("No auth token");
+    const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
+      method: "POST",
+      body: data,
+    });
 
-    const res = await axios.put(
-      `${API_BASE_URL}/api/update-spare-count`,
-      { collectionName, id, increment: delta },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (!res.data.success) {
-      throw new Error(res.data.message || "Unknown error");
+    if (response.ok) {
+      alert("Report submitted successfully!");
+    } else {
+      const errorData = await response.json();
+      console.error("Submit failed:", errorData);
+      alert("Failed to submit. Please try again.");
     }
-    console.log("Updated spareCount:", res.data.spareCount);
   } catch (err) {
-    console.error("Error updating spare count:", err);
-    alert("Could not update spare count. Please try again.");
+    console.error("Error submitting form:", err);
+    alert("Something went wrong.");
   }
 };
 
 
-  // Handle change in form fields
-  const handleChange = (e) => {
-    const { name, value } = e.target;
 
-    if (name === "spareused") {
-      // give back the old one
-      if (previousSpare) updateSpareCount(previousSpare, +1);
-      // take one of the new one
-      if (value)         updateSpareCount(value, -1);
-      setPreviousSpare(value);
-    }
-
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-  
-
-  // Handle file uploads  
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    if (name === "workPhotos") {
-      setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
-    }
-  };
-
-  // Submit form data
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!user?.token) {
-      alert("Please log in to submit the report.");
-      return;
-    }
-
-    const data = new FormData();
-    data.append("ticketId", ticketId);
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === "workPhotos") {
-        value.forEach((file) => data.append("workPhotos", file));
-      } else if (value != null) {
-        data.append(key, value);
-      }
-    });
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/submit-fsr`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${user.token}` },
-        body: data,
-      });
-      const json = await res.json();
-      if (res.ok) {
-        alert("Report submitted successfully!");
-        window.location.href = "/tickets";
-      } else {
-        throw new Error(json.message || json.error || "Submit failed");
-      }
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
-    }
-  };
-
-  useEffect(() => {
-    const load = async () => {
-      if (!user?.token || !ticketId) return;
-      try {
-        // 1) prevent double-submits
-        let r = await fetch(
-          `${API_BASE_URL}/api/reports/fsr/check/${ticketId}`,
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
-        let jr = await r.json();
-        if (jr.exists) {
-          alert("A report has already been submitted for this ticket.");
-          return void (window.location.href = "/tickets");
-        }
-
-        // 2) fetch the spare descriptions
-        let s = await fetch(
-          `${API_BASE_URL}/api/tickets/${ticketId}/spare-description`,
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
-        let js = await s.json();
-        if (js.success && Array.isArray(js.data)) {
-          setSpareOptions(js.data);
-        } else {
-          throw new Error(js.message || "Invalid spare data");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Error loading form data.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    load();
-  }, [ticketId, user]);
-
-  if (isLoading) {
-   return <div className="loading">Loading...</div>;
-     }
   return (
     <div className="generator-service-report">
-      <BackButton url="/tickets" />
       <header className="header">
         <h2>Generator Service Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
@@ -263,23 +159,6 @@ const GeneratorServiceReport = () => {
       <input type="text" name="natureOfFailure" value={formData.natureOfFailure} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Spare Used</label>
-      <select name="spareused" value={formData.spareused} onChange={handleChange}>
-        <option value="">Select a spare part</option>
-        {spareOptions.map((spare) => {
-         const descField = projectFieldMapping[projectKey]?.description
-         || "Spare Discription";
-const description = spare[descField] || spare["NAME OF MATERIALS"] || "Unknown";
-const spareCount  = spare.spareCount || 0;
-return (
-<option key={spare._id} value={spare._id}>
-{description} (Available: {spareCount})
-</option>
-);
-})}
-</select>
-</div>
-    <div className="form-group">
       <label>Checklist/Action Taken</label>
       <textarea name="checklist" rows="4" value={formData.checklist} onChange={handleChange} />
     </div>
@@ -323,6 +202,5 @@ return (
     </div>
   );
 };
-
 
 export default GeneratorServiceReport;

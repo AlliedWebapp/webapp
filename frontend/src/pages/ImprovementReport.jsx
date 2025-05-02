@@ -1,161 +1,193 @@
+//form of continual improvemment report//
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import "../index.css";
 
-const MaintenanceReport = () => {
-  const { ticketId } = useParams();
-
+const ImprovementReport = () => {
   const [formData, setFormData] = useState({
-    unit: "",
-    outageDate: "",
-    outageTime: "",
-    defectReported: "",
-    investigationOutcome: "",
-    correctiveAction: "",
-    followUp: "",
-    repairCost: "",
-    remarks: "",
-    generationLoss: "",
-    hodSignature: null, // 👈 file
-    plantInchargeSignature: null, // 👈 file
+    number: "",
+    department: "",
+    equipment_no: "",
+    equipment_system: "",
+    location: "",
+    objectives: "",
+    concept_date: "",
+    implementation_date: "",
+    present_condition: "",
+    modification: "",
+    resources: "",
+    mandays: "",
+    cost: "",
+    payback: "",
+    end_result: "",
+    additional_info: "",
   });
 
-  // Handle regular input field changes
+  const [hodSign, setHodSign] = useState(null);
+  const [plantSign, setPlantSign] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // Handle file input changes (HOD and Plant Incharge signatures)
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    
-    setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    if (name === "hodSign") setHodSign(files[0]);
+    if (name === "plantSign") setPlantSign(files[0]);
   };
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
   
     const data = new FormData();
-    data.append("ticketId", ticketId);
-
-    // Loop through the formData object and append each entry to FormData
     Object.entries(formData).forEach(([key, value]) => {
-      if (value) {
-        data.append(key, value);
-      }
+      data.append(key, value);
     });
-
-    // Debug logging to check the FormData content before sending
-    console.log("Form Data:", Object.fromEntries(data));
+  
+    if (hodSign) data.append("hodSign", hodSign);
+    if (plantSign) data.append("plantSign", plantSign);
   
     try {
-      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-maintenance-report", {
+      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-improvement-report", {
         method: "POST",
         body: data,
       });
   
       if (response.ok) {
-        const result = await response.json();
-        console.log("Success Response:", result);
-        alert("Maintenance Report submitted successfully!");
+        alert("Improvement Report submitted successfully!");
+        
+        // Reset the form after successful submission
+        setFormData({
+          number: "",
+          department: "",
+          equipment_no: "",
+          equipment_system: "",
+          location: "",
+          objectives: "",
+          concept_date: "",
+          implementation_date: "",
+          present_condition: "",
+          modification: "",
+          resources: "",
+          mandays: "",
+          cost: "",
+          payback: "",
+          end_result: "",
+          additional_info: "",
+        });
+        setHodSign(null);
+        setPlantSign(null);
       } else {
-        const errorData = await response.json();
-        console.error("Error Response:", errorData);
-        alert("Failed to submit. Please try again.");
+        const errData = await response.json();
+        console.error("Submit failed:", errData);
+        alert("Failed to submit. Try again.");
       }
-    } catch (err) {
-      console.error("Network Error:", err);
+    } catch (error) {
+      console.error("Error submitting form:", error);
       alert("Something went wrong.");
     }
   };
   
+
   return (
-    <div className="maintenance-report">
-      <BackButton url="/other-reports" />
+    <div className="improvement-report">
       <header className="header">
-        <h2>BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT</h2>
-        <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
+        <h2>Continual Improvement Report</h2>
+        <p><strong>Allied Hydroprojects</strong></p>
       </header>
 
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">
-            <label>Unit:</label>
-            <input type="text" name="unit" value={formData.unit} onChange={handleChange} />
+            <label>No.</label>
+            <input type="text" name="number" value={formData.number} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Outage Date:</label>
-            <input type="date" name="outageDate" value={formData.outageDate} onChange={handleChange} />
+            <label>Department</label>
+            <input type="text" name="department" value={formData.department} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Time:</label>
-            <input type="time" name="outageTime" value={formData.outageTime} onChange={handleChange} />
+            <label>Equipment/Structure No</label>
+            <input type="text" name="equipment_no" value={formData.equipment_no} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Defect/Problem Reported:</label>
-            <textarea name="defectReported" rows="3" value={formData.defectReported} onChange={handleChange} />
+            <label>Equipment/System</label>
+            <input type="text" name="equipment_system" value={formData.equipment_system} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Outcome of Investigation:</label>
-            <textarea name="investigationOutcome" rows="3" value={formData.investigationOutcome} onChange={handleChange} />
+            <label>Location</label>
+            <input type="text" name="location" value={formData.location} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Corrective Action Taken:</label>
-            <textarea name="correctiveAction" rows="3" value={formData.correctiveAction} onChange={handleChange} />
+            <label>Objectives</label>
+            <textarea name="objectives" rows="3" value={formData.objectives} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Any Follow-up to be Carried Out:</label>
-            <textarea name="followUp" rows="2" value={formData.followUp} onChange={handleChange} />
+            <label>Concept Date</label>
+            <input type="date" name="concept_date" value={formData.concept_date} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Replacement / Repair Cost:</label>
-            <input type="text" name="repairCost" value={formData.repairCost} onChange={handleChange} />
+            <label>Implementation Date</label>
+            <input type="date" name="implementation_date" value={formData.implementation_date} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Remarks:</label>
-            <textarea name="remarks" rows="2" value={formData.remarks} onChange={handleChange} />
+            <label>Present Condition</label>
+            <textarea name="present_condition" rows="3" value={formData.present_condition} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Loss of Generation:</label>
-            <input type="text" name="generationLoss" value={formData.generationLoss} onChange={handleChange} />
+            <label>Modification Carried Out</label>
+            <textarea name="modification" rows="3" value={formData.modification} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Upload HOD Signature Photo:</label>
-            <input type="file" name="hodSignature" accept="image/*" onChange={handleFileChange} />
+            <label>Resources Used</label>
+            <input type="text" name="resources" value={formData.resources} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Upload Plant Incharge Signature Photo:</label>
-            <input type="file" name="plantInchargeSignature" accept="image/*" onChange={handleFileChange} />
+            <label>Man-Days Required</label>
+            <input type="text" name="mandays" value={formData.mandays} onChange={handleChange} />
           </div>
 
-          {/* Signatures section - Pre-filled with relevant names */}
-          <div className="signatures">
-            <div className="signature-block">
-              <label>Prepared by:</label>
-              <input type="text" value="ASHISH S. TOMAR" readOnly />
-            </div>
-            <div className="signature-block">
-              <label>Checked by:</label>
-              <input type="text" value="NEERAJ KAMBOJ" readOnly />
-            </div>
-            <div className="signature-block">
-              <label>Approved by:</label>
-              <input type="text" value="JASWINDER S CHAUHAN" readOnly />
-            </div>
+          <div className="form-group">
+            <label>Cost</label>
+            <input type="text" name="cost" value={formData.cost} onChange={handleChange} />
+          </div>
+
+          <div className="form-group">
+            <label>Payback Period</label>
+            <input type="text" name="payback" value={formData.payback} onChange={handleChange} />
+          </div>
+
+          <div className="form-group">
+            <label>End Result</label>
+            <textarea name="end_result" rows="3" value={formData.end_result} onChange={handleChange} />
+          </div>
+
+          <div className="form-group">
+            <label>Additional Information</label>
+            <textarea name="additional_info" rows="2" value={formData.additional_info} onChange={handleChange} />
+          </div>
+
+          <div className="form-group">
+            <label>Upload HOD Signature</label>
+            <input type="file" name="hodSign" accept="image/*" onChange={handleFileChange} />
+          </div>
+
+          <div className="form-group">
+            <label>Upload Plant Incharge Signature</label>
+            <input type="file" name="plantSign" accept="image/*" onChange={handleFileChange} />
           </div>
         </div>
 
@@ -165,4 +197,4 @@ const MaintenanceReport = () => {
   );
 };
 
-export default MaintenanceReport;
+export default ImprovementReport;

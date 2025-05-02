@@ -30,9 +30,8 @@ const app = express();
 // ✅ CORS Configuration
 app.use(cors({
     origin:["https://alliedwebapp.vercel.app", "https://backend-services-theta.vercel.app"],
-    // origin: "*",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 // Optional but helpful

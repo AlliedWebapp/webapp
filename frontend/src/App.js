@@ -15,10 +15,8 @@ import FSRDetails from './pages/FSRDetails';
 import Monthly from './pages/monthly';
 import ImprovementReport from './pages/ImprovementReport';
 import ViewImprovementReport from './pages/ViewImprovementReport'; 
-import ImprovementReportDetails from './pages/ImprovementReportDetails';   
+import ImporovementReportDetails from './pages/ImporovementReportDetails';   
 import MaintenanceReport from './pages/MaintenanceReport';
-import ViewMaintenanceReport from './pages/ViewMaintenanceReport';
-import MaintenanceReportDetails from './pages/MaintenanceReportDetails';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
 import OtherReports from './pages/OtherReports';  
 
@@ -47,10 +45,8 @@ function App() {
               <Route path="/maintenance-report" element={<MaintenanceReport />} />
               <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
               <Route path="/other-reports" element={<OtherReports />} />
-              <Route path="/view-improvement-reports" element={<ViewImprovementReport />} />
-              <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
-              <Route path="/view-maintenance-reports" element={<ViewMaintenanceReport />} />
-              <Route path="/maintenance-report-details/:id" element={<MaintenanceReportDetails />} />
+              <Route path="/view-improvement-report" element={<ViewImprovementReport />} />
+              <Route path="/improvement-report-details/:id" element={<ImporovementReportDetails />} />
             </Route>
           </Routes>
         </div>
@@ -61,4 +57,3 @@ function App() {
 }
 
 export default App;
-

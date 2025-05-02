@@ -72,14 +72,13 @@ function ViewFSR() {
   return (
     <div className="fsr-container">
       <BackButton url="/" />
-      <h1>Service Reports</h1>
+      <h1>Generator Service Reports</h1>
       <div className="tickets">
         <div className="ticket-headings">
           <div>FSR ID</div>
           <div>Date</div>
           <div>Customer</div>
           <div>Site</div>
-          
           <div></div>
         </div>
 
