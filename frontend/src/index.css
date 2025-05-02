@@ -441,7 +441,7 @@ h3 {
   .ticket-page {
     padding: 15px;
     margin: 10px;
-  }
+}
 
   .ticket-header {
     padding: 20px;
@@ -452,13 +452,13 @@ h3 {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-  }
+}
 
   .info-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-  }
+}
 
   .info-row p {
     width: 100%;
@@ -576,13 +576,13 @@ td {
   width: 100%;
   margin: 0;
   padding: 0;
-}
+  }
 
 .table-container.shong-table table,
 .table-container.solding-table table {
-  width: 100%;
+    width: 100%;
   margin: 0;
-}
+  }
 
 .table-container.shong-table th,
 .table.container.shong-table td,

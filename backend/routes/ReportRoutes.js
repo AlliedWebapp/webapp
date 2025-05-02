@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const ReportController = require("../controllers/ReportController");
+const { checkFSRExists } = require("../controllers/ReportController");
 
 const storage = multer.memoryStorage();  // Store file as buffer in memory
 const upload = multer({ storage: storage });
@@ -11,6 +12,7 @@ const { submitFSR, getAllFSRs, getFSRByMongoId, getFSRById, submitImprovementRep
 
 // Route to fetch all FSR reports
 router.get("/fsrs", getAllFSRs); // 👈 GET route to fetch all reports
+router.get("/fsr/check/:ticketId", checkFSRExists); //to check if fsr exists
 
 // Route to submit a new FSR report (with image uploads)
 router.post(
