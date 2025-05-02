@@ -9,9 +9,9 @@ const mongoose = require("mongoose");
 // map the exact collectionName strings → your Mongoose models
 const MODEL_MAP = {
     jogini:     JoginiModel,
-    solding:    SoldingModel,
+    solding:    soldingModel,
     shong:      ShongModel,
-    sdllpsalun: SDLLPSalunModel,
+    sdllpsalun: SDLLPsalunModel,
     kuwarsi:    KuwarsiModel,
   };
 
