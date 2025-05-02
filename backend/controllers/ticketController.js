@@ -56,7 +56,7 @@ const getTicket = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error('Not authorized')
   }
-
+  
   res.status(200).json(ticket)
 })
 

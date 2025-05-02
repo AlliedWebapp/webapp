@@ -248,6 +248,26 @@ exports.getAllImprovementReports = async (req, res, next) => {
   }
 };
 
+//to fetch one improvement report by id 
+exports.getImprovementReportByMongoId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new ErrorHandler(400, "Improvement Report ID is required");
+    }
+
+    const report = await ImprovementReport.findById(id);
+    if (!report) {
+      throw new ErrorHandler(404, "Improvement Report not found");
+    }
+
+    res.json(report);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 
 //maintenance report
@@ -263,18 +283,29 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       followUp,
       repairCost,
       remarks,
-      generationLoss,
+      generationLoss
     } = req.body;
 
-    if (!unit || !outageDate || !outageTime || !defectReported) {
+    // Validate required fields
+    if (!unit || !outageDate || !outageTime || !defectReported || 
+        !investigationOutcome || !correctiveAction || !followUp || 
+        !repairCost || !remarks || !generationLoss) {
       throw new ErrorHandler(400, "Missing required fields");
     }
 
+    // Check if both signatures are provided
+    if (!req.files["hodSignature"] || !req.files["plantInchargeSignature"]) {
+      throw new ErrorHandler(400, "Both HOD and Plant Incharge signatures are required");
+    }
+
+    // Retrieve image buffers for signatures
     const hodSignature = req.files["hodSignature"]?.[0];
     const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0];
 
+    // Generate a unique 4-digit mrId
     const mrId = generateMRId();
 
+    // Create new maintenance report
     const newReport = new MaintenanceReport({
       mrId,
       unit,
@@ -288,23 +319,104 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       remarks,
       generationLoss,
       hodSignature: {
-        data: hodSignature?.buffer,
-        contentType: hodSignature?.mimetype
+        data: hodSignature.buffer,
+        contentType: hodSignature.mimetype
       },
       plantInchargeSignature: {
-        data: plantInchargeSignature?.buffer,
-        contentType: plantInchargeSignature?.mimetype
+        data: plantInchargeSignature.buffer,
+        contentType: plantInchargeSignature.mimetype
       }
     });
 
+    // Save the new report to the database
     await newReport.save();
-
-    res.status(201).json({
-      message: "Maintenance Report submitted successfully!",
-      mrId: newReport.mrId
+    res.status(201).json({ 
+      message: "Maintenance report submitted successfully!",
+      mrId: newReport.mrId,
+      unit: newReport.unit,
+      outageDate: newReport.outageDate,
+      createdAt: newReport.createdAt
     });
-
   } catch (err) {
     next(err);
   }
 };
+
+exports.getAllMaintenanceReports = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Fetch reports with pagination, excluding signature data
+    const reports = await MaintenanceReport.find()
+      .select('-hodSignature -plantInchargeSignature')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination
+    const total = await MaintenanceReport.countDocuments();
+
+    res.json({
+      success: true,
+      data: {
+        reports,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalReports: total
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Helper function to convert buffer to base64
+const bufferToBase64 = (buffer) => {
+  if (!buffer || !buffer.data) return null;
+  return `data:image/jpeg;base64,${Buffer.from(buffer.data).toString('base64')}`;
+};
+
+exports.getMaintenanceReportByMongoId = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      throw new ErrorHandler(400, "Invalid maintenance report ID");
+    }
+
+    const report = await MaintenanceReport.findById(id).lean();
+    if (!report) {
+      throw new ErrorHandler(404, "Maintenance report not found");
+    }
+
+    // Convert signature buffers to base64 strings
+    if (report.hodSignature && report.hodSignature.data) {
+      const base64String = Buffer.from(report.hodSignature.data).toString('base64');
+      report.hodSignature = {
+        data: `data:${report.hodSignature.contentType || 'image/jpeg'};base64,${base64String}`,
+        contentType: report.hodSignature.contentType || 'image/jpeg'
+      };
+    }
+    if (report.plantInchargeSignature && report.plantInchargeSignature.data) {
+      const base64String = Buffer.from(report.plantInchargeSignature.data).toString('base64');
+      report.plantInchargeSignature = {
+        data: `data:${report.plantInchargeSignature.contentType || 'image/jpeg'};base64,${base64String}`,
+        contentType: report.plantInchargeSignature.contentType || 'image/jpeg'
+      };
+    }
+
+    // Format dates
+    report.outageDate = new Date(report.outageDate).toLocaleDateString();
+    report.createdAt = new Date(report.createdAt).toLocaleDateString();
+
+    res.json({
+      success: true,
+      data: report
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+

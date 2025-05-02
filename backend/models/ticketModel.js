@@ -1,13 +1,12 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const ticketSchema = mongoose.Schema(
+const ticketSchema = new mongoose.Schema(
   {
     ticket_id: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
-    
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
@@ -66,27 +65,29 @@ const ticketSchema = mongoose.Schema(
   {
     timestamps: true
   }
-)
+);
 
-// Generate 4-digit unique ticket_id before saving
-ticketSchema.pre('save', async function (next) {
-  if (this.ticket_id) return next(); // already exists
+// 🔁 PRE-SAVE HOOK to generate 4-digit ticket ID
+ticketSchema.pre('validate', async function (next) {
+  if (!this.ticket_id) {
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 10;
 
-  let unique = false;
-  let attempts = 0;
+    while (!isUnique && attempts < maxAttempts) {
+      attempts++;
+      const randomId = Math.floor(1000 + Math.random() * 9000).toString();
 
-  while (!unique && attempts < 10) {
-    const candidate = Math.floor(1000 + Math.random() * 9000).toString();
-    const exists = await mongoose.models.Ticket.findOne({ ticket_id: candidate });
-    if (!exists) {
-      this.ticket_id = candidate;
-      unique = true;
+      const existing = await mongoose.models.Ticket.findOne({ ticket_id: randomId });
+      if (!existing) {
+        this.ticket_id = randomId;
+        isUnique = true;
+      }
     }
-    attempts++;
-  }
 
-  if (!unique) {
-    return next(new Error('Failed to generate unique 4-digit ticket_id'));
+    if (!isUnique) {
+      return next(new Error('Failed to generate unique ticket ID'));
+    }
   }
 
   next();

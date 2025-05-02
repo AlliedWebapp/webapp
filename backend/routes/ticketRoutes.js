@@ -27,7 +27,7 @@ router.route("/:id")
 
   
 // Serve individual images for a ticket
-router.get("/:ticketId/images/:index", protect, async (req, res) => {
+router.get("/:ticketId/images/:index", async (req, res) => {
   try {
     const ticket = await require("../models/ticketModel").findById(req.params.ticketId);
     const index = parseInt(req.params.index);

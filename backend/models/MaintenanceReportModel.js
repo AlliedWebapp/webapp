@@ -30,6 +30,6 @@ const MaintenanceReportSchema = new mongoose.Schema({
   }
 });
 
-const MaintenanceReport = mongoose.model('MaintenanceReport', MaintenanceReportSchema, "maintenancereports");
+const MaintenanceReport = mongoose.model('MaintenanceReport', MaintenanceReportSchema);
 
 module.exports = MaintenanceReport;
