@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import "../index.css";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const MaintenanceReport = () => {
   const { ticketId } = useParams();
+  const { user } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     unit: "",
@@ -53,6 +55,9 @@ const MaintenanceReport = () => {
     try {
       const response = await fetch(`${API_URL}/api/reports/submit-maintenance-report`, {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        },
         body: data,
       });
   
@@ -60,6 +65,7 @@ const MaintenanceReport = () => {
         const result = await response.json();
         console.log("Success Response:", result);
         alert("Maintenance Report submitted successfully!");
+        window.location.href = "/view-maintenance-reports"; // Redirect to view page
       } else {
         const errorData = await response.json();
         console.error("Error Response:", errorData);

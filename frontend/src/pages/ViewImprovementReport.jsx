@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
+
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Helper function to convert buffer data to a base64 string
@@ -18,24 +20,35 @@ function ViewImprovementReport() {
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
+        if (!user?.token) {
+          setMessage("Please login to view reports");
+          setIsError(true);
+          setIsLoading(false);
+          return;
+        }
+
         console.log("Fetching Improvement Reports...");
         const res = await axios.get(`${API_URL}/api/reports/view-improvement-reports`, {
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
           }
         });
 
         console.log("Improvement Reports Response:", res.data);
 
+        // Check if reports exist in the response
         if (res.data && Array.isArray(res.data.reports)) {
+          console.log("Found reports:", res.data.reports);
           setReports(res.data.reports);
         } else {
-          console.warn("Unexpected response format:", res.data);
+          console.warn("No reports found in response:", res.data);
           setReports([]);
         }
 
@@ -55,7 +68,7 @@ function ViewImprovementReport() {
     };
 
     fetchReports();
-  }, []);
+  }, [user]);
 
   if (isLoading) return <Spinner />;
 

@@ -37,6 +37,8 @@ function Ticket() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
+  const [hasFSR, setHasFSR] = useState(false);
+  const [isCheckingFSR, setIsCheckingFSR] = useState(true);
 
   const { ticket, isLoading, isError, message } = useSelector(
     (state) => state.tickets
@@ -50,13 +52,46 @@ function Ticket() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const checkFSR = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/reports/fsr-by-ticket/${ticketId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setHasFSR(true);
+        toast.warning(`A Service Report (ID: ${data.fsrId}) already exists for this ticket.`);
+        return true;
+      } else if (response.status === 404) {
+        setHasFSR(false);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error checking FSR:", error);
+      return false;
+    }
+  };
+
+  const handleCreateFSR = async () => {
+    const fsrExists = await checkFSR();
+    if (!fsrExists) {
+      navigate(`/generator-service-report/${ticketId}`);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await dispatch(getTicket(ticketId));
         await dispatch(getNotes(ticketId));
+        await checkFSR();
       } catch (error) {
         toast.error("Could not fetch ticket details");
+      } finally {
+        setIsCheckingFSR(false);
       }
     };
 
@@ -232,6 +267,17 @@ function Ticket() {
             </div>
           ) : (
             <p className="no-notes">No notes yet</p>
+          )}
+        </div>
+
+        <div className="ticket-actions">
+          {!isCheckingFSR && (
+            <button
+              className="btn btn-outline"
+              onClick={handleCreateFSR}
+            >
+              Create Service Report
+            </button>
           )}
         </div>
 

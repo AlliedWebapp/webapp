@@ -22,6 +22,21 @@ function generateMRId() {
 //fsr
 exports.submitFSR = async (req, res, next) => {
   try {
+    console.log("Submitting FSR for user:", req.user._id);
+    console.log("Request body:", req.body);
+    console.log("Files:", req.files);
+
+    const { ticketId } = req.body;
+
+    // Check if FSR already exists for this ticket
+    const existingFSR = await FSR.findOne({ ticketId });
+    if (existingFSR) {
+      console.log("FSR already exists for ticket:", ticketId);
+      return res.status(400).json({ 
+        message: "A Service Report already exists for this ticket ID" 
+      });
+    }
+
     const {
       customerName,
       installationAddress,
@@ -44,11 +59,11 @@ exports.submitFSR = async (req, res, next) => {
       engineerName,
       customerContact,
       customerEmail,
-      ticketId
     } = req.body;
 
     // Validate required fields
     if (!customerName || !installationAddress || !siteId || !engineerName) {
+      console.error("Missing required fields:", { customerName, installationAddress, siteId, engineerName });
       throw new ErrorHandler(400, "Missing required fields");
     }
 
@@ -57,12 +72,19 @@ exports.submitFSR = async (req, res, next) => {
     const engineerSignature = req.files["engineerSignature"]?.[0]?.buffer;
     const workPhotos = req.files["workPhotos"]?.map(file => file.buffer) || [];
 
+    console.log("Files processed:", {
+      hasCustomerSignature: !!customerSignature,
+      hasEngineerSignature: !!engineerSignature,
+      workPhotosCount: workPhotos.length
+    });
+
     // Generate a 4-digit fsr_id for each report
     const fsrId = generateFSRId();
+    console.log("Generated FSR ID:", fsrId);
 
     // Create new FSR report with generated fsr_id
     const newReport = new FSR({
-      fsrId,  // Add the unique 4-digit fsr_id
+      fsrId,
       ticketId,
       customerName,
       installationAddress,
@@ -87,34 +109,52 @@ exports.submitFSR = async (req, res, next) => {
       customerEmail,
       customerSignature,
       engineerSignature,
-      workPhotos
+      workPhotos,
+      user: req.user._id
+    });
+
+    console.log("New FSR report object created:", {
+      fsrId: newReport.fsrId,
+      ticketId: newReport.ticketId,
+      user: newReport.user
     });
 
     // Save the new report to the database
-    await newReport.save();
+    const savedReport = await newReport.save();
+    console.log("FSR report saved successfully:", {
+      id: savedReport._id,
+      fsrId: savedReport.fsrId
+    });
+
     res.status(201).json({ 
       message: "FSR submitted successfully!",
-      fsrId: newReport.fsrId
+      fsrId: savedReport.fsrId
     });
   } catch (err) {
+    console.error("Error in submitFSR:", err);
     next(err);
   }
 };
 
 exports.getAllFSRs = async (req, res, next) => {
   try {
+    console.log("Getting FSRs for user:", req.user._id);
+    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch reports with pagination
-    const reports = await FSR.find()
+    // Fetch reports with pagination and user filter
+    const reports = await FSR.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
+    console.log("Found reports:", reports);
+
     // Get total count for pagination
-    const total = await FSR.countDocuments();
+    const total = await FSR.countDocuments({ user: req.user._id });
+    console.log("Total reports:", total);
 
     res.json({
       reports,
@@ -123,6 +163,7 @@ exports.getAllFSRs = async (req, res, next) => {
       totalReports: total
     });
   } catch (err) {
+    console.error("Error in getAllFSRs:", err);
     next(err);
   }
 };
@@ -136,7 +177,13 @@ exports.getFSRByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "FSR ID is required");
     }
 
-    const report = await FSR.findById(id);
+    const report = await FSR.findOne({
+      _id: id,
+      $or: [
+        { user: req.user._id },
+        { user: { $exists: false } }
+      ]
+    });
     if (!report) {
       throw new ErrorHandler(404, "FSR not found");
     }
@@ -206,7 +253,8 @@ exports.submitImprovementReport = async (req, res, next) => {
       plant_incharge_sign: {
         data: plantSign,
         contentType: req.files["plantSign"]?.[0]?.mimetype
-      }
+      },
+      user: req.user._id // Add user reference
     });
 
     await newReport.save();
@@ -228,14 +276,14 @@ exports.getAllImprovementReports = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch improvement reports with pagination
-    const reports = await ImprovementReport.find()
+    // Fetch improvement reports with pagination and user filter
+    const reports = await ImprovementReport.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
     // Get total count for pagination
-    const total = await ImprovementReport.countDocuments();
+    const total = await ImprovementReport.countDocuments({ user: req.user._id });
 
     res.json({
       reports,
@@ -257,7 +305,13 @@ exports.getImprovementReportByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "Improvement Report ID is required");
     }
 
-    const report = await ImprovementReport.findById(id);
+    const report = await ImprovementReport.findOne({
+      _id: id,
+      $or: [
+        { user: req.user._id },
+        { user: { $exists: false } }
+      ]
+    });
     if (!report) {
       throw new ErrorHandler(404, "Improvement Report not found");
     }
@@ -325,7 +379,8 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       plantInchargeSignature: {
         data: plantInchargeSignature.buffer,
         contentType: plantInchargeSignature.mimetype
-      }
+      },
+      user: req.user._id // Add user reference
     });
 
     // Save the new report to the database
@@ -348,15 +403,15 @@ exports.getAllMaintenanceReports = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch reports with pagination, excluding signature data
-    const reports = await MaintenanceReport.find()
+    // Fetch reports with pagination and user filter
+    const reports = await MaintenanceReport.find({ user: req.user._id })
       .select('-hodSignature -plantInchargeSignature')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
     // Get total count for pagination
-    const total = await MaintenanceReport.countDocuments();
+    const total = await MaintenanceReport.countDocuments({ user: req.user._id });
 
     res.json({
       success: true,
@@ -386,7 +441,13 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "Invalid maintenance report ID");
     }
 
-    const report = await MaintenanceReport.findById(id).lean();
+    const report = await MaintenanceReport.findOne({
+      _id: id,
+      $or: [
+        { user: req.user._id },
+        { user: { $exists: false } }
+      ]
+    }).lean();
     if (!report) {
       throw new ErrorHandler(404, "Maintenance report not found");
     }

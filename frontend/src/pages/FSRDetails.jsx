@@ -4,6 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
+
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Helper function to convert buffer data to a base64 string
@@ -25,12 +27,25 @@ function FSRDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchFSR = async () => {
       try {
+        if (!user?.token) {
+          setError("Please login to view reports");
+          setIsLoading(false);
+          return;
+        }
+
         console.log("Fetching FSR with ID:", id);
-        const res = await axios.get(`${API_URL}/api/reports/fsr/${id}`);
+        const res = await axios.get(`${API_URL}/api/reports/fsr/${id}`, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
         console.log("FSR Details Response:", res.data);
         
         if (res.data) {
@@ -47,7 +62,7 @@ function FSRDetails() {
     };
 
     fetchFSR();
-  }, [id]);
+  }, [id, user]);
 
   const handleImageClick = (image) => {
     setSelectedImage(image);

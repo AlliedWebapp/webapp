@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
 
 function ViewMaintenanceReport() {
   const [reports, setReports] = useState([]);
@@ -10,26 +11,36 @@ function ViewMaintenanceReport() {
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
-  const API_URL= process.env.REACT_APP_API_BASE_URL;
+  const API_URL = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
+        if (!user?.token) {
+          setMessage("Please login to view reports");
+          setIsError(true);
+          setIsLoading(false);
+          return;
+        }
+
         console.log("Fetching Maintenance Reports...");
         const res = await axios.get(`${API_URL}/api/reports/view-maintenance-reports`, {
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
           }
         });
 
         console.log("Maintenance Reports Response:", res.data);
 
         if (res.data && res.data.success && Array.isArray(res.data.data.reports)) {
+          console.log("Found reports:", res.data.data.reports);
           setReports(res.data.data.reports);
         } else {
-          console.warn("Unexpected response format:", res.data);
+          console.warn("No reports found in response:", res.data);
           setReports([]);
         }
 
@@ -49,7 +60,7 @@ function ViewMaintenanceReport() {
     };
 
     fetchReports();
-  }, []);
+  }, [user]);
 
   if (isLoading) return <Spinner />;
 

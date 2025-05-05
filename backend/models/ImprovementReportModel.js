@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const improvementReportSchema = new mongoose.Schema({
 irId: Number, // 👈 Add this in schema
+  user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User'
+    },
   number: String,
   department: String,
   equipment_no: String,

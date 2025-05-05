@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -25,10 +26,17 @@ const MaintenanceReportDetails = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
+        if (!user?.token) {
+          setError("Please login to view reports");
+          setLoading(false);
+          return;
+        }
+
         setLoading(true);
         const response = await fetch(
           `${API_URL}/api/reports/maintenance-report-details/${id}`,
@@ -36,6 +44,7 @@ const MaintenanceReportDetails = () => {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
             },
           }
         );
@@ -62,7 +71,7 @@ const MaintenanceReportDetails = () => {
     };
 
     fetchReport();
-  }, [id]);
+  }, [id, user]);
 
   const handleImageClick = (image) => {
     setSelectedImage(image);

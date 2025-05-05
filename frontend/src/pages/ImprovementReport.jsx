@@ -2,9 +2,12 @@
 import React, { useState } from "react";
 import "../index.css";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
+
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ImprovementReport = () => {
+  const { user } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     number: "",
     department: "",
@@ -45,49 +48,38 @@ const ImprovementReport = () => {
   
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
+      if (value) {
+        data.append(key, value);
+      }
     });
-  
+
     if (hodSign) data.append("hodSign", hodSign);
     if (plantSign) data.append("plantSign", plantSign);
+  
+    // Debug logging
+    console.log("Form Data:", Object.fromEntries(data));
   
     try {
       const response = await fetch(`${API_URL}/api/reports/submit-improvement-report`, {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        },
         body: data,
       });
   
       if (response.ok) {
+        const result = await response.json();
+        console.log("Success Response:", result);
         alert("Improvement Report submitted successfully!");
-        
-        // Reset the form after successful submission
-        setFormData({
-          number: "",
-          department: "",
-          equipment_no: "",
-          equipment_system: "",
-          location: "",
-          objectives: "",
-          concept_date: "",
-          implementation_date: "",
-          present_condition: "",
-          modification: "",
-          resources: "",
-          mandays: "",
-          cost: "",
-          payback: "",
-          end_result: "",
-          additional_info: "",
-        });
-        setHodSign(null);
-        setPlantSign(null);
+        window.location.href = "/view-improvement-reports"; // Redirect to view page
       } else {
-        const errData = await response.json();
-        console.error("Submit failed:", errData);
-        alert("Failed to submit. Try again.");
+        const errorData = await response.json();
+        console.error("Error Response:", errorData);
+        alert("Failed to submit. Please try again.");
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch (err) {
+      console.error("Network Error:", err);
       alert("Something went wrong.");
     }
   };

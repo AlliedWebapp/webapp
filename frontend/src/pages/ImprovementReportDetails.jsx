@@ -3,13 +3,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import { useSelector } from "react-redux";
+
 const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 const ImprovementReportDetails = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -21,6 +25,7 @@ const ImprovementReportDetails = () => {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
             },
           }
         );
@@ -46,8 +51,13 @@ const ImprovementReportDetails = () => {
       }
     };
 
-    fetchReport();
-  }, [id]);
+    if (user?.token) {
+      fetchReport();
+    } else {
+      setError("Please login to view reports");
+      setLoading(false);
+    }
+  }, [id, user]);
 
   if (loading) {
     return <Spinner />;

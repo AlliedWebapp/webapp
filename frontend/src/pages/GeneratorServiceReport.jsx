@@ -1,13 +1,18 @@
 //fomrat of form of service report form//
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../index.css"; // Global styles
 import BackButton from "../components/BackButton";
+import axios from "axios";
+import { useSelector } from "react-redux";
+
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
-  
+  const { user } = useSelector((state) => state.auth);
+  console.log("User state:", user);
+
   const [formData, setFormData] = useState({
     srNo: "",
     customerName: "",
@@ -36,55 +41,74 @@ const GeneratorServiceReport = () => {
     workPhotos: []
   });
   
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prev) => ({ ...prev, [name]: value }));
-};
-
-const handleFileChange = (e) => {
-  const { name, files } = e.target;
-  if (name === "workPhotos") {
-    setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
-  } else {
-    setFormData((prev) => ({ ...prev, [name]: files[0] }));
-  }
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const data = new FormData();
-  data.append("ticketId", ticketId);
-
-  Object.entries(formData).forEach(([key, value]) => {
-    if (key === "workPhotos") {
-      value.forEach((file) => data.append("workPhotos", file));
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (name === "workPhotos") {
+      setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
     } else {
-      data.append(key, value);
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
     }
-  });
+  };
 
-  try {
-    const response = await fetch(`${API_URL}/api/reports/submit-fsr`, {
-      method: "POST",
-      body: data,
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user?.token) {
+      alert("Please log in to submit the report.");
+      return;
+    }
+
+    console.log("Submitting FSR for user:", user);
+    console.log("Form data before submission:", formData);
+
+    const submitData = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "workPhotos") {
+        if (value && value.length > 0) {
+          value.forEach((file) => {
+            console.log("Appending work photo:", file.name);
+            submitData.append("workPhotos", file);
+          });
+        }
+      } else if (value != null) {
+        console.log(`Appending ${key}:`, value);
+        submitData.append(key, value);
+      }
     });
 
-    if (response.ok) {
-      alert("Report submitted successfully!");
-    } else {
-      const errorData = await response.json();
-      console.error("Submit failed:", errorData);
-      alert("Failed to submit. Please try again.");
+    // Add ticketId to the form data
+    submitData.append("ticketId", ticketId);
+    console.log("Added ticketId:", ticketId);
+
+    try {
+      console.log("Submitting FSR with data:", Object.fromEntries(submitData));
+      const res = await fetch(`${API_URL}/api/reports/submit-fsr`, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: submitData,
+      });
+
+      const json = await res.json();
+      console.log("FSR submission response:", json);
+
+      if (res.ok) {
+        alert("Report submitted successfully!");
+        window.location.href = "/fsr";
+      } else {
+        console.error("FSR submission failed:", json);
+        throw new Error(json.message || json.error || "Submit failed");
+      }
+    } catch (error) {
+      console.error("Error submitting FSR:", error);
+      alert(error.message);
     }
-  } catch (err) {
-    console.error("Error submitting form:", err);
-    alert("Something went wrong.");
-  }
-};
-
-
+  };
 
   return (
     <div className="generator-service-report">

@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
-const API_URL = process.env.REACT_APP_API_BASE_URL;
+import { useSelector } from "react-redux";
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -19,35 +20,52 @@ function ViewFSR() {
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchFSRs = async () => {
       try {
-        console.log("Fetching FSRs...");
+        if (!user?.token) {
+          console.log("No user token found");
+          setMessage("Please login to view reports");
+          setIsError(true);
+          setIsLoading(false);
+          return;
+        }
+
+        console.log("User state:", user);
+        console.log("Fetching FSRs for user:", user._id);
+        
         const res = await axios.get(`${API_URL}/api/reports/fsrs`, {
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
           }
         });
 
         console.log("FSR Response:", res.data);
 
-        // The backend returns the reports directly in the response
+        // Check if reports exist in the response
         if (res.data && Array.isArray(res.data.reports)) {
+          console.log("Found reports:", res.data.reports);
           setFsrs(res.data.reports);
         } else {
-          console.warn("Unexpected response format:", res.data);
+          console.warn("No reports found in response:", res.data);
           setFsrs([]);
         }
         setIsLoading(false);
       } catch (err) {
         console.error("Failed to fetch FSRs:", err);
         if (err.response) {
+          console.error("Error response:", err.response.data);
+          console.error("Error status:", err.response.status);
           setMessage(`Server error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
         } else if (err.request) {
+          console.error("No response received:", err.request);
           setMessage("No response from server. Please check your connection.");
         } else {
+          console.error("Error message:", err.message);
           setMessage(`Error: ${err.message}`);
         }
         setIsError(true);
@@ -56,7 +74,7 @@ function ViewFSR() {
     };
 
     fetchFSRs();
-  }, []);
+  }, [user]);
 
   // Loading spinner is shown while data is being fetched
   if (isLoading) return <Spinner />;
