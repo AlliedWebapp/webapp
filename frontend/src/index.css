@@ -766,7 +766,7 @@ td {
 
 /* Submit button styling */
 .generator-service-report .submit-btn {
-  background: #4CAF50;
+  background: #333;
   color: white;
   padding: 15px 30px;
   border: none;
@@ -781,7 +781,7 @@ td {
 
 /* Submit button hover effect */
 .generator-service-report .submit-btn:hover {
-  background: #45a049;
+  background: #555;
 }
 
 /* Mobile responsive adjustments */
@@ -856,7 +856,7 @@ td {
 /* Button Styles */
 .report-button {
   padding: 14px 24px;
-  background-color: #111827;
+  background-color: #333;
   color: #ffffff;
   text-decoration: none;
   font-weight: 600;
@@ -868,7 +868,7 @@ td {
 }
 
 .report-button:hover {
-  background-color: #374151;
+  background-color: #555;
 }
 
 
@@ -948,7 +948,7 @@ td {
 }
 
 .improvement-report .submit-btn {
-  background: #4CAF50;
+  background: #333;
   color: white;
   padding: 15px 30px;
   border: none;
@@ -962,7 +962,7 @@ td {
 }
 
 .improvement-report .submit-btn:hover {
-  background: #45a049;
+  background: #555;
 }
 
 /* -------------------------------
@@ -1041,7 +1041,7 @@ td {
 }
 
 .maintenance-report .submit-btn {
-  background: #4CAF50;
+  background: #333;
   color: white;
   padding: 15px 30px;
   border: none;
@@ -1055,7 +1055,7 @@ td {
 }
 
 .maintenance-report .submit-btn:hover {
-  background: #45a049;
+  background: #555;
 }
 
 /* FSR Details Page Styles - One Page Layout */
@@ -1625,7 +1625,7 @@ td {
 }
 
 .improvement-reports .view-btn {
-  background-color: #4CAF50;
+  background-color: #333;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -1635,7 +1635,7 @@ td {
 }
 
 .improvement-reports .view-btn:hover {
-  background-color: #45a049;
+  background-color: #555;
 }
 
 @media (max-width: 768px) {
@@ -1725,7 +1725,7 @@ td {
 }
 
 .improvement-reports .btn {
-  background-color: #4CAF50;
+  background-color: #333;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -1735,7 +1735,7 @@ td {
 }
 
 .improvement-reports .btn:hover {
-  background-color: #45a049;
+  background-color: #555;
 }
 
 .improvement-reports .btn-sm {
@@ -1915,7 +1915,7 @@ td {
 }
 
 .view-btn {
-  background-color: #4CAF50;
+  background-color: #333;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -1926,7 +1926,7 @@ td {
 }
 
 .view-btn:hover {
-  background-color: #45a049;
+  background-color: #555;
 }
 
 @media (max-width: 768px) {
@@ -1939,6 +1939,184 @@ td {
   }
 
   .improvement-reports-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Common Report Styles */
+.report-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.report-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.report-header h2 {
+  font-size: 24px;
+  margin: 20px 0 10px;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+}
+
+.report-header p {
+  margin: 5px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Report Details Styles */
+.report-details {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.report-details-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.report-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.report-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Table Styles for Reports */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 14px;
+}
+
+.report-table td {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.report-label {
+  background-color: #f8fafc;
+  font-weight: 500;
+  color: #333;
+  width: 20%;
+  min-width: 150px;
+}
+
+.report-value {
+  color: #333;
+  padding: 0.75rem;
+}
+
+/* Form Styles */
+.report-form {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  resize: none;
+}
+
+/* Button Styles */
+.submit-btn, .view-btn, .back-button {
+  background: #333;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 20px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover, .view-btn:hover, .back-button:hover {
+  background: #555;
+}
+
+/* Signature Styles */
+.signature-image {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .report-container,
+  .report-details {
+    padding: 1rem;
+  }
+
+  .report-table {
+    font-size: 12px;
+  }
+
+  .report-table td {
+    padding: 0.5rem;
+  }
+
+  .report-label {
+    min-width: 120px;
+  }
+
+  .form-row {
     grid-template-columns: 1fr;
   }
 }

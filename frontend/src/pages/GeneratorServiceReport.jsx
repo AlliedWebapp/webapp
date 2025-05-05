@@ -1,11 +1,13 @@
 //fomrat of form of service report form//
 import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../index.css"; // Global styles
+import BackButton from "../components/BackButton";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
-
+  
   const [formData, setFormData] = useState({
     srNo: "",
     customerName: "",
@@ -64,7 +66,7 @@ const handleSubmit = async (e) => {
   });
 
   try {
-    const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-fsr", {
+    const response = await fetch(`${API_URL}/api/reports/submit-fsr`, {
       method: "POST",
       body: data,
     });
@@ -86,8 +88,9 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="generator-service-report">
+      <BackButton url="/tickets" className="back-button" />
       <header className="header">
-        <h2>Generator Service Report</h2>
+        <h2>Service Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
         <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
       </header>

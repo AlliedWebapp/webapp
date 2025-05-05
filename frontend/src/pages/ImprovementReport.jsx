@@ -1,6 +1,8 @@
 //form of continual improvemment report//
 import React, { useState } from "react";
 import "../index.css";
+import BackButton from "../components/BackButton";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ImprovementReport = () => {
   const [formData, setFormData] = useState({
@@ -50,7 +52,7 @@ const ImprovementReport = () => {
     if (plantSign) data.append("plantSign", plantSign);
   
     try {
-      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-improvement-report", {
+      const response = await fetch(`${API_URL}/api/reports/submit-improvement-report`, {
         method: "POST",
         body: data,
       });
@@ -92,13 +94,14 @@ const ImprovementReport = () => {
   
 
   return (
-    <div className="improvement-report">
-      <header className="header">
+    <div className="report-container">
+      <BackButton url="/other-reports" className="back-button" />
+      <header className="report-header">
         <h2>Continual Improvement Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
       </header>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="report-form">
         <div className="form-row">
           <div className="form-group">
             <label>No.</label>

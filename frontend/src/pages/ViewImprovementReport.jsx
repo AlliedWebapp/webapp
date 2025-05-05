@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -22,7 +23,7 @@ function ViewImprovementReport() {
     const fetchReports = async () => {
       try {
         console.log("Fetching Improvement Reports...");
-        const res = await axios.get("https://backend-services-theta.vercel.app/api/reports/view-improvement-reports", {
+        const res = await axios.get(`${API_URL}/api/reports/view-improvement-reports`, {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -69,7 +70,7 @@ function ViewImprovementReport() {
 
   return (
     <div className="improvement-reports">
-      <BackButton url="/" />
+      <BackButton url="/other-reports" className="back-button" />
       <h1>Improvement Reports</h1>
       <div className="tickets">
         <div className="ticket-headings">
@@ -90,7 +91,7 @@ function ViewImprovementReport() {
               <div>
                 <button
                   className="btn btn-sm btn-outline"
-                  onClick={() => navigate(`/improvementreports/${report._id}`)}
+                  onClick={() => navigate(`/improvement-report-details/${report._id}`)}
                 >
                   View
                 </button>

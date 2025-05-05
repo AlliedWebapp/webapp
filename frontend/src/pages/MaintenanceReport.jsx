@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import "../index.css";
+import BackButton from "../components/BackButton";
+
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const MaintenanceReport = () => {
   const { ticketId } = useParams();
@@ -48,7 +51,7 @@ const MaintenanceReport = () => {
     console.log("Form Data:", Object.fromEntries(data));
   
     try {
-      const response = await fetch("https://backend-services-theta.vercel.app/api/reports/submit-maintenance-report", {
+      const response = await fetch(`${API_URL}/api/reports/submit-maintenance-report`, {
         method: "POST",
         body: data,
       });
@@ -69,13 +72,14 @@ const MaintenanceReport = () => {
   };
   
   return (
-    <div className="maintenance-report">
-      <header className="header">
+    <div className="report-container">
+      <BackButton url="/other-reports" className="back-button" />
+      <header className="report-header">
         <h2>BREAK DOWN MAINTENANCE CUM CORRECTIVE ACTION REPORT</h2>
         <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
       </header>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="report-form">
         <div className="form-row">
           <div className="form-group">
             <label>Unit:</label>

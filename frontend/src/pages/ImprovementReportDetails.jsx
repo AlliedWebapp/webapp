@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
-
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 const ImprovementReportDetails = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ const ImprovementReportDetails = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://backend-services-theta.vercel.app/api/reports/improvementreports/${id}`,
+          `${API_URL}/api/reports/improvement-report-details/${id}`,
           {
             headers: {
               Accept: "application/json",
@@ -72,116 +72,95 @@ const ImprovementReportDetails = () => {
   }
 
   return (
-    <div className="improvement-details">
-      <div className="improvement-details-container">
-        <div className="improvement-header">
+    <div className="report-details">
+      <div className="back-button-container">
+        <BackButton url="/view-improvement-reports" className="back-button" />
+      </div>
+      <div className="report-details-container">
+        <div className="report-header">
           <h2>Improvement Report Details</h2>
-          <BackButton />
         </div>
 
-        <div className="improvement-section">
-          <h3>Basic Information</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>Report ID</label>
-              <p>{report.irId}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Department</label>
-              <p>{report.department}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Equipment Number</label>
-              <p>{report.equipment_no}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Equipment System</label>
-              <p>{report.equipment_system}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="improvement-section">
-          <h3>Location Details</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>Location</label>
-              <p>{report.location}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Area</label>
-              <p>{report.area}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="improvement-section">
-          <h3>Improvement Details</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>Objectives</label>
-              <p>{report.objectives}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Present Condition</label>
-              <p>{report.present_condition}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Proposed Modification</label>
-              <p>{report.modification}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Resources Required</label>
-              <p>{report.resources}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Mandays</label>
-              <p>{report.mandays}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Cost</label>
-              <p>{report.cost}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Payback Period</label>
-              <p>{report.payback}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Expected End Result</label>
-              <p>{report.end_result}</p>
-            </div>
-            <div className="improvement-field">
-              <label>Additional Information</label>
-              <p>{report.additional_info}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="improvement-section">
-          <h3>Signatures</h3>
-          <div className="improvement-grid">
-            <div className="improvement-field">
-              <label>HOD Signature</label>
-              {report.hodSignature && (
-                <img
-                  src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
-                  alt="HOD Signature"
-                  className="signature-image"
-                />
-              )}
-            </div>
-            <div className="improvement-field">
-              <label>Plant Head Signature</label>
-              {report.plantInchargeSignature && (
-                <img
-                  src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
-                  alt="Plant Head Signature"
-                  className="signature-image"
-                />
-              )}
-            </div>
-          </div>
-        </div>
+        <table className="report-table">
+          <tbody>
+            <tr>
+              <td className="report-label">Report ID</td>
+              <td className="report-value">{report.irId}</td>
+              <td className="report-label">Department</td>
+              <td className="report-value">{report.department}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Equipment Number</td>
+              <td className="report-value">{report.equipment_no}</td>
+              <td className="report-label">Equipment System</td>
+              <td className="report-value">{report.equipment_system}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Location</td>
+              <td className="report-value" colSpan="3">{report.location}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Objectives</td>
+              <td className="report-value" colSpan="3">{report.objectives}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Concept Date</td>
+              <td className="report-value">{new Date(report.concept_date).toLocaleDateString()}</td>
+              <td className="report-label">Implementation Date</td>
+              <td className="report-value">{new Date(report.implementation_date).toLocaleDateString()}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Present Condition</td>
+              <td className="report-value" colSpan="3">{report.present_condition}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Modification</td>
+              <td className="report-value" colSpan="3">{report.modification}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Resources</td>
+              <td className="report-value" colSpan="3">{report.resources}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Mandays</td>
+              <td className="report-value">{report.mandays}</td>
+              <td className="report-label">Cost</td>
+              <td className="report-value">{report.cost}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Payback Period</td>
+              <td className="report-value">{report.payback}</td>
+              <td className="report-label">End Result</td>
+              <td className="report-value">{report.end_result}</td>
+            </tr>
+            <tr>
+              <td className="report-label">Additional Information</td>
+              <td className="report-value" colSpan="3">{report.additional_info}</td>
+            </tr>
+            <tr>
+              <td className="report-label">HOD Signature</td>
+              <td className="report-value">
+                {report.hod_sign && (
+                  <img
+                    src={`data:${report.hod_sign.contentType};base64,${report.hod_sign.data}`}
+                    alt="HOD Signature"
+                    className="signature-image"
+                  />
+                )}
+              </td>
+              <td className="report-label">Plant Head Signature</td>
+              <td className="report-value">
+                {report.plant_incharge_sign && (
+                  <img
+                    src={`data:${report.plant_incharge_sign.contentType};base64,${report.plant_incharge_sign.data}`}
+                    alt="Plant Head Signature"
+                    className="signature-image"
+                  />
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

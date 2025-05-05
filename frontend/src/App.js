@@ -17,6 +17,8 @@ import ImprovementReport from './pages/ImprovementReport';
 import ViewImprovementReport from './pages/ViewImprovementReport'; 
 import ImprovementReportDetails from './pages/ImprovementReportDetails';   
 import MaintenanceReport from './pages/MaintenanceReport';
+import ViewMaintenanceReport from './pages/ViewMaintenanceReport';
+import MaintenanceReportDetails from './pages/MaintenanceReportDetails';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
 import OtherReports from './pages/OtherReports';  
 
@@ -43,9 +45,11 @@ function App() {
               <Route path="/monthly" element={<Monthly />} />
               <Route path="/improvement-report" element={<ImprovementReport />} />
               <Route path="/maintenance-report" element={<MaintenanceReport />} />
+              <Route path="/view-maintenance-reports" element={<ViewMaintenanceReport />} />
+              <Route path="/maintenance-report-details/:id" element={<MaintenanceReportDetails />} />
               <Route path="/service-report/:ticketId" element={<GeneratorServiceReport />} />
               <Route path="/other-reports" element={<OtherReports />} />
-              <Route path="/view-improvement-report" element={<ViewImprovementReport />} />
+              <Route path="/view-improvement-reports" element={<ViewImprovementReport/>} />
               <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
             </Route>
           </Routes>

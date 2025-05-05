@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -29,7 +30,7 @@ function FSRDetails() {
     const fetchFSR = async () => {
       try {
         console.log("Fetching FSR with ID:", id);
-        const res = await axios.get(`https://backend-services-theta.vercel.app/api/reports/fsr/${id}`);
+        const res = await axios.get(`${API_URL}/api/reports/fsr/${id}`);
         console.log("FSR Details Response:", res.data);
         
         if (res.data) {
@@ -63,7 +64,7 @@ function FSRDetails() {
   return (
     <div className="fsr-details">
       <BackButton url="/fsr" />
-      <h1>Generator Service Report Details</h1>
+      <h1>Service Report Details</h1>
       
       <div className="fsr-details-container">
         <table className="fsr-table">

@@ -16,6 +16,8 @@ import NoteItem from "../components/NoteItem";
 import Modal from "react-modal";
 import { FaPlus } from "react-icons/fa";
 
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
 const customStyles = {
   content: {
     width: "600px",
@@ -185,7 +187,7 @@ function Ticket() {
             <h3>Uploaded Images</h3>
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
               {ticket.images.map((_, index) => {
-                const imageUrl = `https://backend-services-theta.vercel.app/api/tickets/${ticket._id}/images/${index}`;
+                const imageUrl = `${API_URL}/api/tickets/${ticket._id}/images/${index}`;
                 return (
                   <img
                     key={index}
