@@ -8,7 +8,7 @@ const MaintenanceReportSchema = new mongoose.Schema({
         ref: 'User'
     },
     unit: { type: String, required: true },
-    outageDate: { type: String, required: true },
+    outageDate: { type: Date, required: true },
     outageTime: { type: String, required: true },
     defectReported: { type: String, required: true },
     investigationOutcome: { type: String, required: true },

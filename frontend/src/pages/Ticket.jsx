@@ -44,7 +44,7 @@ function Ticket() {
     (state) => state.tickets
   );
 
-  const { notes, isLoading: notesIsLoading } = useSelector(
+  const { notes, isLoading: notesIsLoading, isError: notesIsError, message: notesMessage } = useSelector(
     (state) => state.notes
   );
 
@@ -89,7 +89,6 @@ function Ticket() {
         await dispatch(getNotes(ticketId));
         await checkFSR();
       } catch (error) {
-        toast.error("Could not fetch ticket details");
       } finally {
         setIsCheckingFSR(false);
       }
@@ -101,7 +100,8 @@ function Ticket() {
     };
   }, [ticketId, dispatch]);
 
-  if (isLoading || notesIsLoading) return <Spinner />;
+ // Show spinner while loading ticket, notes, or FSR check
+ if (isLoading || notesIsLoading || isCheckingFSR) return <Spinner />;
 
   if (isError)
     return (

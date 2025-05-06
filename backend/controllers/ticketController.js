@@ -1,64 +1,66 @@
 const asyncHandler = require('express-async-handler')
-
+const mongoose = require('mongoose')
 const User = require('../models/userModel')
 const Ticket = require('../models/ticketModel')
 
-// @desc    Get user tickets
+const adminEmails = ["bhaskarudit02@gmail.com", "ss@gmail.com"].map(e => e.toLowerCase());
+
+// Helper to compare ObjectId or string
+function isTicketOwner(ticketUser, reqUserId) {
+  return ticketUser.toString() === reqUserId.toString();
+}
+
+// @desc    Get user tickets (admin: all, user: own)
 // @route   GET /api/tickets
 // @access  Private
 const getTickets = asyncHandler(async (req, res) => {
-  // Get user using the id and JWT
   const user = await User.findById(req.user.id);
-
   if (!user) {
     res.status(401);
     throw new Error('User not found');
   }
 
-  const tickets = await Ticket.aggregate([
-    { $match: { user: req.user._id } },
-    {
-      $addFields: {
-        statusPriority: {
-          $cond: [{ $eq: ["$status", "new"] }, 0, 1] // new = 0, close = 1
-        }
-      }
-    },
-    { $sort: { statusPriority: 1, createdAt: -1 } } // new first, then recent
-  ]);
-  
+  const userEmail = (req.user.email || "").toLowerCase();
+
+  let tickets;
+  if (adminEmails.includes(userEmail)) {
+    tickets = await Ticket.find({});
+  } else {
+    tickets = await Ticket.find({ user: new mongoose.Types.ObjectId(req.user.id) });
+  }
 
   res.status(200).json(tickets);
 });
 
-// @desc    Get user ticket
+// @desc    Get user ticket (admin: any, user: own)
 // @route   GET /api/tickets/:id
 // @access  Private
 const getTicket = asyncHandler(async (req, res) => {
-  // Get user using the id and JWT
-  const user = await User.findById(req.user.id)
-
+  const user = await User.findById(req.user.id);
   if (!user) {
-    res.status(401)
-    throw new Error('User not found')
+    res.status(401);
+    throw new Error('User not found');
   }
 
-  const ticket = await Ticket.findById(req.params.id)
-
+  const ticket = await Ticket.findById(req.params.id);
   if (!ticket) {
-    res.status(404)
-    throw new Error('Ticket not found')
+    res.status(404);
+    throw new Error('Ticket not found');
   }
 
+  const userEmail = (req.user.email || "").toLowerCase();
 
-  // Check if ticket belongs to user
-  if (ticket.user.toString() !== req.user.id) {
-    res.status(401)
-    throw new Error('Not authorized')
+  // Admin can view any ticket; user only their own
+  if (
+    !adminEmails.includes(userEmail) &&
+    !isTicketOwner(ticket.user, req.user.id)
+  ) {
+    res.status(401);
+    throw new Error('Not authorized');
   }
-  
-  res.status(200).json(ticket)
-})
+
+  res.status(200).json(ticket);
+});
 
 // @desc    Create new ticket
 // @route   POST /api/tickets
@@ -130,76 +132,78 @@ const createTicket = asyncHandler(async (req, res) => {
   }
 })
 
-// @desc    Delete ticket
+// @desc    Delete ticket (admin: any, user: own)
 // @route   DELETE /api/tickets/:id
 // @access  Private
 const deleteTicket = asyncHandler(async (req, res) => {
-  // Get user using the id and JWT
-  const user = await User.findById(req.user.id)
-
+  const user = await User.findById(req.user.id);
   if (!user) {
-    res.status(401)
-    throw new Error('User not found')
+    res.status(401);
+    throw new Error('User not found');
   }
 
-  const ticket = await Ticket.findById(req.params.id)
-
+  const ticket = await Ticket.findById(req.params.id);
   if (!ticket) {
-    res.status(404)
-    throw new Error('Ticket not found')
+    res.status(404);
+    throw new Error('Ticket not found');
   }
 
-  // Check if ticket belongs to user
-  if (ticket.user.toString() !== req.user.id) {
-    res.status(401)
-    throw new Error('Not authorized')
+  const userEmail = (req.user.email || "").toLowerCase();
+
+  // Admin can delete any ticket; user only their own
+  if (
+    !adminEmails.includes(userEmail) &&
+    !isTicketOwner(ticket.user, req.user.id)
+  ) {
+    res.status(401);
+    throw new Error('Not authorized');
   }
 
-  await ticket.remove()
+  await ticket.remove();
 
-  res.status(200).json({ success: true })
-})
+  res.status(200).json({ success: true });
+});
 
-// @desc    Update ticket
+// @desc    Update ticket (admin: any, user: own)
 // @route   PUT /api/tickets/:id
 // @access  Private
 const updateTicket = asyncHandler(async (req, res) => {
-  // Get user using the id and JWT
-  const user = await User.findById(req.user.id)
-
+  const user = await User.findById(req.user.id);
   if (!user) {
-    res.status(401)
-    throw new Error('User not found')
+    res.status(401);
+    throw new Error('User not found');
   }
 
-  const ticket = await Ticket.findById(req.params.id)
-
+  const ticket = await Ticket.findById(req.params.id);
   if (!ticket) {
-    res.status(404)
-    throw new Error('Ticket not found')
+    res.status(404);
+    throw new Error('Ticket not found');
   }
 
-  // Check if ticket belongs to user
-  if (ticket.user.toString() !== req.user.id) {
-    res.status(401)
-    throw new Error('Not authorized')
+  const userEmail = (req.user.email || "").toLowerCase();
+
+  // Admin can update any ticket; user only their own
+  if (
+    !adminEmails.includes(userEmail) &&
+    !isTicketOwner(ticket.user, req.user.id)
+  ) {
+    res.status(401);
+    throw new Error('Not authorized');
   }
 
   const updatedTicket = await Ticket.findByIdAndUpdate(
     req.params.id,
     req.body,
-    {
-      new: true
-    }
-  )
+    { new: true }
+  );
 
-  res.status(200).json(updatedTicket)
-})
+  res.status(200).json(updatedTicket);
+});
 
 module.exports = {
   getTickets,
   createTicket,
   getTicket,
   deleteTicket,
-  updateTicket
-}
+  updateTicket,
+};

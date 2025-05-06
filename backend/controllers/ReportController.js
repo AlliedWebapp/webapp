@@ -4,6 +4,14 @@ const ImprovementReport = require("../models/ImprovementReportModel"); // Import
 const MaintenanceReport = require("../models/MaintenanceReportModel");
 const mongoose = require("mongoose");
 
+const adminEmails = ["bhaskarudit02@gmail.com", "ss@gmail.com"];
+
+
+// Helper to compare ObjectId or string
+function isOwner(docUser, reqUserId) {
+  return docUser.toString() === reqUserId.toString();
+}
+
 // Function to generate a 4-digit unique fsr_id
 function generateFSRId() {
   return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
@@ -136,25 +144,24 @@ exports.submitFSR = async (req, res, next) => {
   }
 };
 
+// Get all FSRs (admin: all, user: own)
 exports.getAllFSRs = async (req, res, next) => {
   try {
-    console.log("Getting FSRs for user:", req.user._id);
-    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch reports with pagination and user filter
-    const reports = await FSR.find({ user: req.user._id })
+    let query = {};
+    if (!adminEmails.includes(req.user.email)) {
+      query.user = req.user._id;
+    }
+
+    const reports = await FSR.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    console.log("Found reports:", reports);
-
-    // Get total count for pagination
-    const total = await FSR.countDocuments({ user: req.user._id });
-    console.log("Total reports:", total);
+    const total = await FSR.countDocuments(query);
 
     res.json({
       reports,
@@ -163,29 +170,30 @@ exports.getAllFSRs = async (req, res, next) => {
       totalReports: total
     });
   } catch (err) {
-    console.error("Error in getAllFSRs:", err);
     next(err);
   }
 };
 
 // ✅ NEW FUNCTION TO FETCH BY MONGO _id
+// Get FSR by Mongo _id (admin: any, user: own)
 exports.getFSRByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
     if (!id) {
       throw new ErrorHandler(400, "FSR ID is required");
     }
 
-    const report = await FSR.findOne({
-      _id: id,
-      $or: [
-        { user: req.user._id },
-        { user: { $exists: false } }
-      ]
-    });
+    const report = await FSR.findById(id);
     if (!report) {
       throw new ErrorHandler(404, "FSR not found");
+    }
+
+    // Admin can view any report; user only their own
+    if (
+      !adminEmails.includes(req.user.email) &&
+      !isOwner(report.user, req.user._id)
+    ) {
+      throw new ErrorHandler(401, "Not authorized to view this FSR");
     }
 
     res.json(report);
@@ -193,7 +201,6 @@ exports.getFSRByMongoId = async (req, res, next) => {
     next(err);
   }
 };
-
 
 //improvement report
 exports.submitImprovementReport = async (req, res, next) => {
@@ -270,20 +277,24 @@ exports.submitImprovementReport = async (req, res, next) => {
 };
 
 // Function to fetch all Improvement Reports with pagination
+// Get all Improvement Reports (admin: all, user: own)
 exports.getAllImprovementReports = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch improvement reports with pagination and user filter
-    const reports = await ImprovementReport.find({ user: req.user._id })
+    let query = {};
+    if (!adminEmails.includes(req.user.email)) {
+      query.user = req.user._id;
+    }
+
+    const reports = await ImprovementReport.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Get total count for pagination
-    const total = await ImprovementReport.countDocuments({ user: req.user._id });
+    const total = await ImprovementReport.countDocuments(query);
 
     res.json({
       reports,
@@ -296,7 +307,7 @@ exports.getAllImprovementReports = async (req, res, next) => {
   }
 };
 
-//to fetch one improvement report by id 
+// Get one Improvement Report by Mongo _id (admin: any, user: own)
 exports.getImprovementReportByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -305,15 +316,17 @@ exports.getImprovementReportByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "Improvement Report ID is required");
     }
 
-    const report = await ImprovementReport.findOne({
-      _id: id,
-      $or: [
-        { user: req.user._id },
-        { user: { $exists: false } }
-      ]
-    });
+    const report = await ImprovementReport.findById(id);
     if (!report) {
       throw new ErrorHandler(404, "Improvement Report not found");
+    }
+
+    // Admin can view any report; user only their own
+    if (
+      !adminEmails.includes(req.user.email) &&
+      !isOwner(report.user, req.user._id)
+    ) {
+      throw new ErrorHandler(401, "Not authorized to view this Improvement Report");
     }
 
     res.json(report);
@@ -321,8 +334,6 @@ exports.getImprovementReportByMongoId = async (req, res, next) => {
     next(err);
   }
 };
-
-
 
 //maintenance report
 exports.submitMaintenanceReport = async (req, res, next) => {
@@ -397,21 +408,25 @@ exports.submitMaintenanceReport = async (req, res, next) => {
   }
 };
 
+// Get all Maintenance Reports (admin: all, user: own)
 exports.getAllMaintenanceReports = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch reports with pagination and user filter
-    const reports = await MaintenanceReport.find({ user: req.user._id })
+    let query = {};
+    if (!adminEmails.includes(req.user.email)) {
+      query.user = req.user._id;
+    }
+
+    const reports = await MaintenanceReport.find(query)
       .select('-hodSignature -plantInchargeSignature')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Get total count for pagination
-    const total = await MaintenanceReport.countDocuments({ user: req.user._id });
+    const total = await MaintenanceReport.countDocuments(query);
 
     res.json({
       success: true,
@@ -433,6 +448,7 @@ const bufferToBase64 = (buffer) => {
   return `data:image/jpeg;base64,${Buffer.from(buffer.data).toString('base64')}`;
 };
 
+// Get one Maintenance Report by Mongo _id (admin: any, user: own)
 exports.getMaintenanceReportByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -441,15 +457,17 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "Invalid maintenance report ID");
     }
 
-    const report = await MaintenanceReport.findOne({
-      _id: id,
-      $or: [
-        { user: req.user._id },
-        { user: { $exists: false } }
-      ]
-    }).lean();
+    const report = await MaintenanceReport.findById(id).lean();
     if (!report) {
       throw new ErrorHandler(404, "Maintenance report not found");
+    }
+
+    // Admin can view any report; user only their own
+    if (
+      !adminEmails.includes(req.user.email) &&
+      !isOwner(report.user, req.user._id)
+    ) {
+      throw new ErrorHandler(401, "Not authorized to view this maintenance report");
     }
 
     // Convert signature buffers to base64 strings
@@ -468,9 +486,15 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
       };
     }
 
-    // Format dates
-    report.outageDate = new Date(report.outageDate).toLocaleDateString();
-    report.createdAt = new Date(report.createdAt).toLocaleDateString();
+    // Format dates safely
+    if (report.outageDate) {
+      const d = new Date(report.outageDate);
+      report.outageDate = isNaN(d) ? report.outageDate : d.toLocaleDateString();
+    }
+    if (report.createdAt) {
+      const d = new Date(report.createdAt);
+      report.createdAt = isNaN(d) ? report.createdAt : d.toLocaleDateString();
+    }
 
     res.json({
       success: true,
@@ -480,4 +504,3 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
     next(err);
   }
 };
-

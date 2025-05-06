@@ -1,13 +1,19 @@
 //form of continual improvemment report//
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../index.css";
 import BackButton from "../components/BackButton";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ImprovementReport = () => {
+  const { ticketId } = useParams();
   const { user } = useSelector((state) => state.auth);
+
+  const [previewImage, setPreviewImage] = useState(null);
+  const [ticketImages, setTicketImages] = useState([]);
+
   const [formData, setFormData] = useState({
     number: "",
     department: "",
@@ -30,6 +36,37 @@ const ImprovementReport = () => {
   const [hodSign, setHodSign] = useState(null);
   const [plantSign, setPlantSign] = useState(null);
 
+useEffect(() => {
+  async function fetchTicketImages() {
+    try {
+      const res = await fetch(
+        `${API_URL}/api/tickets/${ticketId}/images`,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      if (!res.ok) {
+        setTicketImages([]);
+        return;
+      }
+      const data = await res.json(); // { images: [ { contentType, data:{type:'Buffer',data:[…]} }, … ] }
+
+      // Convert each image‐object into a data‐URI string:
+      const urls = (data.images || []).map(imgObj => {
+        const byteArray = imgObj.data.data;         // Array of bytes
+        let binary = "";                           
+        byteArray.forEach(b => binary += String.fromCharCode(b));
+        const b64 = window.btoa(binary);          // base64‐encode
+        return `data:${imgObj.contentType};base64,${b64}`;
+      });
+
+      setTicketImages(urls);
+    } catch (err) {
+      console.error("Error fetching ticket images:", err);
+      setTicketImages([]);
+    }
+  }
+
+  fetchTicketImages();
+}, [ticketId, user.token]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -92,6 +129,50 @@ const ImprovementReport = () => {
         <h2>Continual Improvement Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
       </header>
+
+
+
+
+      {ticketImages.length > 0 && (
+  <div className="ticket-images">
+    <h3>Ticket Images</h3>
+    <div
+      style={{
+        display: "flex",
+        gap: "12px",
+        flexWrap: "wrap",
+        marginBottom: "20px",
+      }}
+    >
+      {ticketImages.map((_, index) => {
+        const imageUrl = `${API_URL}/api/tickets/${ticketId}/images/${index}`;
+        return (
+          <img
+            key={index}
+            src={imageUrl}
+            alt={`Ticket Image ${index + 1}`}
+            style={{
+              width: "80px",
+              height: "80px",
+              objectFit: "cover",
+              borderRadius: "10px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              cursor: "pointer",
+              transition: "transform 0.2s ease-in-out",
+            }}
+            onClick={() => {
+              console.log("previewImage set to:", imageUrl);
+              setPreviewImage(imageUrl);
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          />
+        );
+      })}
+    </div>
+  </div>
+)}
+
 
       <form onSubmit={handleSubmit} className="report-form">
         <div className="form-row">
@@ -188,7 +269,41 @@ const ImprovementReport = () => {
 
         <button type="submit" className="submit-btn">Submit Report</button>
       </form>
-    </div>
+
+    
+
+
+      {previewImage && (
+  <div
+    onClick={() => setPreviewImage(null)}
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.6)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+    }}
+  >
+    <img
+      src={previewImage}
+      alt="Preview"
+      style={{
+        maxWidth: "90%",
+        maxHeight: "80%",
+        borderRadius: "12px",
+        background: "#fff",
+        padding: "8px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+      }}
+    />
+  </div>
+)}
+ </div>
   );
 };
 
