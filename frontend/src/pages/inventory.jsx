@@ -10,15 +10,15 @@ const Inventory = () => {
   const [loading, setLoading] = useState(false);
   const [headers, setHeaders] = useState([]);
   const [error, setError] = useState(null);
+  const [lowStockItems, setLowStockItems] = useState([]);
+  const [showLowStock, setShowLowStock] = useState(false);
 
-  // Sync state with localStorage on selection change
   useEffect(() => {
     if (selectedCollection) {
       localStorage.setItem("selectedCollection", selectedCollection);
     }
   }, [selectedCollection]);
 
-  // Function to get collection details
   const getCollectionDetails = (collection) => {
     const collections = {
       Jogini: {
@@ -50,7 +50,6 @@ const Inventory = () => {
     return collections[collection] || { name: "", headers: [], dbFields: [] };
   };
 
-  // Fetch Inventory Data
   const fetchInventory = useCallback(async () => {
     if (!selectedCollection) return;
 
@@ -64,21 +63,19 @@ const Inventory = () => {
         return;
       }
 
-      // Use the environment variable for production URL
       const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/api/${selectedCollection}`;
-      console.log(`Fetching inventory from: ${apiUrl}`);
-
       const response = await axios.get(apiUrl, {
         headers: {
           'Authorization': `Bearer ${user.token}`,
           'Content-Type': 'application/json'
         }
       });
-      console.log("Fetched Inventory Data:", response.data);
 
       const collectionDetails = getCollectionDetails(selectedCollection);
-      setInventory(response.data.data || []);
+      const items = response.data.data || [];
+      setInventory(items);
       setHeaders(collectionDetails.headers || []);
+      setLowStockItems(items.filter(item => item.spareCount < 10));
     } catch (err) {
       console.error("Error fetching inventory:", err);
       setInventory([]);
@@ -88,7 +85,6 @@ const Inventory = () => {
     }
   }, [selectedCollection]);
 
-  // Fetch inventory when collection changes
   useEffect(() => {
     if (selectedCollection) {
       fetchInventory();
@@ -120,17 +116,21 @@ const Inventory = () => {
       });
 
       if (response.data.success) {
-          // ✅ Instead of fetching the whole inventory, update only the affected item
-          setInventory((prevInventory) =>
-            prevInventory.map((item) =>
-              item._id === id ? { ...item, spareCount: response.data.spareCount } : item
-            )
+        setInventory((prevInventory) =>
+          prevInventory.map((item) =>
+            item._id === id ? { ...item, spareCount: response.data.spareCount } : item
+          )
+        );
+        setLowStockItems((prevLowStock) => {
+          const updated = inventory.map((item) =>
+            item._id === id ? { ...item, spareCount: response.data.spareCount } : item
           );
-        }
+          return updated.filter(item => item.spareCount < 10);
+        });
+      }
     } catch (error) {
       console.error("Error updating spares count:", error);
       if (error.response?.status === 401) {
-        // Handle unauthorized error (token expired or invalid)
         console.error("Please log in again");
       }
     }
@@ -138,8 +138,9 @@ const Inventory = () => {
 
   return (
     <div>
-      <BackButton url="/" className= "back-button" />
+      <BackButton url="/" />
       <h2>View Inventory</h2>
+
       <label>Select Project: </label>
       <select onChange={handleCollectionChange} value={selectedCollection}>
         <option value="">Select a Project</option>
@@ -148,12 +149,72 @@ const Inventory = () => {
         ))}
       </select>
 
+      {/* ✅ Project Name Below Dropdown */}
+      {selectedCollection && (
+        <p style={{ marginTop: "0.5rem", fontSize: "1.5rem", fontWeight: "bold" }}>
+          {getCollectionDetails(selectedCollection)?.name} Project
+        </p>
+      )}
+
+      {/* Low Stock Toggle Button */}
+      {selectedCollection && (
+        <div style={{ margin: "1rem 0" }}>
+          <button
+            onClick={() => setShowLowStock(!showLowStock)}
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "#e74c3c",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: "5px"
+            }}
+          >
+            {showLowStock ? "Hide" : "Show"} Low Stock Items
+          </button>
+        </div>
+      )}
+
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
       {selectedCollection && !loading && !error && (
         <div>
-          <h3>Inventory for {getCollectionDetails(selectedCollection)?.name}</h3>
+          {/* ✅ Show Low Stock Items Table with clean heading */}
+          {showLowStock && lowStockItems.length > 0 && (
+            <div style={{ marginBottom: "2rem" }}>
+              <h3 style={{ color: "#e74c3c" }}>Low Stock Items</h3>
+              <table border="1">
+                <thead>
+                  <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
+                </thead>
+                <tbody>
+  {lowStockItems.map((item, index) => (
+    <tr key={index} className={item.spareCount < 10 ? "low-stock" : ""}>
+      {getCollectionDetails(selectedCollection).dbFields.map((field, idx) => {
+        let value = field.includes(".")
+          ? field.split(".").reduce((obj, key) => obj?.[key], item)
+          : item?.[field] ?? "N/A";
+        if (Array.isArray(value)) value = value.join(", ");
+        return <td key={idx}>{value ?? "N/A"}</td>;
+      })}
+      <td className="spares-btn-container">
+        <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
+        <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+              </table>
+            </div>
+          )}
+
+          {/* ✅ Inventory Title Now After Low Stock Section */}
+          <h3 style={{ color: "#2c3e50", marginTop: "1.5rem" }}>
+            Inventory for {getCollectionDetails(selectedCollection)?.name}
+          </h3>
+
+          {/* Main Inventory Table */}
           <table border="1">
             <thead>
               <tr>{headers.map((header, index) => (<th key={index}>{header}</th>))}</tr>
@@ -170,18 +231,8 @@ const Inventory = () => {
                       return <td key={idx}>{value ?? "N/A"}</td>;
                     })}
                     <td className="spares-btn-container">
-                      <button 
-                        className="spares-btn" 
-                        onClick={() => updatespareCount(item._id, 1)}
-                      >
-                        ➕
-                      </button>
-                      <button 
-                        className="spares-btn minus" 
-                        onClick={() => updatespareCount(item._id, -1)}
-                      >
-                        ➖
-                      </button>
+                      <button className="spares-btn" onClick={() => updatespareCount(item._id, 1)}>➕</button>
+                      <button className="spares-btn minus" onClick={() => updatespareCount(item._id, -1)}>➖</button>
                     </td>
                   </tr>
                 ))
