@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import { getTickets, reset } from "../features/tickets/ticketSlice";
-import TicketItem from "../components/TicketItem";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
