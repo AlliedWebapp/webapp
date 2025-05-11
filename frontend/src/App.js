@@ -20,7 +20,8 @@ import MaintenanceReport from './pages/MaintenanceReport';
 import ViewMaintenanceReport from './pages/ViewMaintenanceReport';
 import MaintenanceReportDetails from './pages/MaintenanceReportDetails';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
-import OtherReports from './pages/OtherReports';  
+import OtherReports from './pages/OtherReports'; 
+import Formats from './pages/Formats';
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
               <Route path="/other-reports" element={<OtherReports />} />
               <Route path="/view-improvement-reports" element={<ViewImprovementReport/>} />
               <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
+              <Route path="/formats" element={<Formats />} />
             </Route>
           </Routes>
         </div>

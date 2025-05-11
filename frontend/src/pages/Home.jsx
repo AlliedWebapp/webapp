@@ -1,4 +1,4 @@
-import { FaBoxOpen, FaCalendarAlt, FaClipboard, FaClipboardCheck, FaClipboardList, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt, FaWarehouse } from "react-icons/fa";
+import { FaBoxOpen, FaCalendarAlt, FaClipboard, FaClipboardCheck, FaClipboardList, FaDownload, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt, FaWarehouse } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 function Home() {
@@ -31,6 +31,10 @@ function Home() {
 
       <Link to="/other-reports" className="btn btn-block">
         <FaFolderOpen /> View Other Reports
+      </Link>
+
+      <Link to="/Formats" className="btn btn-block">
+        <FaDownload/> Download Maintenance Formats
       </Link>
     </>
   );

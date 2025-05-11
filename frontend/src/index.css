@@ -2153,8 +2153,42 @@ td {
   margin-bottom: 0.5rem;
   color: #79031d;
 }
-/* New style to highlight low stock rows in the table */
 .low-stock td {
   background-color: #febbc0; /* Light red background to indicate urgency */
+}
+
+/* MONTHLY SUMMARY */
+
+
+.monthly-summary {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0.5rem;
+}
+
+.monthly-summary__title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.monthly-summary__subtitle {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.monthly-summary__select-container {
+  display: flex;
+  justify-content: center;
+}
+
+.monthly-summary__select {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #fff;
 }
 

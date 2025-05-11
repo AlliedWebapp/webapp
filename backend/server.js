@@ -14,7 +14,7 @@ const userRoutes = require("./routes/userRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const reportRoutes = require("./routes/ReportRoutes"); // 👈 Make sure the path is correct
-
+const FormatsRoutes = require('./routes/FormatsRoutes');
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
@@ -62,6 +62,7 @@ app.use("/api/tickets", ticketRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/reports", reportRoutes);
 app.use('/api', spareRoutes);
+app.use('/api/formats', FormatsRoutes);
 
 
 
