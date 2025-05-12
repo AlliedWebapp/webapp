@@ -5,6 +5,7 @@ const dotenv = require('dotenv').config();
 const cors = require('cors'); 
 const path = require('path');
 const mongoose = require('mongoose');
+const qaRoutes = require('./routes/qaRoutes');
 
 // 📌 Import Local Modules
 const { errorHandler } = require('./middleware/errorMiddleware');
@@ -18,7 +19,7 @@ const FormatsRoutes = require('./routes/FormatsRoutes');
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // ✅ Debugging Environment Variables
 console.log("🔑 JWT_SECRET:", process.env.JWT_SECRET ? "Loaded ✅" : "Missing ❌");
@@ -63,6 +64,7 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/reports", reportRoutes);
 app.use('/api', spareRoutes);
 app.use('/api/formats', FormatsRoutes);
+app.use('/api/qa', qaRoutes);
 
 
 

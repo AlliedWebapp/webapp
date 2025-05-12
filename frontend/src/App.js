@@ -22,6 +22,8 @@ import MaintenanceReportDetails from './pages/MaintenanceReportDetails';
 import GeneratorServiceReport from './pages/GeneratorServiceReport';
 import OtherReports from './pages/OtherReports'; 
 import Formats from './pages/Formats';
+import QASubmit from './pages/QASubmit';
+import QAList from './pages/QAList';
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
               <Route path="/view-improvement-reports" element={<ViewImprovementReport/>} />
               <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
               <Route path="/formats" element={<Formats />} />
+              <Route path="/qa" element={<QASubmit />} />
+              <Route path="/qa/list" element={<QAList />} />    
             </Route>
           </Routes>
         </div>
