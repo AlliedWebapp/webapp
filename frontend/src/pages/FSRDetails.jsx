@@ -1,10 +1,12 @@
 //individual fsr form from view button//
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import { useSelector } from "react-redux";
+import html2pdf from "html2pdf.js";
+import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -28,6 +30,7 @@ function FSRDetails() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const { user } = useSelector((state) => state.auth);
+  const fsrRef = useRef();
 
   useEffect(() => {
     const fetchFSR = async () => {
@@ -72,6 +75,20 @@ function FSRDetails() {
     setSelectedImage(null);
   };
 
+  // Download as PDF handler
+  const handleDownload = () => {
+    if (!fsrRef.current) return;
+    const opt = {
+      margin:       0.5,
+      filename:     `FSR-${fsr?.fsrId || "report"}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(fsrRef.current).save();
+  };
+
+
   if (isLoading) return <Spinner />;
   if (error) return <div className="error">{error}</div>;
   if (!fsr) return <div className="error">FSR not found</div>;
@@ -80,8 +97,20 @@ function FSRDetails() {
     <div className="fsr-details">
       <BackButton url="/fsr" />
       <h1>Service Report Details</h1>
+
+          {/* Download icon button at top left */}
+      <button
+        onClick={handleDownload}
+        style={{ position: "absolute", top: 380, left: 350, zIndex: 1000, background: "lightgrey", colour: "white", fontSize: "1rem", padding: "0.2rem", borderRadius: "8px", cursor: "pointer", boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+        aria-label="Download PDF"
+        title="Download PDF"
+      >
+        <FiDownload style={{ fontSize: "1.2rem", marginRight: "0.5rem", verticalAlign: "sub"}} />
+          Download PDF
+      </button>
+
       
-      <div className="fsr-details-container">
+      <div className="fsr-details-container" ref={fsrRef}>
         <table className="fsr-table">
           <tbody>
             {/* Basic Information */}

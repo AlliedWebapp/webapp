@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import BackButton from '../components/BackButton';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -66,6 +67,7 @@ const Formats = () => {
 
   return (
     <div style={{ maxWidth: 600, margin: '40px auto', padding: 24, background: '#fafafa', borderRadius: 8 }}>
+      <BackButton url="/" />
       <h2 style={{ textAlign: 'center' }}>Maintenance Formats</h2>
       {loading ? (
         <p>Loading...</p>

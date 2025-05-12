@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import BackButton from '../components/BackButton';
+
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const QAList = () => {
   const [qas, setQAs] = useState([]);
@@ -12,7 +15,7 @@ const QAList = () => {
 
   const fetchQAs = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/qa');
+      const res = await axios.get(`${API_URL}/api/qa`);
       setQAs(res.data);
     } catch (err) {
       alert('Failed to load Q&As');
@@ -37,7 +40,7 @@ const QAList = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5001/api/qa/${qaId}/answers`, {
+      await axios.post(`${API_URL}/api/qa/${qaId}/answers`, {
         text: answer,
         answeredBy,
       });
@@ -51,6 +54,7 @@ const QAList = () => {
 
   return (
     <div style={{ maxWidth: '900px', margin: 'auto', padding: '2rem' }}>
+      <BackButton url='/' className='back-button' />
       <h1 style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '2rem' }}>Questions & Answers</h1>
       {qas.map((qa) => (
         <div key={qa._id} style={{

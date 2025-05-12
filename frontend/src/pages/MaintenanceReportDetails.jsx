@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import { useSelector } from "react-redux";
+import html2pdf from "html2pdf.js";
+import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -27,6 +29,7 @@ const MaintenanceReportDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const reportRef = useRef();
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -81,6 +84,19 @@ const MaintenanceReportDetails = () => {
     setSelectedImage(null);
   };
 
+  // Download as PDF handler
+  const handleDownload = () => {
+    if (!reportRef.current) return;
+    const opt = {
+      margin: 0.5,
+      filename: `Maintenance-Report-${report?.mrId || "details"}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(reportRef.current).save();
+  };
+
   if (loading) {
     return <Spinner />;
   }
@@ -105,6 +121,16 @@ const MaintenanceReportDetails = () => {
 
   return (
     <div className="report-details">
+    <button
+            onClick={handleDownload}
+            style={{ position: "absolute", top: 320, left: 350, zIndex: 1000, background: "lightgrey", colour: "white", fontSize: "1rem", padding: "0.2rem", borderRadius: "8px", cursor: "pointer", boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+            aria-label="Download PDF"
+            title="Download PDF"
+          >
+            <FiDownload style={{ fontSize: "1.2rem", marginRight: "0.5rem", verticalAlign: "sub"}} />
+              Download PDF
+          </button>
+
       <div className="back-button-container">
         <BackButton url="/view-maintenance-reports" className="back-button" />
       </div>

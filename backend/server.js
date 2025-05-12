@@ -64,7 +64,7 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/reports", reportRoutes);
 app.use('/api', spareRoutes);
 app.use('/api/formats', FormatsRoutes);
-app.use('/api/qa', qaRoutes);
+app.use('/api/qa', qaRoutes); //forum
 
 
 

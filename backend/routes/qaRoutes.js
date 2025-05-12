@@ -28,6 +28,8 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Adds an answer to a question
+
 router.post('/:id/answers', async (req, res) => {
     try {
       const { text, answeredBy } = req.body;

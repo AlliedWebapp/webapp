@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import { useSelector } from "react-redux";
+import html2pdf from "html2pdf.js";
+import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -14,6 +16,9 @@ const ImprovementReportDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+
+  // Ref for PDF export
+  const reportRef = useRef();
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -35,15 +40,12 @@ const ImprovementReportDetails = () => {
         }
 
         const data = await response.json();
-        console.log("Improvement Report Data:", data);
-
         if (!data) {
           throw new Error("Report not found");
         }
 
         setReport(data);
       } catch (err) {
-        console.error("Error fetching report:", err);
         setError(err.message);
         toast.error("Failed to load report details");
       } finally {
@@ -58,6 +60,19 @@ const ImprovementReportDetails = () => {
       setLoading(false);
     }
   }, [id, user]);
+
+  // PDF download handler
+  const handleDownload = () => {
+    if (!reportRef.current) return;
+    const opt = {
+      margin: 0.5,
+      filename: `Improvement-Report-${report?.irId || "details"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+    };
+    html2pdf().set(opt).from(reportRef.current).save();
+  };
 
   if (loading) {
     return <Spinner />;
@@ -82,11 +97,23 @@ const ImprovementReportDetails = () => {
   }
 
   return (
-    <div className="report-details">
+    <div className="report-details" style={{ position: "relative" }}>
+      {/* Download icon button at top left */}
+      <button
+        onClick={handleDownload}
+        style={{ position: "absolute", top: 120, left: 50, zIndex: 1000, background: "lightgrey", colour: "white", fontSize: "1rem", padding: "0.2rem", borderRadius: "8px", cursor: "pointer", boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+        aria-label="Download PDF"
+        title="Download PDF"
+      >
+        <FiDownload style={{ fontSize: "1.2rem", marginRight: "0.5rem", verticalAlign: "sub"}} />
+          Download PDF
+      </button>
+
       <div className="back-button-container">
         <BackButton url="/view-improvement-reports" className="back-button" />
       </div>
-      <div className="report-details-container">
+      {/* Attach ref here for PDF export */}
+      <div className="report-details-container" ref={reportRef}>
         <div className="report-header">
           <h2>Improvement Report Details</h2>
         </div>
@@ -176,4 +203,4 @@ const ImprovementReportDetails = () => {
   );
 };
 
-export default ImprovementReportDetails; 
+export default ImprovementReportDetails;
