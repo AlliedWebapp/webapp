@@ -79,7 +79,17 @@ const Inventory = () => {
     } catch (err) {
       console.error("Error fetching inventory:", err);
       setInventory([]);
-      setError(err.message);
+      // Custom error message for 403
+      if (err.response && err.response.status === 403) {
+        setError(
+          err.response.data?.message ||
+         'Access denied: Not authorized for this project.'
+        );
+      } else if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError(err.message || "An error occurred while fetching inventory.");
+      }
     } finally {
       setLoading(false);
     }

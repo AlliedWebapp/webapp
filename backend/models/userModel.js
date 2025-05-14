@@ -24,6 +24,13 @@ const userSchema = mongoose.Schema(
     role: {
       type: String,
       default: 'user'
+    },
+    allowedProject: {
+      type: String,
+      default: '',
+      required: function () {
+        return this.role === 'inventoryOnly'
+      } 
     }
   },
   {

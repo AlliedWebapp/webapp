@@ -23,6 +23,11 @@ const getSpareInventory = async (req, res) => {
 const getAllSolding = async (req, res) => {
     console.log("Getting Solding data...");
     try {
+// Restrict access for inventoryOnly users
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'solding') {
+            return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
+        }
+
         const userId = req.user._id;
         const data = await solding.find();
         
@@ -67,6 +72,11 @@ const getAllSolding = async (req, res) => {
 const getAllShong = async (req, res) => {
     console.log("Getting Shong data...");
     try {
+// Restrict access for inventoryOnly users
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'Shong') {
+            return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
+        }
+
         const userId = req.user._id;
         const data = await Shong.find();
         
@@ -111,6 +121,11 @@ const getAllShong = async (req, res) => {
 const getAllJogini = async (req, res) => {
     console.log("🔍 Fetching Jogini data...");
     try {
+         // Restrict access for inventoryOnly users
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'Jogini') {
+            return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
+        }
+
         const userId = req.user._id;
         const data = await Jogini.find();
         
@@ -152,6 +167,11 @@ const getAllJogini = async (req, res) => {
 const getAllSDLLPsalun = async (req, res) => {
     console.log("Getting SDLLPsalun data...");
     try {
+        // Restrict access for inventoryOnly users
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'SDLLPsalun') {
+            return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
+        }
+
         const userId = req.user._id;
         const data = await SDLLPsalun.find();
         
@@ -196,6 +216,11 @@ const getAllSDLLPsalun = async (req, res) => {
 const getAllKuwarsi = async (req, res) => {
     console.log("Getting Kuwarsi data...");
     try {
+        // Restrict access for inventoryOnly users
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'Kuwarsi') {
+            return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
+        }
+
         const userId = req.user._id;
         const data = await Kuwarsi.find();
         
