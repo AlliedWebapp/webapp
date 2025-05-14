@@ -43,5 +43,27 @@ const optionalAuth = asyncHandler(async (req, res, next) => {
     next();
 });
 
+// Middleware to allow only users with role 'inventoryOnly'
+const inventoryAccess = (req, res, next) => {
+    if (
+        req.user &&
+        (req.user.role === 'user' ||
+         req.user.role === 'admin' ||
+         req.user.role === 'inventoryOnly')
+    ) {
+        return next();
+    }
+    return res.status(403).json({ message: "Access denied: Inventory access only." });
+};
+// Block 'inventoryOnly' from non-inventory routes
+const blockInventoryOnly = (req, res, next) => {
+    if (req.user && req.user.role === 'inventoryOnly') {
+        return res.status(403).json({ message: "Access denied" });
+    }
+    next();
+};
+
+
+
 // ✅ Export after defining functions
-module.exports = { protect, optionalAuth };
+module.exports = { protect, optionalAuth, inventoryAccess, blockInventoryOnly };

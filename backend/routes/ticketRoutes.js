@@ -8,8 +8,10 @@ const {
   deleteTicket
 } = require("../controllers/ticketController");
 
-const { protect } = require("../middleware/authMiddleware");
+const { protect, blockInventoryOnly } = require("../middleware/authMiddleware");
 const upload = require('../middleware/uploadMiddleware');
+
+router.use(protect, blockInventoryOnly);
 
 // Re-route into note router for ticket-related notes
 const noteRouter = require("./noteRoutes");
@@ -17,13 +19,13 @@ router.use("/:ticketId/notes", noteRouter);
 
 // Main ticket routes
 router.route("/")
-  .get(protect, getTickets)
-  .post(protect, upload.array('images', 4), createTicket); // ✅ only one post route here
+  .get( getTickets)
+  .post( upload.array('images', 4), createTicket); // ✅ only one post route here
 
 router.route("/:id")
-  .get(protect, getTicket)
-  .put(protect, updateTicket)
-  .delete(protect, deleteTicket);
+  .get( getTicket)
+  .put( updateTicket)
+  .delete( deleteTicket);
 
   
 // Serve individual images for a ticket

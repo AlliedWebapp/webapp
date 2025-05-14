@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import BackButton from '../components/BackButton';
+import { useSelector } from 'react-redux';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -9,6 +10,7 @@ const Formats = () => {
   const [pdfs, setPdfs] = useState([]);         // List of PDFs
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null);     // Error state
+  const { user } = useSelector((state) => state.auth);
 
   // Fetch the list of PDFs from the backend on component mount
   useEffect(() => {
@@ -16,12 +18,22 @@ const Formats = () => {
       try {
         setError(null);
         setLoading(true);
-        const res = await axios.get(`${API_URL}/api/formats`);
+        const res = await axios.get(`${API_URL}/api/formats`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
         setPdfs(res.data);
       } catch (err) {
-        setError('Failed to load PDF list');
-      } finally {
-        setLoading(false);
+        // Check for 403 Forbidden from backend
+      if (err.response && err.response.status === 403) {
+        setError('Access denied');
+      } else {
+        setError(
+          err.response?.data?.message ||
+          'Failed to load PDF list'
+        );
+      }
+    } finally {
+      setLoading(false);
       }
     };
     fetchPDFs();
@@ -33,7 +45,8 @@ const Formats = () => {
       const res = await axios.get(`${API_URL}/api/formats/${id}`, {
   responseType: 'blob',
   headers: {
-    'Accept': 'application/pdf',}
+    'Accept': 'application/pdf',
+   Authorization: `Bearer ${user.token}`}
 });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -53,7 +66,9 @@ const Formats = () => {
     try {
       const res = await axios.get(`${API_URL}/api/formats/${id}`, {
         responseType: 'blob',
-        headers: { 'Accept': 'application/pdf' }
+        headers: { 'Accept': 'application/pdf', 
+          Authorization: `Bearer ${user.token}`
+        }
       });
       const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
       window.open(url, '_blank', 'noopener,noreferrer');

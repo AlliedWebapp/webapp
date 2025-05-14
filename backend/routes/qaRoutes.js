@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const QA = require('../models/Qa');
+const { protect, blockInventoryOnly } = require('../middleware/authMiddleware');
+
+router.use(protect, blockInventoryOnly);
 
 // POST /api/qa → create new Q&A
 router.post('/', async (req, res) => {

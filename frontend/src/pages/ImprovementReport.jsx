@@ -144,31 +144,25 @@ useEffect(() => {
         marginBottom: "20px",
       }}
     >
-      {ticketImages.map((_, index) => {
-        const imageUrl = `${API_URL}/api/tickets/${ticketId}/images/${index}`;
-        return (
-          <img
-            key={index}
-            src={imageUrl}
-            alt={`Ticket Image ${index + 1}`}
-            style={{
-              width: "80px",
-              height: "80px",
-              objectFit: "cover",
-              borderRadius: "10px",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-              cursor: "pointer",
-              transition: "transform 0.2s ease-in-out",
-            }}
-            onClick={() => {
-              console.log("previewImage set to:", imageUrl);
-              setPreviewImage(imageUrl);
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          />
-        );
-      })}
+      {ticketImages.map((imageUrl, index) => (
+  <img
+    key={index}
+    src={imageUrl}
+    alt={`Ticket Image ${index + 1}`}
+    style={{
+      width: "80px",
+      height: "80px",
+      objectFit: "cover",
+      borderRadius: "10px",
+      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+      cursor: "pointer",
+      transition: "transform 0.2s ease-in-out",
+    }}
+    onClick={() => setPreviewImage(imageUrl)}
+    onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+    onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+  />
+))}
     </div>
   </div>
 )}

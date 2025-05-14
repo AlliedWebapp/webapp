@@ -32,9 +32,9 @@ fsrId: { type: Number, required: true, unique: true }, // Unique 4-digit fsr_id
   customerContact: String,
   customerEmail: String,
 
-  customerSignature: Buffer, // single image stored as binary
-  engineerSignature: Buffer,
-  workPhotos: [Buffer],      // array of images stored as binary
+  customerSignature: { data: Buffer, contentType: String },  // single image stored as binary
+  engineerSignature: { data: Buffer, contentType: String },
+  workPhotos: [{ data: Buffer, contentType: String }],      // array of images stored as binary
 
   createdAt: {
     type: Date,

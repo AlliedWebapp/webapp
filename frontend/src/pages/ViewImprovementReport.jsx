@@ -8,11 +8,11 @@ import { useSelector } from "react-redux";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
-// Helper function to convert buffer data to a base64 string
-const imageToBase64 = (buffer) => {
-  const binary = String.fromCharCode(...new Uint8Array(buffer));
-  return `data:image/jpeg;base64,${btoa(binary)}`;
-};
+// // Helper function to convert buffer data to a base64 string
+// const imageToBase64 = (buffer) => {
+//   const binary = String.fromCharCode(...new Uint8Array(buffer));
+//   return `data:image/jpeg;base64,${btoa(binary)}`;
+// };
 
 function ViewImprovementReport() {
   const [reports, setReports] = useState([]);

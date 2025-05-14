@@ -14,6 +14,7 @@ const ImprovementReportDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
+  const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
@@ -179,9 +180,11 @@ const ImprovementReportDetails = () => {
               <td className="report-value">
                 {report.hod_sign && (
                   <img
-                    src={`data:${report.hod_sign.contentType};base64,${report.hod_sign.data}`}
+                    src={report.hod_sign}
                     alt="HOD Signature"
                     className="signature-image"
+                    style={{ cursor: "pointer", maxWidth: "120px", maxHeight: "80px" }}
+                    onClick={() => setSelectedImage(report.hod_sign)}
                   />
                 )}
               </td>
@@ -189,9 +192,11 @@ const ImprovementReportDetails = () => {
               <td className="report-value">
                 {report.plant_incharge_sign && (
                   <img
-                    src={`data:${report.plant_incharge_sign.contentType};base64,${report.plant_incharge_sign.data}`}
+                    src={report.plant_incharge_sign}
                     alt="Plant Head Signature"
                     className="signature-image"
+                    style={{ cursor: "pointer", maxWidth: "120px", maxHeight: "80px" }}
+                    onClick={() => setSelectedImage(report.plant_incharge_sign)}
                   />
                 )}
               </td>
@@ -199,6 +204,48 @@ const ImprovementReportDetails = () => {
           </tbody>
         </table>
       </div>
+      {/* //Modal preview */}
+      {selectedImage && (
+  <div
+    className="image-modal"
+    onClick={() => setSelectedImage(null)}
+    style={{
+      position: "fixed",
+      top: 0, left: 0, width: "100vw", height: "100vh",
+      background: "rgba(0,0,0,0.6)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      zIndex: 2000
+    }}
+  >
+    <img
+      src={selectedImage}
+      alt="Signature Preview"
+       style={{
+        maxWidth: "90vw",
+        maxHeight: "90vh",
+        background: "#fff",
+        borderRadius: "8px",
+        padding: "1rem"
+      }}
+      onClick={e => e.stopPropagation()} // Prevent modal close on image click
+    />
+     <button
+      onClick={() => setSelectedImage(null)}
+      style={{
+        position: "absolute",
+        top: 30, right: 40,
+        fontSize: 32,
+        color: "#fff",
+        background: "transparent",
+        border: "none",
+        cursor: "pointer"
+      }}
+      aria-label="Close"
+    >
+      &times;
+    </button>
+  </div>
+)}
     </div>
   );
 };

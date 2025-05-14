@@ -19,6 +19,11 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       required: true,
       default: false
+    },
+    //'inventoryOnly' for users
+    role: {
+      type: String,
+      default: 'user'
     }
   },
   {

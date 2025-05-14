@@ -6,7 +6,9 @@ const Formats = require('../models/FormatsModel');
 // Use multer's memory storage to keep files in memory as Buffer
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const { protect, blockInventoryOnly } = require('../middleware/authMiddleware');
 
+router.use(protect, blockInventoryOnly);
 
 // to upload a pdf with title (api/formats/upload)
 router.post('/upload', upload.single('pdf'), async (req, res) => {

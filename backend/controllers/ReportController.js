@@ -12,6 +12,12 @@ function isOwner(docUser, reqUserId) {
   return docUser.toString() === reqUserId.toString();
 }
 
+// Helper to convert buffer to base64 Data URL
+const bufferToDataUrl = (imgObj) => {
+  if (!imgObj || !imgObj.data) return null;
+  return `data:${imgObj.contentType || 'image/jpeg'};base64,${Buffer.from(imgObj.data).toString('base64')}`;
+};
+
 // Function to generate a 4-digit unique fsr_id
 function generateFSRId() {
   return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
@@ -75,10 +81,27 @@ exports.submitFSR = async (req, res, next) => {
       throw new ErrorHandler(400, "Missing required fields");
     }
 
-    // Retrieve image buffers for signatures and work photos
-    const customerSignature = req.files["customerSignature"]?.[0]?.buffer;
-    const engineerSignature = req.files["engineerSignature"]?.[0]?.buffer;
-    const workPhotos = req.files["workPhotos"]?.map(file => file.buffer) || [];
+    // Retrieve image buffers and content types for signatures and work photos
+const customerSignature = req.files["customerSignature"]?.[0]
+  ? {
+      data: req.files["customerSignature"][0].buffer,
+      contentType: req.files["customerSignature"][0].mimetype,
+    }
+  : null;
+
+const engineerSignature = req.files["engineerSignature"]?.[0]
+  ? {
+      data: req.files["engineerSignature"][0].buffer,
+      contentType: req.files["engineerSignature"][0].mimetype,
+    }
+  : null;
+
+const workPhotos = req.files["workPhotos"]
+  ? req.files["workPhotos"].map(file => ({
+      data: file.buffer,
+      contentType: file.mimetype,
+    }))
+  : [];
 
     console.log("Files processed:", {
       hasCustomerSignature: !!customerSignature,
@@ -229,9 +252,21 @@ exports.submitImprovementReport = async (req, res, next) => {
       throw new ErrorHandler(400, "Missing required fields");
     }
 
-    // Image buffers for signatures
-    const hodSign = req.files["hodSign"]?.[0]?.buffer;
-    const plantSign = req.files["plantSign"]?.[0]?.buffer;
+    // Image buffers and content types for signatures
+const hodSign = req.files["hodSign"]?.[0]
+  ? {
+      data: req.files["hodSign"][0].buffer,
+      contentType: req.files["hodSign"][0].mimetype,
+    }
+  : null;
+
+const plantSign = req.files["plantSign"]?.[0]
+  ? {
+      data: req.files["plantSign"][0].buffer,
+      contentType: req.files["plantSign"][0].mimetype,
+    }
+  : null;
+
 
     const irId = generateIRId(); // ✅ Generate a unique 4-digit IR ID
 
@@ -253,14 +288,8 @@ exports.submitImprovementReport = async (req, res, next) => {
       payback,
       end_result,
       additional_info,
-      hod_sign: {
-        data: hodSign,
-        contentType: req.files["hodSign"]?.[0]?.mimetype
-      },
-      plant_incharge_sign: {
-        data: plantSign,
-        contentType: req.files["plantSign"]?.[0]?.mimetype
-      },
+      hod_sign: hodSign,
+      plant_incharge_sign: plantSign,
       user: req.user._id // Add user reference
     });
 
@@ -362,10 +391,20 @@ exports.submitMaintenanceReport = async (req, res, next) => {
     if (!req.files["hodSignature"] || !req.files["plantInchargeSignature"]) {
       throw new ErrorHandler(400, "Both HOD and Plant Incharge signatures are required");
     }
+// Retrieve image buffers and content types for signatures
+const hodSignature = req.files["hodSignature"]?.[0]
+  ? {
+      data: req.files["hodSignature"][0].buffer,
+      contentType: req.files["hodSignature"][0].mimetype,
+    }
+  : null;
 
-    // Retrieve image buffers for signatures
-    const hodSignature = req.files["hodSignature"]?.[0];
-    const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0];
+const plantInchargeSignature = req.files["plantInchargeSignature"]?.[0]
+  ? {
+      data: req.files["plantInchargeSignature"][0].buffer,
+      contentType: req.files["plantInchargeSignature"][0].mimetype,
+    }
+  : null;
 
     // Generate a unique 4-digit mrId
     const mrId = generateMRId();
@@ -383,14 +422,8 @@ exports.submitMaintenanceReport = async (req, res, next) => {
       repairCost,
       remarks,
       generationLoss,
-      hodSignature: {
-        data: hodSignature.buffer,
-        contentType: hodSignature.mimetype
-      },
-      plantInchargeSignature: {
-        data: plantInchargeSignature.buffer,
-        contentType: plantInchargeSignature.mimetype
-      },
+      hodSignature: hodSignature,
+      plantInchargeSignature: plantInchargeSignature,
       user: req.user._id // Add user reference
     });
 

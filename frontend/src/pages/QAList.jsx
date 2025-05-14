@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import BackButton from '../components/BackButton';
+import { useSelector } from 'react-redux';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -8,6 +9,8 @@ const QAList = () => {
   const [qas, setQAs] = useState([]);
   const [newAnswers, setNewAnswers] = useState({});
   const [usernames, setUsernames] = useState({});
+  const [error, setError] = useState('');
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     fetchQAs();
@@ -15,10 +18,19 @@ const QAList = () => {
 
   const fetchQAs = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/qa`);
+      const res = await axios.get(`${API_URL}/api/qa`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
       setQAs(res.data);
     } catch (err) {
-      alert('Failed to load Q&As');
+      if (err.response && err.response.status === 403) {
+        setError('Access denied');
+      } else {
+        setError(
+          err.response?.data?.message ||
+          'Failed to load Q&As'
+        );
+      }
     }
   };
 
@@ -43,19 +55,33 @@ const QAList = () => {
       await axios.post(`${API_URL}/api/qa/${qaId}/answers`, {
         text: answer,
         answeredBy,
-      });
+      },
+    {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
       await fetchQAs();
       setNewAnswers({ ...newAnswers, [qaId]: '' });
       setUsernames({ ...usernames, [qaId]: '' });
     } catch (err) {
-      alert('Failed to submit answer');
+      if (err.response && err.response.status === 403) {
+        setError('Access denied');
+      } else {
+        setError(
+          err.response?.data?.message ||
+          'Failed to submit answer'
+        );
+      }
     }
   };
-
   return (
     <div style={{ maxWidth: '900px', margin: 'auto', padding: '2rem' }}>
       <BackButton url='/' className='back-button' />
       <h1 style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '2rem' }}>Questions & Answers</h1>
+       {error ? (
+      <div style={{ color: 'red', marginBottom: '1.5rem', textAlign: 'center' }}>
+        {error}
+      </div>
+    ) : null}
       {qas.map((qa) => (
         <div key={qa._id} style={{
           border: '1px solid #ccc',

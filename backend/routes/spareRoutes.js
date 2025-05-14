@@ -10,7 +10,7 @@ const {
     updatespareCount,
     getUserSpareCounts
 } = require("../controllers/sparesController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect,inventoryAccess } = require("../middleware/authMiddleware");
 
 // Debug route to test API
 router.get("/debug", (req, res) => {
@@ -29,17 +29,17 @@ router.get("/debug", (req, res) => {
 });
 
 // Update spares count (protected route)
-router.put("/update-spare", protect, updatespareCount);
+router.put("/update-spare", protect, inventoryAccess, updatespareCount);
 
 // Get user-specific SpareCounts for a collection (protected route)
-router.get("/spare-counts/:collectionName", protect, getUserSpareCounts);
+router.get("/spare-counts/:collectionName", protect, inventoryAccess, getUserSpareCounts);
 
 // Data routes (protected)
-router.get("/jogini", protect, getAllJogini);
-router.get("/solding", protect, getAllSolding);
-router.get("/shong", protect, getAllShong);
-router.get("/sdllpsalun", protect, getAllSDLLPsalun);
-router.get("/kuwarsi", protect, getAllKuwarsi);
-router.get("/inventory", protect, getSpareInventory);
+router.get("/jogini", protect, inventoryAccess, getAllJogini);
+router.get("/solding", protect, inventoryAccess, getAllSolding);
+router.get("/shong", protect, inventoryAccess, getAllShong);
+router.get("/sdllpsalun", protect, inventoryAccess, getAllSDLLPsalun);
+router.get("/kuwarsi", protect, inventoryAccess, getAllKuwarsi);
+router.get("/inventory", protect, inventoryAccess, getSpareInventory);
 
 module.exports = router;

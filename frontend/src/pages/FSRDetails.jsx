@@ -10,17 +10,17 @@ import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
-// Helper function to convert buffer data to a base64 string
-const imageToBase64 = (buffer) => {
-  try {
-    if (!buffer || !buffer.data) return null;
-    const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-    return `data:image/jpeg;base64,${btoa(binary)}`;
-  } catch (error) {
-    console.error("Error converting image to base64:", error);
-    return null;
-  }
-};
+// // Helper function to convert buffer data to a base64 string
+// const imageToBase64 = (buffer) => {
+//   try {
+//     if (!buffer || !buffer.data) return null;
+//     const binary = String.fromCharCode(...new Uint8Array(buffer.data));
+//     return `data:image/jpeg;base64,${btoa(binary)}`;
+//   } catch (error) {
+//     console.error("Error converting image to base64:", error);
+//     return null;
+//   }
+// };
 
 function FSRDetails() {
   const { id } = useParams();
@@ -205,7 +205,7 @@ function FSRDetails() {
               <td colSpan="5">
                 {fsr.customerSignature && (
                   <img 
-                    src={imageToBase64(fsr.customerSignature)} 
+                    src={fsr.customerSignature} 
                     alt="Customer Signature" 
                     className="signature-image"
                     onClick={() => handleImageClick(fsr.customerSignature)}
@@ -218,7 +218,7 @@ function FSRDetails() {
               <td colSpan="5">
                 {fsr.engineerSignature && (
                   <img 
-                    src={imageToBase64(fsr.engineerSignature)} 
+                    src={fsr.engineerSignature} 
                     alt="Engineer Signature" 
                     className="signature-image"
                     onClick={() => handleImageClick(fsr.engineerSignature)}
@@ -233,7 +233,7 @@ function FSRDetails() {
                   {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
                     <img 
                       key={index}
-                      src={imageToBase64(photo)} 
+                      src={photo} 
                       alt={`Work Photo ${index + 1}`}
                       className="work-photo"
                       onClick={() => handleImageClick(photo)}
@@ -251,7 +251,7 @@ function FSRDetails() {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <span className="close-button" onClick={closeImageModal}>&times;</span>
             <img 
-              src={imageToBase64(selectedImage)} 
+              src={selectedImage} 
               alt="Preview" 
               className="preview-image"
             />

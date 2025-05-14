@@ -9,17 +9,17 @@ import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
-// Helper function to convert buffer data to a base64 string
-const imageToBase64 = (buffer) => {
-  try {
-    if (!buffer || !buffer.data) return null;
-    const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-    return `data:image/jpeg;base64,${btoa(binary)}`;
-  } catch (error) {
-    console.error("Error converting image to base64:", error);
-    return null;
-  }
-};
+// // Helper function to convert buffer data to a base64 string
+// const imageToBase64 = (buffer) => {
+//   try {
+//     if (!buffer || !buffer.data) return null;
+//     const binary = String.fromCharCode(...new Uint8Array(buffer.data));
+//     return `data:image/jpeg;base64,${btoa(binary)}`;
+//   } catch (error) {
+//     console.error("Error converting image to base64:", error);
+//     return null;
+//   }
+// };
 
 const MaintenanceReportDetails = () => {
   const [report, setReport] = useState(null);
@@ -184,7 +184,7 @@ const MaintenanceReportDetails = () => {
               <td className="report-value">
                 {report.hodSignature && (
                   <img
-                    src={`data:${report.hodSignature.contentType};base64,${report.hodSignature.data}`}
+                    src={report.hodSignature}
                     alt="HOD Signature"
                     className="signature-image"
                   />
@@ -194,7 +194,7 @@ const MaintenanceReportDetails = () => {
               <td className="report-value">
                 {report.plantInchargeSignature && (
                   <img
-                    src={`data:${report.plantInchargeSignature.contentType};base64,${report.plantInchargeSignature.data}`}
+                    src={report.plantInchargeSignature}
                     alt="Plant Head Signature"
                     className="signature-image"
                   />
@@ -204,6 +204,20 @@ const MaintenanceReportDetails = () => {
           </tbody>
         </table>
       </div>
+      
+     {/* Modal for image preview */}
+      {selectedImage && (
+        <div className="image-modal" onClick={closeImageModal} style={{
+          position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+          background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000
+        }}>
+          <img
+            src={selectedImage}
+            alt="Signature Preview"
+            style={{ maxWidth: "90vw", maxHeight: "90vh", background: "#fff", borderRadius: "8px", padding: "1rem" }}
+          />
+        </div>
+      )} 
     </div>
   );
 };

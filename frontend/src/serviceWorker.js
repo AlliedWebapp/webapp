@@ -2,6 +2,10 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'http://localhost:5000'
   : 'https://backend-services-theta.vercel.app'
 
+  // const API_BASE_URL = process.env.NODE_ENV === 'production'
+  // ? 'https://backend-services-theta.vercel.app'
+  // : 'http://localhost:5000'
+
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
   window.location.hostname === "[::1]" ||
