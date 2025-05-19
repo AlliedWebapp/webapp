@@ -20,7 +20,7 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false
     },
-    //'inventoryOnly' for users
+    
     role: {
       type: String,
       default: 'user'

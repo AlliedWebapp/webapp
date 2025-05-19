@@ -62,7 +62,6 @@ const ImprovementReportDetails = () => {
     }
   }, [id, user]);
 
-  // PDF download handler
   const handleDownload = () => {
     if (!reportRef.current) return;
     const opt = {

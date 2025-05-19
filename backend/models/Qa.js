@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const answerSchema = new mongoose.Schema({
   text: { type: String, required: true },
-  answeredBy: { type: String, required: true }, // e.g., "Chirantan"
+  answeredBy: { type: String, required: true }, 
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -79,7 +79,8 @@ const Inventory = () => {
     } catch (err) {
       console.error("Error fetching inventory:", err);
       setInventory([]);
-      // Custom error message for 403
+    
+      
       if (err.response && err.response.status === 403) {
         setError(
           err.response.data?.message ||

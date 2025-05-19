@@ -316,7 +316,7 @@ const updatespareCount = async (req, res) => {
         console.log(`Updated spare count for user ${userName} (${userEmail}): ${oldCount} -> ${userSpareCount.spareCount}`);
         console.log("Final spare count document:", userSpareCount);
 
-        // Format the date and time
+        
         const updatedAt = new Date(userSpareCount.updatedAt);
         const formattedDate = updatedAt.toLocaleString('en-US', {
             year: 'numeric',

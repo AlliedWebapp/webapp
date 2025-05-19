@@ -13,7 +13,6 @@ const upload = require('../middleware/uploadMiddleware');
 
 router.use(protect, blockInventoryOnly);
 
-// Re-route into note router for ticket-related notes
 const noteRouter = require("./noteRoutes");
 router.use("/:ticketId/notes", noteRouter);
 

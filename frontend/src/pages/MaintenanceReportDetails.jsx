@@ -9,17 +9,7 @@ import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
-// // Helper function to convert buffer data to a base64 string
-// const imageToBase64 = (buffer) => {
-//   try {
-//     if (!buffer || !buffer.data) return null;
-//     const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-//     return `data:image/jpeg;base64,${btoa(binary)}`;
-//   } catch (error) {
-//     console.error("Error converting image to base64:", error);
-//     return null;
-//   }
-// };
+
 
 const MaintenanceReportDetails = () => {
   const [report, setReport] = useState(null);

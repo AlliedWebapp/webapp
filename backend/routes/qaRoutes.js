@@ -5,7 +5,7 @@ const { protect, blockInventoryOnly } = require('../middleware/authMiddleware');
 
 router.use(protect, blockInventoryOnly);
 
-// POST /api/qa → create new Q&A
+
 router.post('/', async (req, res) => {
   try {
     const { question, answer } = req.body;
@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/qa → list all Q&As
+
 router.get('/', async (req, res) => {
   try {
     const qas = await QA.find().sort({ createdAt: -1 });
@@ -31,7 +31,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Adds an answer to a question
 
 router.post('/:id/answers', async (req, res) => {
     try {

@@ -5,15 +5,15 @@ const ReportController = require("../controllers/ReportController");
 const { protect, blockInventoryOnly } = require("../middleware/authMiddleware");
 const FSR = require("../models/FSRModel");
 
-const storage = multer.memoryStorage();  // Store file as buffer in memory
+const storage = multer.memoryStorage(); 
 const upload = multer({ storage: storage });
 router.use(protect, blockInventoryOnly);
-// Import the controller functions
+
 const { submitFSR, getAllFSRs, getFSRByMongoId, getFSRById, submitImprovementReport, getAllImprovementReports, getImprovementReportByMongoId, submitMaintenanceReport, getAllMaintenanceReports, getMaintenanceReportByMongoId  } = require("../controllers/ReportController");
 
 // ------FSR------
 
-// Route to check if FSR exists for a ticket
+
 router.get("/fsr-by-ticket/:ticketId", async (req, res) => {
   try {
     const { ticketId } = req.params;
@@ -30,7 +30,7 @@ router.get("/fsr-by-ticket/:ticketId", async (req, res) => {
   }
 });
 
-// Route to fetch all FSR reports
+
 router.get("/fsrs", getAllFSRs);
 
 // Route to submit a new FSR report (with image uploads)

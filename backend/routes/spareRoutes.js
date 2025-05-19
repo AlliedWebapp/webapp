@@ -12,7 +12,6 @@ const {
 } = require("../controllers/sparesController");
 const { protect,inventoryAccess } = require("../middleware/authMiddleware");
 
-// Debug route to test API
 router.get("/debug", (req, res) => {
     res.json({
         message: "API is working in development mode",

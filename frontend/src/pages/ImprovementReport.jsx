@@ -1,4 +1,3 @@
-//form of continual improvemment report//
 import React, { useState, useEffect } from "react";
 import "../index.css";
 import BackButton from "../components/BackButton";

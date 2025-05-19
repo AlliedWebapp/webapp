@@ -3,14 +3,14 @@ const router = express.Router();
 const multer = require('multer');
 const Formats = require('../models/FormatsModel');
 
-// Use multer's memory storage to keep files in memory as Buffer
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const { protect, blockInventoryOnly } = require('../middleware/authMiddleware');
 
 router.use(protect, blockInventoryOnly);
 
-// to upload a pdf with title (api/formats/upload)
+
 router.post('/upload', upload.single('pdf'), async (req, res) => {
   try {
     const newFormat = new Formats({
@@ -27,7 +27,7 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
   }
 });
 
-// (api/formats/:id will get a specific pdf) to view or download
+
 router.get('/:id', async (req, res) => {
   try {
     const format = await Formats.findById(req.params.id);
@@ -40,7 +40,6 @@ router.get('/:id', async (req, res) => {
 });
 
 
-// (/api/formats will list all pdfs)
 router.get('/', async (req, res) => {
   try {
     const formats = await Formats.find({}, 'title uploadedAt');
