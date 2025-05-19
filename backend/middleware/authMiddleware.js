@@ -53,12 +53,12 @@ const inventoryAccess = (req, res, next) => {
     ) {
         return next();
     }
-    return res.status(403).json({ message: "Access denied: Inventory access only." });
+    return res.status(403).json({ message: "Access denied: This user has inventory access only." });
 };
 // Block 'inventoryOnly' from non-inventory routes
 const blockInventoryOnly = (req, res, next) => {
     if (req.user && req.user.role === 'inventoryOnly') {
-        return res.status(403).json({ message: "Access denied" });
+        return res.status(403).json({ message: "Access denied: This user has inventory access only." });
     }
     next();
 };

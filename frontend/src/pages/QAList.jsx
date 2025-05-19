@@ -24,7 +24,7 @@ const QAList = () => {
       setQAs(res.data);
     } catch (err) {
       if (err.response && err.response.status === 403) {
-        setError('Access denied');
+        setError('Access denied: This user has inventory access only.');
       } else {
         setError(
           err.response?.data?.message ||
@@ -64,7 +64,7 @@ const QAList = () => {
       setUsernames({ ...usernames, [qaId]: '' });
     } catch (err) {
       if (err.response && err.response.status === 403) {
-        setError('Access denied');
+        setError('Access denied: This user has inventory access only.');
       } else {
         setError(
           err.response?.data?.message ||

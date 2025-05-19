@@ -25,7 +25,7 @@ const Formats = () => {
       } catch (err) {
         // Check for 403 Forbidden from backend
       if (err.response && err.response.status === 403) {
-        setError('Access denied');
+        setError('Access denied: This user has inventory access only.');
       } else {
         setError(
           err.response?.data?.message ||

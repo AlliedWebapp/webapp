@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 
 const fsrSchema = new mongoose.Schema({
 fsrId: { type: Number, required: true, unique: true }, // Unique 4-digit fsr_id
-  ticketId: { type: String, required: true },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -39,6 +38,10 @@ fsrId: { type: Number, required: true, unique: true }, // Unique 4-digit fsr_id
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  createdBy: {
+    type: String,
+    required: true,
   },
 });
 

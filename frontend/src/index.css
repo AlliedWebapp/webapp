@@ -255,11 +255,6 @@ h3 {
   border-radius: 10px;
 }
 
-.status-open {
-  background-color: steelblue;
-  color: #fff;
-  border-radius: 10px;
-}
 
 .status-closed {
   background-color: #922626;
@@ -400,11 +395,6 @@ h3 {
   box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
 }
 
-.status-open {
-  background: #3b82f6;
-  color: white;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-}
 
 .status-closed {
   background: #dc2626;
@@ -2159,36 +2149,80 @@ td {
 
 /* MONTHLY SUMMARY */
 
-
 .monthly-summary {
-  max-width: 600px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0.5rem;
+  padding: 32px 16px;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
-
 .monthly-summary__title {
-  text-align: center;
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
-
 .monthly-summary__subtitle {
-  text-align: center;
-  font-size: 1.5rem;
+  color: #666;
   margin-bottom: 1.5rem;
 }
-
-.monthly-summary__select-container {
+.dropdown-row {
   display: flex;
-  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
-
-.monthly-summary__select {
-  padding: 0.5rem 1rem;
+.dropdown {
+  padding: 8px 12px;
   font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  background: #fafafa;
+}
+.summary-boxes {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.summary-box {
+  flex: 1;
+  background: #f7fafd;
+  border: 1px solid #e0e6ed;
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+.summary-box-label {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+.summary-box-value {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #1976d2;
+}
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  background: #fff;
+}
+.summary-table th, .summary-table td {
+  border: 1px solid #e0e6ed;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+.summary-table th {
+  background: #f0f4f8;
+  font-weight: 500;
+}
+.loading {
+  margin: 2rem 0;
+  color: #1976d2;
+  font-weight: bold;
+}
+.no-data {
+  margin: 2rem 0;
+  color: #b71c1c;
+  font-weight: bold;
 }
 

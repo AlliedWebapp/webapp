@@ -60,7 +60,7 @@ function ViewFSR() {
         if (err.response) {
           console.error("Error response:", err.response.data);
           console.error("Error status:", err.response.status);
-          setMessage(`Server error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
+          setMessage(`${err.response.data?.message || 'Unknown error'}`);
         } else if (err.request) {
           console.error("No response received:", err.request);
           setMessage("No response from server. Please check your connection.");
@@ -83,7 +83,7 @@ function ViewFSR() {
   if (isError) {
     return (
       <div className="error-container">
-        <h3 className="text-red-500">Error: {message}</h3>
+        <h3 className="text-red-500"> {message}</h3>
         <BackButton url="/" />
       </div>
     );

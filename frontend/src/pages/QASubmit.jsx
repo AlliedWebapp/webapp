@@ -23,7 +23,7 @@ const QASubmit = () => {
       } catch (err) {
        // Show access denied if 403, otherwise generic error
       if (err.response && err.response.status === 403) {
-        setError('Access denied');
+        setError('Access denied: This user has inventory access only.');
       } else {
         setError(
           err.response?.data?.message ||

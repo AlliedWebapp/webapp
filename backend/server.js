@@ -16,6 +16,7 @@ const ticketRoutes = require("./routes/ticketRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const reportRoutes = require("./routes/ReportRoutes"); 
 const FormatsRoutes = require('./routes/FormatsRoutes');
+const SummaryRoutes = require('./routes/SummaryRoutes');
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
@@ -65,7 +66,7 @@ app.use("/api/reports", reportRoutes);
 app.use('/api', spareRoutes);
 app.use('/api/formats', FormatsRoutes);
 app.use('/api/qa', qaRoutes);
-
+app.use('/api', SummaryRoutes);
 
 // 📌 Default Root Route
 app.get('/', (req, res) => {

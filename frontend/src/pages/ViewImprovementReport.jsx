@@ -56,7 +56,7 @@ function ViewImprovementReport() {
       } catch (err) {
         console.error("Failed to fetch Improvement Reports:", err);
         if (err.response) {
-          setMessage(`Server error: ${err.response.status} - ${err.response.data?.message || 'Unknown error'}`);
+          setMessage(`${err.response.data?.message || 'Unknown error'}`);
         } else if (err.request) {
           setMessage("No response from server. Please check your connection.");
         } else {

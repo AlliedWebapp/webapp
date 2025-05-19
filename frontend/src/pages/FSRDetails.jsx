@@ -117,8 +117,6 @@ function FSRDetails() {
             <tr>
               <td className="fsr-label">FSR ID</td>
               <td>{fsr.fsrId}</td>
-              <td className="fsr-label">Ticket ID</td>
-              <td>{fsr.ticketId}</td>
               <td className="fsr-label">SR No</td>
               <td>{fsr.srNo || "N/A"}</td>
             </tr>

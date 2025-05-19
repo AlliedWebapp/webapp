@@ -141,7 +141,8 @@ const workPhotos = req.files["workPhotos"]
       customerSignature,
       engineerSignature,
       workPhotos,
-      user: req.user._id
+      user: req.user._id,
+      createdBy: req.user.email,
     });
 
     console.log("New FSR report object created:", {

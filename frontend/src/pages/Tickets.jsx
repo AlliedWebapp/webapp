@@ -56,7 +56,7 @@ function Tickets() {
   if (isError) {
     return (
       <div>
-        <h3 className="text-red-500">Error: {message}</h3>
+        <h3 className="text-red-500">{message}</h3>
         <BackButton url="/" />
       </div>
     );

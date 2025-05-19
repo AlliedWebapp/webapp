@@ -60,6 +60,14 @@ const ticketSchema = new mongoose.Schema(
       required: true,
       enum: ['new', 'open', 'close'],
       default: 'new'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    createdBy: {
+      type: String,
+      required: true
     }
   },
   {

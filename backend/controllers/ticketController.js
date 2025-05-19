@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const User = require('../models/userModel')
 const Ticket = require('../models/ticketModel')
 
+
 const adminEmails = ["bhaskarudit02@gmail.com", "ss@gmail.com"].map(e => e.toLowerCase());
 
 // Helper to compare ObjectId or string
@@ -83,7 +84,7 @@ const createTicket = asyncHandler(async (req, res) => {
   const imageFiles = req.files;
   const imagePaths = imageFiles.map((file) => file.path); // save path to DB
 
-    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
+    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating || !imageFiles)  {
       res.status(400)
       throw new Error('Please provide all required fields')
     }
@@ -114,6 +115,7 @@ const createTicket = asyncHandler(async (req, res) => {
       rating,
       images,
       user: req.user.id,
+      createdBy: user.email,
       status: 'new'
       // ❌ DO NOT pass `ticket_id` here manually!
     });
