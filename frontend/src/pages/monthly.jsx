@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import BackButton from '../components/BackButton';
+import { useSelector } from 'react-redux';
 import "../index.css";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
+
+const adminEmails = ["bhaskarudit02@gmail.com", "ss@gmail.com"];
+
+const projectList = [
+  { name: 'All Projects', value: '' },
+  { name: 'Jogini', value: 'Jogini' },
+  { name: 'Shong', value: 'Shong' },
+  { name: 'Solding', value: 'Solding' },
+  { name: 'SDLLPsalun', value: 'SDLLPsalun' },
+  { name: 'Kuwarsi', value: 'Kuwarsi' },
+];
 
 const monthsList = [
   { name: 'January', value: 1 },
@@ -19,16 +32,7 @@ const monthsList = [
   { name: 'December', value: 12 }
 ];
 
-// Project dropdown values (keys must match backend mapping)
-const projectList = [
-  { name: 'All Projects', value: '' },
-  { name: 'Jogini', value: 'Jogini' },
-  { name: 'Shong', value: 'Shong' },
-  { name: 'Solding', value: 'Solding' },
-  { name: 'SDLLPsalun', value: 'SDLLPsalun' },
-  { name: 'Kuwarsi', value: 'Kuwarsi' },
-];
-
+// Generate years from 2024 to current year
 const yearsList = [];
 const currentYear = new Date().getFullYear();
 for (let y = 2025; y <= currentYear; y++) {
@@ -42,42 +46,67 @@ const MonthlySummary = () => {
   const [summary, setSummary] = useState(null);
   const [displayList, setDisplayList] = useState('tickets');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = adminEmails.includes(user?.email);
 
   useEffect(() => {
-    if (selectedMonth && selectedYear) {
-      setLoading(true);
-      let url = `${API_URL}/api/monthly-summary?year=${selectedYear}&month=${selectedMonth}`;
-      if (selectedProject) {
-        url += `&project=${encodeURIComponent(selectedProject)}`;
-      }
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          setSummary(data);
-          setLoading(false);
-        })
-        .catch(() => {
+    if (!isAdmin) setSelectedProject('');
+  }, [isAdmin]);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      if (selectedMonth && selectedYear) {
+        setLoading(true);
+        setError('');
+        let url = `${API_URL}/api/monthly-summary?year=${selectedYear}&month=${selectedMonth}`;
+        if (isAdmin && selectedProject) {
+          url += `&project=${encodeURIComponent(selectedProject)}`;
+        }
+        try {
+          const res = await axios.get(url, {
+            headers: { Authorization: `Bearer ${user.token}` }
+          });
+          setSummary(res.data);
+        } catch (err) {
+          if (err.response && err.response.status === 403) {
+            setError('Access denied: This user has inventory access only.');
+          } else if (err.response && err.response.status === 401) {
+            setError('Unauthorized: Please log in again.');
+          } else {
+            setError(
+              err.response?.data?.message ||
+              err.response?.data?.error ||
+              'Failed to load summary'
+            );
+          }
           setSummary(null);
+        } finally {
           setLoading(false);
-        });
-    }
-  }, [selectedMonth, selectedYear, selectedProject]);
+        }
+      }
+    };
+    fetchSummary();
+  }, [selectedMonth, selectedYear, selectedProject, isAdmin, user.token]);
 
   return (
     <div className="monthly-summary">
       <BackButton url="/" />
       <h1 className="monthly-summary__title">Monthly Summary</h1>
-      <p className="monthly-summary__subtitle">Choose the year, month, and project</p>
+      <p className="monthly-summary__subtitle">Choose the year, month{isAdmin ? ', and project' : ''}</p>
       <div className="dropdown-row">
-        <select
-          className="dropdown"
-          value={selectedProject}
-          onChange={e => setSelectedProject(e.target.value)}
-        >
-          {projectList.map(project => (
-            <option key={project.value} value={project.value}>{project.name}</option>
-          ))}
-        </select>
+        {isAdmin && (
+          <select
+            className="dropdown"
+            value={selectedProject}
+            onChange={e => setSelectedProject(e.target.value)}
+          >
+            {projectList.map(project => (
+              <option key={project.value} value={project.value}>{project.name}</option>
+            ))}
+          </select>
+        )}
         <select
           className="dropdown"
           value={selectedYear}
@@ -100,9 +129,11 @@ const MonthlySummary = () => {
         </select>
       </div>
 
-      {/* Summary Boxes */}
       {loading && <div className="loading">Loading...</div>}
-      {summary && !loading && (
+      {error && <div className="error" style={{ color: 'red' }}>{error}</div>}
+
+      {/* Summary Boxes */}
+      {summary && !loading && !error && (
         <div className="summary-boxes">
           <div className="summary-box">
             <div className="summary-box-label">Open Tickets</div>
@@ -120,12 +151,12 @@ const MonthlySummary = () => {
       )}
 
       {/* No data message */}
-      {summary && !loading && summary.openTicketsCount === 0 && summary.closedTicketsCount === 0 && summary.fsrCreatedCount === 0 && (
+      {summary && !loading && !error && summary.openTicketsCount === 0 && summary.closedTicketsCount === 0 && summary.fsrCreatedCount === 0 && (
         <div className="no-data">No data found for this month.</div>
       )}
 
       {/* Dropdown for List Selection */}
-      {summary && !loading && (
+      {summary && !loading && !error && (
         <div className="monthly-summary__select-container" style={{ marginTop: 24 }}>
           <select
             className="dropdown"
