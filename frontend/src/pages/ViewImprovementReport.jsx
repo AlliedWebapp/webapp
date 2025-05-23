@@ -86,21 +86,13 @@ function ViewImprovementReport() {
       <BackButton url="/other-reports" className="back-button" />
       <h1>Improvement Reports</h1>
       <div className="tickets">
-        <div className="ticket-headings">
-          <div>IR ID</div>
-          <div>Date</div>
-          <div>Department</div>
-          <div>Location</div>
-          <div></div>
-        </div>
-
         {reports.length > 0 ? (
           reports.map((report) => (
             <div className="ticket" key={report._id}>
-              <div>{report.irId}</div>
-              <div>{new Date(report.createdAt).toLocaleDateString()}</div>
-              <div>{report.department}</div>
-              <div>{report.location}</div>
+              <div data-label="IR ID">{report.irId}</div>
+              <div data-label="Date">{new Date(report.createdAt).toLocaleDateString()}</div>
+              <div data-label="Department">{report.department}</div>
+              <div data-label="Location">{report.location}</div>
               <div>
                 <button
                   className="btn btn-sm btn-outline"

@@ -23,13 +23,17 @@ function ViewFSR() {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchFSRs = async () => {
       try {
         if (!user?.token) {
           console.log("No user token found");
-          setMessage("Please login to view reports");
-          setIsError(true);
-          setIsLoading(false);
+          if (isMounted) {
+            setMessage("Please login to view reports");
+            setIsError(true);
+            setIsLoading(false);
+          }
           return;
         }
 
@@ -46,34 +50,44 @@ function ViewFSR() {
 
         console.log("FSR Response:", res.data);
 
-        // Check if reports exist in the response
-        if (res.data && Array.isArray(res.data.reports)) {
-          console.log("Found reports:", res.data.reports);
-          setFsrs(res.data.reports);
-        } else {
-          console.warn("No reports found in response:", res.data);
-          setFsrs([]);
+        // Only update state if component is still mounted
+        if (isMounted) {
+          // Check if reports exist in the response
+          if (res.data && Array.isArray(res.data.reports)) {
+            console.log("Found reports:", res.data.reports);
+            setFsrs(res.data.reports);
+          } else {
+            console.warn("No reports found in response:", res.data);
+            setFsrs([]);
+          }
+          setIsLoading(false);
         }
-        setIsLoading(false);
       } catch (err) {
         console.error("Failed to fetch FSRs:", err);
-        if (err.response) {
-          console.error("Error response:", err.response.data);
-          console.error("Error status:", err.response.status);
-          setMessage(`${err.response.data?.message || 'Unknown error'}`);
-        } else if (err.request) {
-          console.error("No response received:", err.request);
-          setMessage("No response from server. Please check your connection.");
-        } else {
-          console.error("Error message:", err.message);
-          setMessage(`Error: ${err.message}`);
+        if (isMounted) {
+          if (err.response) {
+            console.error("Error response:", err.response.data);
+            console.error("Error status:", err.response.status);
+            setMessage(`${err.response.data?.message || 'Unknown error'}`);
+          } else if (err.request) {
+            console.error("No response received:", err.request);
+            setMessage("No response from server. Please check your connection.");
+          } else {
+            console.error("Error message:", err.message);
+            setMessage(`Error: ${err.message}`);
+          }
+          setIsError(true);
+          setIsLoading(false);
         }
-        setIsError(true);
-        setIsLoading(false);
       }
     };
 
     fetchFSRs();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   // Loading spinner is shown while data is being fetched
@@ -105,10 +119,10 @@ function ViewFSR() {
         {fsrs.length > 0 ? (
           fsrs.map((fsr) => (
             <div className="ticket" key={fsr._id}>
-              <div>{fsr.fsrId}</div>
-              <div>{new Date(fsr.createdAt).toLocaleDateString()}</div>
-              <div>{fsr.customerName}</div>
-              <div>{fsr.installationAddress}</div>
+              <div data-label="FSR ID">{fsr.fsrId}</div>
+              <div data-label="Date">{new Date(fsr.createdAt).toLocaleDateString()}</div>
+              <div data-label="Customer">{fsr.customerName}</div>
+              <div data-label="Site">{fsr.installationAddress}</div>
               <div>
                 <button
                   className="btn btn-sm btn-outline"

@@ -78,21 +78,13 @@ function ViewMaintenanceReport() {
       <BackButton url="/other-reports" />
       <h1>Maintenance Reports</h1>
       <div className="tickets">
-        <div className="ticket-headings">
-          <div>MR ID</div>
-          <div>Date</div>
-          <div>Unit</div>
-          <div>Outage Date</div>
-          <div></div>
-        </div>
-
         {reports.length > 0 ? (
           reports.map((report) => (
             <div className="ticket" key={report._id}>
-              <div>{report.mrId}</div>
-              <div>{new Date(report.createdAt).toLocaleDateString()}</div>
-              <div>{report.unit}</div>
-              <div>{new Date(report.outageDate).toLocaleDateString()}</div>
+              <div data-label="MR ID">{report.mrId}</div>
+              <div data-label="Date">{new Date(report.createdAt).toLocaleDateString()}</div>
+              <div data-label="Unit">{report.unit}</div>
+              <div data-label="Outage Date">{new Date(report.outageDate).toLocaleDateString()}</div>
               <div>
                 <button
                   className="btn btn-sm btn-outline"

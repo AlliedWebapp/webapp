@@ -1,5 +1,5 @@
 /* Import Google Fonts - Poppins for modern look */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Reset default styles */
 * {
@@ -2094,22 +2094,206 @@ td {
     padding: 1rem;
   }
 
+  .report-details-container {
+    padding: 1rem;
+  }
+
+  /* Mobile styles for generic report tables */
   .report-table {
-    font-size: 12px;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Add vertical spacing between rows */
+  }
+
+  .report-table tr {
+    display: block; /* Each row is a block (card) */
+    margin-bottom: 10px; /* Additional space between rows */
+    background: #f8fafc; /* Background for row */
+    padding: 15px; /* Padding around row content */
+    border-radius: 8px; /* Rounded corners for rows */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
   }
 
   .report-table td {
-    padding: 0.5rem;
+    display: block; /* Each cell is a block */
+    width: 100%; /* Full width */
+    padding: 5px 0; /* Vertical padding */
+    border: none; /* Remove borders between cells */
+    margin-bottom: 4px; /* Space between cells */
   }
 
-  .report-label {
-    min-width: 120px;
+  .report-table td:last-child {
+      margin-bottom: 0; /* No bottom margin for the last td in a row */
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
+  .report-table .report-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    /* Display inline or inline-block to be next to value */
+    display: inline-block;
+    margin-right: 8px; /* Space between label and value */
+    min-width: unset;
+    width: auto; /* Allow label to take natural width */
+    vertical-align: top; /* Align label to the top */
+  }
+
+  .report-table .report-value {
+    font-size: 15px;
+    color: #2d3748;
+    padding: 0;
+    /* Display inline-block to be next to label and take remaining width */
+    display: inline-block;
+    width: calc(100% - 100px); /* Adjust width to fit next to label, approx 100px for label min-width consideration */
+    word-break: break-word; /* Prevent overflow */
+    vertical-align: top; /* Align value to the top */
+  }
+
+  /* Mobile styles for FSR details */
+  .fsr-details {
+    padding: 1rem;
+  }
+
+  .fsr-details-container {
+    padding: 1rem;
+  }
+
+  .fsr-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .fsr-grid {
+    grid-template-columns: 1fr; /* Stack sections vertically */
+    gap: 1rem; /* Add space between sections */
+  }
+
+  .fsr-field {
+    /* Make each field a block element */
+    display: block;
+    padding: 0.8rem; /* Add padding around each field */
+    background: #f7fafc; /* Light background for clarity */
+    border-radius: 4px; /* Rounded corners */
+    border: 1px solid #e2e8f0; /* Subtle border */
+    gap: 0; /* Remove gap from flex-direction column */
+    flex-direction: row; /* Reset flex direction if it was column */
+    align-items: flex-start; /* Align items to the start */
+  }
+
+  .fsr-field label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem; /* Adjust label font size */
+    margin-bottom: 0; /* Remove default margin-bottom */
+    /* Display inline or inline-block */
+    display: inline-block;
+    margin-right: 8px; /* Space between label and value */
+    width: auto; /* Allow label to take natural width */
+    vertical-align: top; /* Align label to the top */
+  }
+
+  .fsr-field span {
+    color: #2d3748;
+    padding: 0; /* Remove default padding */
+    background: none; /* Remove background */
+    border-radius: 0; /* Remove border-radius */
+    min-height: unset; /* Remove min-height */
+    /* Display inline-block to be next to label */
+    display: inline-block;
+    width: calc(100% - 100px); /* Adjust width to fit next to label, approx 100px for label min-width consideration */
+    word-break: break-word; /* Prevent overflow */
+    vertical-align: top; /* Align value to the top */
+  }
+
+  /* Styles for table-based reports within fsr-details if they exist */
+  /* This might be redundant if fsr-details only uses fsr-grid, but included for completeness */
+   .fsr-details .fsr-table {
+    width: 100%;
+    border-collapse: separate; /* Use separate to allow spacing */
+    border-spacing: 0 10px; /* Add vertical spacing between rows */
+  }
+
+  .fsr-details .fsr-table tr {
+    display: block;
+    margin-bottom: 10px; /* Additional space between rows */
+    background: #f8fafc; /* Background for row */
+    padding: 15px; /* Padding around row content */
+    border-radius: 8px; /* Rounded corners for rows */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
+  }
+
+  .fsr-details .fsr-table td {
+    display: block; /* Make each cell a block */
+    width: 100%; /* Full width */
+    padding: 8px 0; /* Vertical padding */
+    border: none; /* Remove borders between cells */
+    margin-bottom: 4px; /* Space between cells */
+  }
+
+   .fsr-details .fsr-table .fsr-label {
+     font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: inline-block; /* Make label inline-block */
+    width: auto;
+    min-width: unset;
+    margin-right: 8px; /* Space between label and value */
+    vertical-align: top;
+  }
+
+   .fsr-details .fsr-table .fsr-value {
+    font-size: 15px;
+    color: #2d3748;
+    padding: 0;
+    display: inline-block; /* Make value inline-block */
+    width: calc(100% - 100px); /* Adjust width */
+    word-break: break-word;
+    vertical-align: top;
+  }
+
+  .signature-image {
+    max-width: 120px;
+    max-height: 60px;
+    margin: 8px auto; /* Center image and add vertical margin */
+    display: block; /* Ensure image is block */
+  }
+
+  .work-photos {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjust photo grid */
+    gap: 8px; /* Adjust photo gap */
+    margin-top: 8px;
+  }
+
+  .work-photo {
+    height: 100px; /* Adjust photo height */
+  }
+
+  .download-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+
+  .download-btn svg {
+    width: 14px;
+    height: 14px;
   }
 }
+
 /* Low stock section */
 
 .low-stock-section {
@@ -2224,5 +2408,382 @@ td {
   margin: 2rem 0;
   color: #b71c1c;
   font-weight: bold;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .tickets, .improvement-reports, .maintenance-reports, .fsr-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .ticket, .improvement-reports .ticket, .maintenance-reports .ticket, .fsr-container .ticket {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+  }
+
+  .ticket-headings {
+    display: none;
+  }
+
+  .ticket > div, .improvement-reports .ticket > div, .maintenance-reports .ticket > div, .fsr-container .ticket > div {
+    display: table-row;
+    padding: 0.5rem;
+  }
+
+  .ticket > div::before, .improvement-reports .ticket > div::before, .maintenance-reports .ticket > div::before, .fsr-container .ticket > div::before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: table-cell;
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .ticket > div:last-child::before {
+    content: "Actions";
+  }
+
+  .ticket > div:last-child {
+    display: table-cell;
+    padding: 0.5rem;
+    text-align: right;
+  }
+
+  .ticket-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    min-width: auto;
+  }
+}
+
+/* Additional breakpoint for very small screens */
+@media (max-width: 480px) {
+  .work-photos, .ticket-images {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .signature-image {
+    max-width: 80px;
+    max-height: 50px;
+  }
+
+  .btn {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* OHOME Report Details Styles */
+.ohome-details {
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.ohome-details-container {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.ohome-section {
+  margin-bottom: 2rem;
+}
+
+.ohome-section h2 {
+  font-size: 1.5rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.ohome-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.ohome-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.ohome-field label {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.ohome-field span {
+  color: #2d3748;
+  padding: 0.5rem;
+  background: #f7fafc;
+  border-radius: 4px;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile styles for OHOME reports */
+@media (max-width: 768px) {
+  .ohome-details,
+  .ohome-details-container {
+    padding: 1rem;
+  }
+
+  .ohome-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .ohome-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ohome-field {
+    display: block;
+    padding: 0.8rem;
+    background: #f7fafc;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    gap: 0;
+  }
+
+  .ohome-field label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-right: 8px;
+    width: auto;
+    vertical-align: top;
+  }
+
+  .ohome-field span {
+    color: #2d3748;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    min-height: unset;
+    display: inline-block;
+    width: calc(100% - 100px);
+    word-break: break-word;
+    vertical-align: top;
+  }
+
+  .download-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 15px;
+  }
+
+  .download-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Mobile styles for improvement and maintenance reports */
+@media (max-width: 768px) {
+  /* Improvement Reports List */
+  .improvement-reports .ticket,
+  .maintenance-reports .ticket {
+    display: block;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .improvement-reports .ticket > div,
+  .maintenance-reports .ticket > div {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .improvement-reports .ticket > div:last-child,
+  .maintenance-reports .ticket > div:last-child {
+    border-bottom: none;
+  }
+
+  .improvement-reports .ticket > div::before,
+  .maintenance-reports .ticket > div::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #4a5568;
+    margin-right: 8px;
+  }
+
+  /* Report Details */
+  .improvement-details,
+  .maintenance-details {
+    padding: 1rem;
+  }
+
+  .improvement-details-container,
+  .maintenance-details-container {
+    padding: 1rem;
+  }
+
+  .report-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+  }
+
+  .report-table tr {
+    display: block;
+    margin-bottom: 10px;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .report-table td {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    border: none;
+    margin-bottom: 4px;
+  }
+
+  .report-table .report-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: inline-block;
+    width: auto;
+    min-width: unset;
+    margin-right: 8px;
+    vertical-align: top;
+  }
+
+  .report-table .report-value {
+    font-size: 15px;
+    color: #2d3748;
+    padding: 0;
+    display: inline-block;
+    width: calc(100% - 100px);
+    word-break: break-word;
+    vertical-align: top;
+  }
+
+  /* Signature Images */
+  .signature-image {
+    max-width: 120px;
+    max-height: 60px;
+    margin: 8px auto;
+    display: block;
+  }
+
+  /* Download Button */
+  .download-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+
+  .download-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Download Button Styles */
+.download-btn {
+  background: #333;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.download-btn:hover {
+  background: #555;
+}
+
+.download-btn svg {
+  width: 20px;
+  height: 16px;
+}
+
+@media (max-width: 768px) {
+  .download-btn {
+    position: fixed;
+    bottom: 1110px;
+    left: 70%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    border: none;
+    white-space: nowrap;
+  }
+
+  .download-btn:hover {
+    background: #555;
+  }
+
+  .download-btn svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 

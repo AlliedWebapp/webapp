@@ -74,39 +74,72 @@ const ImprovementReportDetails = () => {
     html2pdf().set(opt).from(reportRef.current).save();
   };
 
+  const handleImageClick = (image) => {
+    if (!image || !image.data) return;
+    try {
+      const dataUrl = `data:${image.contentType};base64,${image.data}`;
+      setSelectedImage(dataUrl);
+    } catch (err) {
+      console.error("Error handling image click:", err);
+    }
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
+  // Helper function to convert base64 data to a data URL
+  const bufferToDataUrl = (imgObj) => {
+    if (!imgObj || !imgObj.data) return null;
+    try {
+      return `data:${imgObj.contentType || 'image/jpeg'};base64,${imgObj.data}`;
+    } catch (err) {
+      console.error("Error converting image:", err);
+      return null;
+    }
+  };
+
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="loading-container">
+        <Spinner />
+        <p>Loading report details...</p>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="error">
-        <p>{error}</p>
-        <button onClick={() => navigate(-1)}>Go Back</button>
+      <div className="error-container">
+        <h3>Error: {error}</h3>
+        <button onClick={() => navigate(-1)} className="btn">
+          Go Back
+        </button>
       </div>
     );
   }
 
   if (!report) {
     return (
-      <div className="error">
-        <p>Report not found</p>
-        <button onClick={() => navigate(-1)}>Go Back</button>
+      <div className="error-container">
+        <h3>No report data found</h3>
+        <button onClick={() => navigate(-1)} className="btn">
+          Go Back
+        </button>
       </div>
     );
   }
 
   return (
     <div className="report-details" style={{ position: "relative" }}>
-      {/* Download icon button at top left */}
       <button
         onClick={handleDownload}
-        style={{ position: "absolute", top: 120, left: 50, zIndex: 1000, background: "lightgrey", colour: "white", fontSize: "1rem", padding: "0.2rem", borderRadius: "8px", cursor: "pointer", boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
+        className="download-btn"
         aria-label="Download PDF"
         title="Download PDF"
       >
-        <FiDownload style={{ fontSize: "1.2rem", marginRight: "0.5rem", verticalAlign: "sub"}} />
-          Download PDF
+        <FiDownload />
+        Download PDF
       </button>
 
       <div className="back-button-container">
@@ -123,7 +156,7 @@ const ImprovementReportDetails = () => {
             <tr>
               <td className="report-label">Report ID</td>
               <td className="report-value">{report.irId}</td>
-              <td className="report-label">Department</td>
+              <td className="report-label">Project</td>
               <td className="report-value">{report.department}</td>
             </tr>
             <tr>
@@ -175,15 +208,28 @@ const ImprovementReportDetails = () => {
               <td className="report-value" colSpan="3">{report.additional_info}</td>
             </tr>
             <tr>
-              <td className="report-label">HOD Signature</td>
+              <td className="report-label">Head of Project Signature</td>
               <td className="report-value">
                 {report.hod_sign && (
                   <img
-                    src={report.hod_sign}
+                    src={bufferToDataUrl(report.hod_sign)}
                     alt="HOD Signature"
                     className="signature-image"
-                    style={{ cursor: "pointer", maxWidth: "120px", maxHeight: "80px" }}
-                    onClick={() => setSelectedImage(report.hod_sign)}
+                    onClick={() => handleImageClick(report.hod_sign)}
+                    style={{ 
+                      cursor: "pointer", 
+                      maxWidth: "120px", 
+                      maxHeight: "80px",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s ease-in-out"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    onError={(e) => {
+                      console.error("Error loading HOD signature");
+                      e.target.style.display = "none";
+                    }}
                   />
                 )}
               </td>
@@ -191,11 +237,24 @@ const ImprovementReportDetails = () => {
               <td className="report-value">
                 {report.plant_incharge_sign && (
                   <img
-                    src={report.plant_incharge_sign}
+                    src={bufferToDataUrl(report.plant_incharge_sign)}
                     alt="Plant Head Signature"
                     className="signature-image"
-                    style={{ cursor: "pointer", maxWidth: "120px", maxHeight: "80px" }}
-                    onClick={() => setSelectedImage(report.plant_incharge_sign)}
+                    onClick={() => handleImageClick(report.plant_incharge_sign)}
+                    style={{ 
+                      cursor: "pointer", 
+                      maxWidth: "120px", 
+                      maxHeight: "80px",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s ease-in-out"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    onError={(e) => {
+                      console.error("Error loading Plant Head signature");
+                      e.target.style.display = "none";
+                    }}
                   />
                 )}
               </td>
@@ -203,48 +262,55 @@ const ImprovementReportDetails = () => {
           </tbody>
         </table>
       </div>
-      {/* //Modal preview */}
+      {/* Image Modal */}
       {selectedImage && (
-  <div
-    className="image-modal"
-    onClick={() => setSelectedImage(null)}
-    style={{
-      position: "fixed",
-      top: 0, left: 0, width: "100vw", height: "100vh",
-      background: "rgba(0,0,0,0.6)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      zIndex: 2000
-    }}
-  >
-    <img
-      src={selectedImage}
-      alt="Signature Preview"
-       style={{
-        maxWidth: "90vw",
-        maxHeight: "90vh",
-        background: "#fff",
-        borderRadius: "8px",
-        padding: "1rem"
-      }}
-      onClick={e => e.stopPropagation()} // Prevent modal close on image click
-    />
-     <button
-      onClick={() => setSelectedImage(null)}
-      style={{
-        position: "absolute",
-        top: 30, right: 40,
-        fontSize: 32,
-        color: "#fff",
-        background: "transparent",
-        border: "none",
-        cursor: "pointer"
-      }}
-      aria-label="Close"
-    >
-      &times;
-    </button>
-  </div>
-)}
+        <div 
+          className="image-modal" 
+          onClick={closeImageModal}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000
+          }}
+        >
+          <img
+            src={selectedImage}
+            alt="Preview"
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              background: "#fff",
+              borderRadius: "8px",
+              padding: "1rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            onClick={closeImageModal}
+            style={{
+              position: "absolute",
+              top: 30,
+              right: 40,
+              fontSize: 32,
+              color: "#fff",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer"
+            }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+      )}
     </div>
   );
 };

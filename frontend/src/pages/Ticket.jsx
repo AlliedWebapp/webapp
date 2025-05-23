@@ -244,6 +244,22 @@ function Ticket() {
                     onMouseOut={(e) =>
                       (e.currentTarget.style.transform = "scale(1)")
                     }
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      fetch(imageUrl, {
+                        headers: {
+                          'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                        }
+                      })
+                      .then(response => response.blob())
+                      .then(blob => {
+                        e.target.src = URL.createObjectURL(blob);
+                      })
+                      .catch(err => {
+                        console.error('Error loading image:', err);
+                        e.target.src = 'placeholder-image-url'; // Add a placeholder image URL
+                      });
+                    }}
                   />
                 );
               })}
@@ -344,6 +360,22 @@ function Ticket() {
               background: "#fff",
               padding: "8px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              fetch(previewImage, {
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                }
+              })
+              .then(response => response.blob())
+              .then(blob => {
+                e.target.src = URL.createObjectURL(blob);
+              })
+              .catch(err => {
+                console.error('Error loading preview image:', err);
+                e.target.src = 'placeholder-image-url'; // Add a placeholder image URL
+              });
             }}
           />
         </div>

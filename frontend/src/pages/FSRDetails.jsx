@@ -10,17 +10,13 @@ import { FiDownload } from "react-icons/fi";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
-// // Helper function to convert buffer data to a base64 string
-// const imageToBase64 = (buffer) => {
-//   try {
-//     if (!buffer || !buffer.data) return null;
-//     const binary = String.fromCharCode(...new Uint8Array(buffer.data));
-//     return `data:image/jpeg;base64,${btoa(binary)}`;
-//   } catch (error) {
-//     console.error("Error converting image to base64:", error);
-//     return null;
-//   }
-// };
+// Helper function to convert buffer data to a base64 string
+const bufferToDataUrl = (imgObj) => {
+  if (!imgObj || !imgObj.data) return null;
+  // Convert buffer data to Uint8Array and then to base64
+  const base64String = btoa(String.fromCharCode(...new Uint8Array(imgObj.data)));
+  return `data:${imgObj.contentType || 'image/jpeg'};base64,${base64String}`;
+};
 
 function FSRDetails() {
   const { id } = useParams();
@@ -68,7 +64,13 @@ function FSRDetails() {
   }, [id, user]);
 
   const handleImageClick = (image) => {
-    setSelectedImage(image);
+    if (!image || !image.data) return;
+    try {
+      const dataUrl = `data:${image.contentType};base64,${image.data}`;
+      setSelectedImage(dataUrl);
+    } catch (err) {
+      console.error("Error handling image click:", err);
+    }
   };
 
   const closeImageModal = () => {
@@ -88,10 +90,47 @@ function FSRDetails() {
     html2pdf().set(opt).from(fsrRef.current).save();
   };
 
+  // Helper function to convert base64 data to a data URL
+  const bufferToDataUrl = (imgObj) => {
+    if (!imgObj || !imgObj.data) return null;
+    try {
+      return `data:${imgObj.contentType || 'image/jpeg'};base64,${imgObj.data}`;
+    } catch (err) {
+      console.error("Error converting image:", err);
+      return null;
+    }
+  };
 
-  if (isLoading) return <Spinner />;
-  if (error) return <div className="error">{error}</div>;
-  if (!fsr) return <div className="error">FSR not found</div>;
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <Spinner />
+        <p>Loading report details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <h3>Error: {error}</h3>
+        <button onClick={() => navigate(-1)} className="btn">
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  if (!fsr) {
+    return (
+      <div className="error-container">
+        <h3>No report data found</h3>
+        <button onClick={() => navigate(-1)} className="btn">
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="fsr-details">
@@ -203,10 +242,24 @@ function FSRDetails() {
               <td colSpan="5">
                 {fsr.customerSignature && (
                   <img 
-                    src={fsr.customerSignature} 
+                    src={bufferToDataUrl(fsr.customerSignature)}
                     alt="Customer Signature" 
                     className="signature-image"
                     onClick={() => handleImageClick(fsr.customerSignature)}
+                    style={{ 
+                      cursor: "pointer", 
+                      maxWidth: "120px", 
+                      maxHeight: "80px",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s ease-in-out"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    onError={(e) => {
+                      console.error("Error loading customer signature");
+                      e.target.style.display = "none";
+                    }}
                   />
                 )}
               </td>
@@ -216,10 +269,24 @@ function FSRDetails() {
               <td colSpan="5">
                 {fsr.engineerSignature && (
                   <img 
-                    src={fsr.engineerSignature} 
+                    src={bufferToDataUrl(fsr.engineerSignature)}
                     alt="Engineer Signature" 
                     className="signature-image"
                     onClick={() => handleImageClick(fsr.engineerSignature)}
+                    style={{ 
+                      cursor: "pointer", 
+                      maxWidth: "120px", 
+                      maxHeight: "80px",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s ease-in-out"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    onError={(e) => {
+                      console.error("Error loading engineer signature");
+                      e.target.style.display = "none";
+                    }}
                   />
                 )}
               </td>
@@ -231,10 +298,26 @@ function FSRDetails() {
                   {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
                     <img 
                       key={index}
-                      src={photo} 
+                      src={bufferToDataUrl(photo)}
                       alt={`Work Photo ${index + 1}`}
                       className="work-photo"
                       onClick={() => handleImageClick(photo)}
+                      style={{ 
+                        width: "80px", 
+                        height: "80px", 
+                        objectFit: "cover",
+                        borderRadius: "10px",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                        cursor: "pointer",
+                        margin: "5px",
+                        transition: "transform 0.2s ease-in-out"
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                      onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                      onError={(e) => {
+                        console.error(`Error loading work photo ${index + 1}`);
+                        e.target.style.display = "none";
+                      }}
                     />
                   ))}
                 </div>
@@ -244,16 +327,53 @@ function FSRDetails() {
         </table>
       </div>
 
+      {/* Image Modal */}
       {selectedImage && (
-        <div className="image-modal" onClick={closeImageModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <span className="close-button" onClick={closeImageModal}>&times;</span>
-            <img 
-              src={selectedImage} 
-              alt="Preview" 
-              className="preview-image"
-            />
-          </div>
+        <div 
+          className="image-modal" 
+          onClick={closeImageModal}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000
+          }}
+        >
+          <img
+            src={selectedImage}
+            alt="Preview"
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              background: "#fff",
+              borderRadius: "8px",
+              padding: "1rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            onClick={closeImageModal}
+            style={{
+              position: "absolute",
+              top: 30,
+              right: 40,
+              fontSize: 32,
+              color: "#fff",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer"
+            }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
         </div>
       )}
     </div>

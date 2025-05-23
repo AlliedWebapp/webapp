@@ -175,7 +175,7 @@ useEffect(() => {
           </div>
 
           <div className="form-group">
-            <label>Department</label>
+            <label>Project</label>
             <input type="text" name="department" value={formData.department} onChange={handleChange} />
           </div>
 
@@ -250,7 +250,7 @@ useEffect(() => {
           </div>
 
           <div className="form-group">
-            <label>Upload HOD Signature</label>
+            <label>Upload Head of Project Signature</label>
             <input type="file" name="hodSign" accept="image/*" onChange={handleFileChange} />
           </div>
 

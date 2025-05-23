@@ -77,10 +77,10 @@ function Tickets() {
         {tickets && tickets.length > 0 ? (
           tickets.map((ticket) => (
             <div key={ticket._id} className="ticket">
-              <div>{ticket.ticket_id}</div>
-              <div>{new Date(ticket.createdAt).toLocaleDateString()}</div>
-              <div>{ticket.projectname}</div>
-              <div className={`status status-${ticket.status}`}>{ticket.status}</div>
+              <div data-label="Ticket ID">{ticket.ticket_id}</div>
+              <div data-label="Date">{new Date(ticket.createdAt).toLocaleDateString()}</div>
+              <div data-label="Project">{ticket.projectname}</div>
+              <div data-label="Status" className={`status status-${ticket.status}`}>{ticket.status}</div>
               <div className="ticket-buttons">
                 <Link to={`/ticket/${ticket._id}`} className="btn btn-reverse btn-sm">
                   Read

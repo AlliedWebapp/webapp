@@ -207,7 +207,7 @@ exports.getFSRByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "FSR ID is required");
     }
 
-    const report = await FSR.findById(id);
+    const report = await FSR.findById(id).lean();
     if (!report) {
       throw new ErrorHandler(404, "FSR not found");
     }
@@ -218,6 +218,28 @@ exports.getFSRByMongoId = async (req, res, next) => {
       !isOwner(report.user, req.user._id)
     ) {
       throw new ErrorHandler(401, "Not authorized to view this FSR");
+    }
+
+    // Convert image data to base64
+    if (report.customerSignature) {
+      report.customerSignature = {
+        data: report.customerSignature.data.toString('base64'),
+        contentType: report.customerSignature.contentType
+      };
+    }
+
+    if (report.engineerSignature) {
+      report.engineerSignature = {
+        data: report.engineerSignature.data.toString('base64'),
+        contentType: report.engineerSignature.contentType
+      };
+    }
+
+    if (report.workPhotos && Array.isArray(report.workPhotos)) {
+      report.workPhotos = report.workPhotos.map(photo => ({
+        data: photo.data.toString('base64'),
+        contentType: photo.contentType
+      }));
     }
 
     res.json(report);
@@ -346,7 +368,7 @@ exports.getImprovementReportByMongoId = async (req, res, next) => {
       throw new ErrorHandler(400, "Improvement Report ID is required");
     }
 
-    const report = await ImprovementReport.findById(id);
+    const report = await ImprovementReport.findById(id).lean();
     if (!report) {
       throw new ErrorHandler(404, "Improvement Report not found");
     }
@@ -357,6 +379,21 @@ exports.getImprovementReportByMongoId = async (req, res, next) => {
       !isOwner(report.user, req.user._id)
     ) {
       throw new ErrorHandler(401, "Not authorized to view this Improvement Report");
+    }
+
+    // Convert Buffer data to base64 for images
+    if (report.hod_sign && report.hod_sign.data) {
+      report.hod_sign = {
+        data: report.hod_sign.data.toString('base64'),
+        contentType: report.hod_sign.contentType
+      };
+    }
+
+    if (report.plant_incharge_sign && report.plant_incharge_sign.data) {
+      report.plant_incharge_sign = {
+        data: report.plant_incharge_sign.data.toString('base64'),
+        contentType: report.plant_incharge_sign.contentType
+      };
     }
 
     res.json(report);
@@ -486,13 +523,18 @@ const bufferToBase64 = (buffer) => {
 exports.getMaintenanceReportByMongoId = async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log("Fetching maintenance report with ID:", id);
     
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      console.error("Invalid ID provided:", id);
       throw new ErrorHandler(400, "Invalid maintenance report ID");
     }
 
-    const report = await MaintenanceReport.findById(id).lean();
+    const report = await MaintenanceReport.findById(id);
+    console.log("Found report:", report ? "Yes" : "No");
+
     if (!report) {
+      console.error("Report not found for ID:", id);
       throw new ErrorHandler(404, "Maintenance report not found");
     }
 
@@ -501,40 +543,46 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
       !adminEmails.includes(req.user.email) &&
       !isOwner(report.user, req.user._id)
     ) {
+      console.error("Unauthorized access attempt for report:", id);
       throw new ErrorHandler(401, "Not authorized to view this maintenance report");
     }
 
-    // Convert signature buffers to base64 strings
-    if (report.hodSignature && report.hodSignature.data) {
-      const base64String = Buffer.from(report.hodSignature.data).toString('base64');
-      report.hodSignature = {
-        data: `data:${report.hodSignature.contentType || 'image/jpeg'};base64,${base64String}`,
-        contentType: report.hodSignature.contentType || 'image/jpeg'
+    // Convert the Mongoose document to a plain object
+    const reportData = report.toObject();
+    console.log("Report data converted to object");
+
+    // Keep image data in Buffer format
+    if (reportData.hodSignature) {
+      reportData.hodSignature = {
+        data: reportData.hodSignature.data,
+        contentType: reportData.hodSignature.contentType
       };
     }
-    if (report.plantInchargeSignature && report.plantInchargeSignature.data) {
-      const base64String = Buffer.from(report.plantInchargeSignature.data).toString('base64');
-      report.plantInchargeSignature = {
-        data: `data:${report.plantInchargeSignature.contentType || 'image/jpeg'};base64,${base64String}`,
-        contentType: report.plantInchargeSignature.contentType || 'image/jpeg'
+
+    if (reportData.plantInchargeSignature) {
+      reportData.plantInchargeSignature = {
+        data: reportData.plantInchargeSignature.data,
+        contentType: reportData.plantInchargeSignature.contentType
       };
     }
 
     // Format dates safely
-    if (report.outageDate) {
-      const d = new Date(report.outageDate);
-      report.outageDate = isNaN(d) ? report.outageDate : d.toLocaleDateString();
+    if (reportData.outageDate) {
+      const d = new Date(reportData.outageDate);
+      reportData.outageDate = isNaN(d) ? reportData.outageDate : d.toLocaleDateString();
     }
-    if (report.createdAt) {
-      const d = new Date(report.createdAt);
-      report.createdAt = isNaN(d) ? report.createdAt : d.toLocaleDateString();
+    if (reportData.createdAt) {
+      const d = new Date(reportData.createdAt);
+      reportData.createdAt = isNaN(d) ? reportData.createdAt : d.toLocaleDateString();
     }
 
+    console.log("Sending response with report data");
     res.json({
       success: true,
-      data: report
+      data: reportData
     });
   } catch (err) {
+    console.error("Error in getMaintenanceReportByMongoId:", err);
     next(err);
   }
 };

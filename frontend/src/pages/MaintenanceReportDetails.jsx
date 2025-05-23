@@ -31,6 +31,9 @@ const MaintenanceReportDetails = () => {
         }
 
         setLoading(true);
+        console.log("Fetching report with ID:", id);
+        console.log("Using token:", user.token);
+
         const response = await fetch(
           `${API_URL}/api/reports/maintenance-report-details/${id}`,
           {
@@ -42,32 +45,43 @@ const MaintenanceReportDetails = () => {
           }
         );
 
+        console.log("Response status:", response.status);
+        const result = await response.json();
+        console.log("Full response:", result);
+
         if (!response.ok) {
-          throw new Error("Failed to fetch report");
+          throw new Error(result.message || "Failed to fetch report");
         }
 
-        const data = await response.json();
-        console.log("Maintenance Report Data:", data);
-
-        if (!data || !data.success || !data.data) {
-          throw new Error("Report not found");
+        if (!result.success || !result.data) {
+          console.error("Invalid response format:", result);
+          throw new Error("Invalid report data received");
         }
 
-        setReport(data.data);
+        console.log("Setting report data:", result.data);
+        setReport(result.data);
       } catch (err) {
-        console.error("Error fetching report:", err);
-        setError(err.message);
-        toast.error("Failed to load report details");
+        console.error("Error in fetchReport:", err);
+        setError(err.message || "Failed to load report details");
+        toast.error(err.message || "Failed to load report details");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReport();
+    if (id && user?.token) {
+      fetchReport();
+    }
   }, [id, user]);
 
   const handleImageClick = (image) => {
-    setSelectedImage(image);
+    if (!image || !image.data) return;
+    try {
+      const dataUrl = `data:${image.contentType};base64,${image.data}`;
+      setSelectedImage(dataUrl);
+    } catch (err) {
+      console.error("Error handling image click:", err);
+    }
   };
 
   const closeImageModal = () => {
@@ -87,39 +101,59 @@ const MaintenanceReportDetails = () => {
     html2pdf().set(opt).from(reportRef.current).save();
   };
 
+  // Helper function to convert base64 data to a data URL
+  const bufferToDataUrl = (imgObj) => {
+    if (!imgObj || !imgObj.data) return null;
+    try {
+      return `data:${imgObj.contentType || 'image/jpeg'};base64,${imgObj.data}`;
+    } catch (err) {
+      console.error("Error converting image:", err);
+      return null;
+    }
+  };
+
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="loading-container">
+        <Spinner />
+        <p>Loading report details...</p>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="error">
-        <p>{error}</p>
-        <button onClick={() => navigate(-1)}>Go Back</button>
+      <div className="error-container">
+        <h3>Error: {error}</h3>
+        <button onClick={() => navigate(-1)} className="btn">
+          Go Back
+        </button>
       </div>
     );
   }
 
   if (!report) {
     return (
-      <div className="error">
-        <p>Report not found</p>
-        <button onClick={() => navigate(-1)}>Go Back</button>
+      <div className="error-container">
+        <h3>No report data found</h3>
+        <button onClick={() => navigate(-1)} className="btn">
+          Go Back
+        </button>
       </div>
     );
   }
 
   return (
     <div className="report-details">
-    <button
-            onClick={handleDownload}
-            style={{ position: "absolute", top: 320, left: 350, zIndex: 1000, background: "lightgrey", colour: "white", fontSize: "1rem", padding: "0.2rem", borderRadius: "8px", cursor: "pointer", boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
-            aria-label="Download PDF"
-            title="Download PDF"
-          >
-            <FiDownload style={{ fontSize: "1.2rem", marginRight: "0.5rem", verticalAlign: "sub"}} />
-              Download PDF
-          </button>
+      <button
+        onClick={handleDownload}
+        className="download-btn"
+        aria-label="Download PDF"
+        title="Download PDF"
+      >
+        <FiDownload />
+        Download PDF
+      </button>
 
       <div className="back-button-container">
         <BackButton url="/view-maintenance-reports" className="back-button" />
@@ -174,9 +208,24 @@ const MaintenanceReportDetails = () => {
               <td className="report-value">
                 {report.hodSignature && (
                   <img
-                    src={report.hodSignature}
+                    src={bufferToDataUrl(report.hodSignature)}
                     alt="HOD Signature"
                     className="signature-image"
+                    onClick={() => handleImageClick(report.hodSignature)}
+                    style={{ 
+                      cursor: "pointer", 
+                      maxWidth: "120px", 
+                      maxHeight: "80px",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s ease-in-out"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    onError={(e) => {
+                      console.error("Error loading HOD signature");
+                      e.target.style.display = "none";
+                    }}
                   />
                 )}
               </td>
@@ -184,9 +233,24 @@ const MaintenanceReportDetails = () => {
               <td className="report-value">
                 {report.plantInchargeSignature && (
                   <img
-                    src={report.plantInchargeSignature}
+                    src={bufferToDataUrl(report.plantInchargeSignature)}
                     alt="Plant Head Signature"
                     className="signature-image"
+                    onClick={() => handleImageClick(report.plantInchargeSignature)}
+                    style={{ 
+                      cursor: "pointer", 
+                      maxWidth: "120px", 
+                      maxHeight: "80px",
+                      borderRadius: "10px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s ease-in-out"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    onError={(e) => {
+                      console.error("Error loading Plant Head signature");
+                      e.target.style.display = "none";
+                    }}
                   />
                 )}
               </td>
@@ -195,17 +259,53 @@ const MaintenanceReportDetails = () => {
         </table>
       </div>
       
-     {/* Modal for image preview */}
+     {/* Image Modal */}
       {selectedImage && (
-        <div className="image-modal" onClick={closeImageModal} style={{
-          position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-          background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000
-        }}>
+        <div 
+          className="image-modal" 
+          onClick={closeImageModal}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000
+          }}
+        >
           <img
             src={selectedImage}
-            alt="Signature Preview"
-            style={{ maxWidth: "90vw", maxHeight: "90vh", background: "#fff", borderRadius: "8px", padding: "1rem" }}
+            alt="Preview"
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              background: "#fff",
+              borderRadius: "8px",
+              padding: "1rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
+            }}
+            onClick={e => e.stopPropagation()}
           />
+          <button
+            onClick={closeImageModal}
+            style={{
+              position: "absolute",
+              top: 30,
+              right: 40,
+              fontSize: 32,
+              color: "#fff",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer"
+            }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
         </div>
       )} 
     </div>
