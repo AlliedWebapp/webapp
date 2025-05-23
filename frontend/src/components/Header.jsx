@@ -2,6 +2,7 @@ import { FaSignOutAlt, FaSignInAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, reset } from "../features/auth/authSlice";
+import SearchBar from './SearchBar';
 
 function Header() {
   const navigate = useNavigate();
@@ -15,14 +16,14 @@ function Header() {
   };
 
   return (
-  <header className="header">
-   <div className="logo">
-    <Link to="/">
-    <img src="https://github.com/ShaivyaaSharma/GITHUB/blob/main/logo.png?raw=true" alt="Logo" className="logo-image" />
-    </Link>
-  </div>
-  
+    <header className="header">
+      <div className="logo">
+        <Link to="/">
+          <img src="https://github.com/ShaivyaaSharma/GITHUB/blob/main/logo.png?raw=true" alt="Logo" className="logo-image" />
+        </Link>
+      </div>
 
+      {user && <SearchBar />}
 
       <ul>
         {user ? (

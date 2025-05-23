@@ -2787,3 +2787,105 @@ td {
   }
 }
 
+/* 1. Thick black border on the search box (keeps your existing width/height) */
+.search-input {
+  /* preserve whatever width/height you already have */
+  border: 2px solid #000;    /* thick black border */
+  box-sizing: border-box;
+  width: 150px;
+  height: 30px;
+}
+
+/* 2. Light-yellow highlights */
+mark {
+  background-color: #ffff99; /* pale yellow */
+  padding: 0 0.1em;          /* optional horizontal padding */
+}
+
+.search-controls {
+  position: absolute;
+  z-index: 1000;                /* sit above page content */
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  pointer-events: auto;         /* ensure buttons stay clickable */
+  transition: top 0.1s, left 0.1s;
+}
+
+/* (Optional) Tweak the nav buttons’ spacing so they’re easy to hit */
+.nav-button {
+  margin: 0 0.5rem;
+  cursor: pointer;
+}
+
+/* (Optional) If you want the “active” match highlighted differently: */
+mark.active-match {
+  background-color: hsl(57, 40%, 52%); /* a bit brighter for the current one */
+}
+ .search-input-wrapper {
+  position: absolute;
+  top: 50px;
+  left: 150px;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  /* 1) Pin the search bar full-width at the top */
+  .search-input-wrapper {
+    position: relative !important;
+    top: 130px   !important;
+    left: auto   !important;
+    width: 100%   !important;
+    right: 250px  !important;
+    margin: 90px    !important;
+  }
+
+  /* 2) Make the input fill its container */
+  .search-input {
+    width: 100% !important;
+    height: 40px;
+    padding: 0 2.5rem 0 0.75rem;
+  }
+
+  /* 3) Tuck the clear “×” inside properly */
+  .clear-search {
+    position: relative !important;
+    right: 1rem !important;
+    top: 10px   !important;
+    transform: translateY(-50%) !important;
+  }
+
+  /* 4) Drop “No matches found” below the bar */
+  .no-matches-inline {
+    position: static !important;
+    display: block;
+    text-align: center;
+    margin: 0.8rem 0 0.5rem 0px;
+    color: red;
+    font-size: 1rem;
+  }
+
+  /* 5) Float the nav arrows fixed atthe bottom center */
+  .search-controls {
+    position: fixed !important;
+    left: 60%      !important;
+    top: 15%      !important;
+    transform: translateX(-50%) !important;
+    background: rgba(255,255,255,0.95);
+    padding: 0.4rem 0.6rem;
+    border-radius: 9px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    gap: 0.5rem;
+    z-index: 1002;
+  }
+
+  /* 6) Slightly enlarge touch targets on mobile */
+  .nav-button {
+    padding: 0.4rem 0.6rem;
+  }
+}
