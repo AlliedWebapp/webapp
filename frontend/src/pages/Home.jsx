@@ -4,8 +4,8 @@ function Home() {
   return (
     <>
       <section className="heading">
-        <h1>Ticket Management System Admin</h1>
-        <p>Please choose from an option below</p>
+        <h1>Service Management System </h1>
+        <p>Please choose a service below</p>
       </section>
 
       <Link to="/new-ticket" className="btn btn-block">
@@ -21,7 +21,7 @@ function Home() {
       </Link>
 
       <Link to="/InvetoryManager" className="btn btn-block">
-        <FaClipboardList /> Manage Inventory
+        <FaClipboardList />  Manage Inventory
       </Link>
 
       <Link to="/FSR" className="btn btn-block">
