@@ -1,6 +1,5 @@
 import { FaBoxOpen, FaList, FaQuestion, FaCalendarAlt, FaClipboard, FaClipboardCheck, FaClipboardList, FaDownload, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt, FaWarehouse } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
 function Home() {
   return (
     <>
@@ -19,6 +18,10 @@ function Home() {
 
       <Link to="/inventory" className="btn btn-block">
         <FaClipboardList /> View Inventory
+      </Link>
+
+      <Link to="/InvetoryManager" className="btn btn-block">
+        <FaClipboardList /> Manage Inventory
       </Link>
 
       <Link to="/FSR" className="btn btn-block">
