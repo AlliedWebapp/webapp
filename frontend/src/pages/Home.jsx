@@ -1,4 +1,4 @@
-import { FaBoxOpen, FaList, FaQuestion, FaCalendarAlt, FaClipboard, FaClipboardCheck, FaClipboardList, FaDownload, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt, FaWarehouse } from "react-icons/fa";
+import { FaBoxOpen, FaList, FaQuestion, FaCalendarAlt, FaClipboard, FaEdit, FaClipboardCheck, FaClipboardList, FaDownload, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt, FaWarehouse } from "react-icons/fa";
 import { Link } from "react-router-dom";
 function Home() {
   return (
@@ -20,8 +20,8 @@ function Home() {
         <FaClipboardList /> View Inventory
       </Link>
 
-      <Link to="/InvetoryManager" className="btn btn-block">
-        <FaClipboardList />  Manage Inventory
+      <Link to="/inventory-manager" className="btn btn-block">
+        <FaEdit />  Manage Inventory
       </Link>
 
       <Link to="/FSR" className="btn btn-block">

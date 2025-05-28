@@ -16,13 +16,13 @@ function Header() {
   };
 
   return (
-    <header className="header">
-      <div className="logo">
-        <Link to="/">
-          <img src="https://github.com/ShaivyaaSharma/GITHUB/blob/main/logo.png?raw=true" alt="Logo" className="logo-image" />
-        </Link>
-      </div>
-
+  <header className="header">
+   <div className="logo">
+    <Link to="/">
+    <img src="https://github.com/ShaivyaaSharma/GITHUB/blob/main/logo.png?raw=true" alt="Logo" className="logo-image" />
+    </Link>
+  </div>
+  
       {user && <SearchBar />}
 
       <ul>

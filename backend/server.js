@@ -5,8 +5,7 @@ const dotenv = require('dotenv').config();
 const cors = require('cors'); 
 const path = require('path');
 const mongoose = require('mongoose');
-const qaRoutes = require('./routes/qaRoutes');
-const inventorActions = require('./routes/InventoryActions')
+
 
 // 📌 Import Local Modules
 const { errorHandler } = require('./middleware/errorMiddleware');
@@ -17,11 +16,13 @@ const ticketRoutes = require("./routes/ticketRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const reportRoutes = require("./routes/ReportRoutes"); 
 const FormatsRoutes = require('./routes/FormatsRoutes');
+const qaRoutes = require('./routes/qaRoutes');
+const SummaryRoutes = require('./routes/SummaryRoutes');
 const inventoryActions = require('./routes/InventoryActions');
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 // ✅ Debugging Environment Variables
 console.log("🔑 JWT_SECRET:", process.env.JWT_SECRET ? "Loaded ✅" : "Missing ❌");
@@ -35,7 +36,7 @@ app.use(cors({
     // origin:["https://alliedwebapp.vercel.app", "https://backend-services-theta.vercel.app"],
     origin: "*",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 // Optional but helpful
@@ -67,7 +68,8 @@ app.use("/api/reports", reportRoutes);
 app.use('/api', spareRoutes);
 app.use('/api/formats', FormatsRoutes);
 app.use('/api/qa', qaRoutes);
-app.use('/api/inventory', inventoryActions);
+app.use('/api', SummaryRoutes);
+app.use('/api', inventoryActions);
 
 
 // 📌 Default Root Route
@@ -138,11 +140,6 @@ app.listen(PORT, () => {
 // Export app for Vercel
 module.exports = app;
 
-const express = require("express");
-const joginiRoutes = require("./routes/joginiRoutes");
 
-app.use(express.json());
 
-app.use("/api", joginiRoutes);
 
-module.exports = app;

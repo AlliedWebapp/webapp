@@ -24,6 +24,7 @@ import OtherReports from './pages/OtherReports';
 import Formats from './pages/Formats';
 import QASubmit from './pages/QASubmit';
 import QAList from './pages/QAList';
+import InventoryManager from './pages/InventoryManager';
 
 function App() {
   return (
@@ -56,7 +57,8 @@ function App() {
               <Route path="/improvement-report-details/:id" element={<ImprovementReportDetails />} />
               <Route path="/formats" element={<Formats />} />
               <Route path="/qa" element={<QASubmit />} />
-              <Route path="/qa/list" element={<QAList />} />    
+              <Route path="/qa/list" element={<QAList />} /> 
+              <Route path="/inventory-manager" element={<InventoryManager />} />   
             </Route>
           </Routes>
         </div>

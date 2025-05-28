@@ -1,21 +1,35 @@
 const mongoose = require("mongoose");
 
 const kuwarsiSchema = new mongoose.Schema({
-  srNo: { type: Number, required: true }, // "SR. NO."
-  nameOfMaterials: { type: String, required: true }, // "NAME OF MATERIALS"
-  openingBalance: { type: String, required: true }, // "OPENING BALANCE"
-  receivedDuringMonth: { type: String, default: "Nil" }, // "RECEIVED DURING THE MONTH"
-  total: { type: [String], default: [] }, // "TOTAL" (Array with two values)
-  issueDuringMonth: { type: String, default: "Nil" }, // "ISSUE DURING THE MONTH"
-  issueDuringYear: { type: String, default: "Nil" }, // "ISSUE DURING THE YEAR (from 1 Jan 2025)"
-  closingBalance: { type: String, required: true }, // "CLOSING BALANCE"
-  specification: { type: String, default: "" }, // "SPECIFICATION"
-  make: {
-    manufacture: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
+  "SR. NO.": { type: Number, immutable: true }, // "SR. NO."
+  "NAME OF MATERIALS": { type: String, required: true }, // "NAME OF MATERIALS"
+  "OPENING BALANCE": { type: String, required: true }, // "OPENING BALANCE"
+  "RECEIVED DURING THE MONTH": { type: String, default: "Nil" }, // "RECEIVED DURING THE MONTH"
+  TOTAL: { type: [String], default: [] }, // "TOTAL" (Array with two values)
+  "ISSUE DURING THE MONTH": { type: String, default: "Nil" }, // "ISSUE DURING THE MONTH"
+  "ISSUE DURING THE YEAR ( from 1 jan 2025)": { type: String, default: "Nil" }, // "ISSUE DURING THE YEAR (from 1 Jan 2025)"
+  "CLOSING BALANCE": { type: String, required: true }, // "CLOSING BALANCE"
+  SPECIFICATION: { type: String, default: "" }, // "SPECIFICATION"
+  MAKE: {
+    MANUFACTURE: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
   },
-  remarks: { type: String, default: "" }, // "REMARKS"
+  REMARKS: { type: String, default: "" }, // "REMARKS"
   spareCount: { type: Number, default: 0 } 
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
+
+// 🚀 Auto-increment srNo on new docs
+kuwarsiSchema.pre("validate", async function(next) {
+  if (this.isNew) {
+    const last = await this.constructor
+      .findOne({}, { srNo: 1 })
+      .sort({ srNo: -1 })
+      .lean();
+    this.srNo = last && typeof last.srNo === "number"
+      ? last.srNo + 1
+      : 1;
+  }
+  next();
+});
 
 const Kuwarsi = mongoose.model("Kuwarsi", kuwarsiSchema, "Kuwarsi"); 
 module.exports = Kuwarsi;

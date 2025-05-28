@@ -23,8 +23,8 @@ const Inventory = () => {
     const collections = {
       Jogini: {
         name: "Jogini",
-        headers: ["Spare Description", "Vendor", "Month", "Opening Stock", "Monthly Consumption", "Closing Stock", "SpareCount"],
-        dbFields: ["Spare Discription", "Make.Vendor", "Month", "OPENING STOCK ( NOS )", "Monthly Consumption ( NOS )", "CLOSING STOCK ( NOS )", "spareCount"],
+        headers: ["Spare Description", "Vendor", "Month", "Opening Stock", "Received Qty", "Monthly Consumption", "Closing Stock", "SpareCount"],
+        dbFields: ["Spare Discription", "Make.Vendor", "Month", "OPENING STOCK ( NOS )", "RECEIVED QTY ( NOS )", "Monthly Consumption ( NOS )", "CLOSING STOCK ( NOS )", "spareCount"],
       },
       Shong: {
         name: "Shong",
@@ -38,13 +38,13 @@ const Inventory = () => {
       },
       SDLLPsalun: {
         name: "SDLLP Salun",
-        headers: ["Name of Materials", "Opening Balance", "Received during the month", "Total", "Issue during the month", "Issue during the year ", "Closing Balance", "Specification", "Manufacture", "Types", "SpareCount"],
-        dbFields: ["NAME OF MATERIALS", "OPENING BALANCE", "RECEIVED DURING THE MONTH", "TOTAL", "ISSUE DURING THE MONTH", "ISSUE DURING THE YEAR (from 1st Jan 2025)", "CLOSING BALANCE", "SPECIFICATION", "MAKE.MANUFACTURE", "Types", "spareCount"],
+        headers: ["Name of Materials", "Opening Balance", "Received during the month", "Issue during the month", "Issue during the year ", "Closing Balance", "Specification", "Manufacture", "Types", "SpareCount"],
+        dbFields: ["NAME OF MATERIALS", "OPENING BALANCE", "RECEIVED DURING THE MONTH", "ISSUE DURING THE MONTH", "ISSUE DURING THE YEAR (from 1st Jan 2025)", "CLOSING BALANCE", "SPECIFICATION", "MAKE.MANUFACTURE", "Types", "spareCount"],
       },
       Kuwarsi: {
         name: "Kuwarsi",
-        headers: ["Name of Materials", "Opening balance", "Received during the month", "Total", "Issue during the month", "Issue during the year", "Closing balance", "Specification", "Manufacture", "Remarks", "SpareCount"],
-        dbFields: ["NAME OF MATERIALS", "OPENING BALANCE", "RECEIVED DURING THE MONTH", "TOTAL", "ISSUE DURING THE MONTH", "ISSUE DURING THE YEAR ( from 1 jan 2025)", "CLOSING BALANCE", "SPECIFICATION", "MAKE.MANUFACTURE", "REMARKS", "spareCount"],
+        headers: ["Name of Materials", "Opening balance", "Received during the month", "Issue during the month", "Issue during the year", "Closing balance", "Specification", "Manufacture", "Remarks", "SpareCount"],
+        dbFields: ["NAME OF MATERIALS", "OPENING BALANCE", "RECEIVED DURING THE MONTH", "ISSUE DURING THE MONTH", "ISSUE DURING THE YEAR ( from 1 jan 2025)", "CLOSING BALANCE", "SPECIFICATION", "MAKE.MANUFACTURE", "REMARKS", "spareCount"],
       },
     };
     return collections[collection] || { name: "", headers: [], dbFields: [] };
