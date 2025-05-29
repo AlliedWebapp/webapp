@@ -114,28 +114,20 @@ const GeneratorServiceReport = () => {
     <div className="generator-service-report">
       <BackButton url="/tickets" className="back-button" />
       <header className="header">
-        <h2>Service Report</h2>
+        <h2>Plant Fault Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
-        <p><strong>Service Report for Ticket ID: {ticketId}</strong></p>
+        <p><strong> Report for Ticket ID: {ticketId}</strong></p>
       </header>
 
       <form onSubmit={handleSubmit}>
   <div className="form-row">
     <div className="form-group">
-      <label>SR No</label>
+      <label>Report No.</label>
       <input type="text" name="srNo" value={formData.srNo} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Customer Name</label>
+      <label>Project Name</label>
       <input type="text" name="customerName" value={formData.customerName} onChange={handleChange} />
-    </div>
-    <div className="form-group">
-      <label>Installation Site Address</label>
-      <textarea name="installationAddress" rows="2" value={formData.installationAddress} onChange={handleChange} />
-    </div>
-    <div className="form-group">
-      <label>Customer Site ID</label>
-      <input type="text" name="siteId" value={formData.siteId} onChange={handleChange} />
     </div>
     <div className="form-group">
       <label>Date of Commissioning</label>
@@ -150,11 +142,11 @@ const GeneratorServiceReport = () => {
       <input type="text" name="state" value={formData.state} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Rating (KVA/HP)</label>
+      <label>Unit Rating</label>
       <input type="text" name="rating" value={formData.rating} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Engine Model</label>
+      <label> Model No.</label>
       <input type="text" name="engineModel" value={formData.engineModel} onChange={handleChange} />
     </div>
     <div className="form-group">
@@ -162,7 +154,7 @@ const GeneratorServiceReport = () => {
       <input type="text" name="engineSerial" value={formData.engineSerial} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Genset Serial Number</label>
+      <label>Serial Number</label>
       <input type="text" name="gensetSerial" value={formData.gensetSerial} onChange={handleChange} />
     </div>
     <div className="form-group">
@@ -178,7 +170,7 @@ const GeneratorServiceReport = () => {
       <input type="datetime-local" name="taskEnd" value={formData.taskEnd} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Problem Summary</label>
+      <label>Fault Summary</label>
       <textarea name="problemSummary" rows="2" value={formData.problemSummary} onChange={handleChange} />
     </div>
     <div className="form-group">
@@ -196,6 +188,10 @@ const GeneratorServiceReport = () => {
     <div className="form-group">
       <label>Customer Remarks</label>
       <textarea name="customerRemarks" rows="3" value={formData.customerRemarks} onChange={handleChange} />
+    </div>
+       <div className="form-group">
+      <label>Recommendation for future</label>
+      <textarea name="recommendations" rows="3" value={formData.recommendations} onChange={handleChange} />
     </div>
     <div className="form-group">
       <label>Engineer Name</label>

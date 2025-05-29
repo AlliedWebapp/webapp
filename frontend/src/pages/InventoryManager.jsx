@@ -109,8 +109,15 @@ export default function InventoryManager() {
         Authorization: `Bearer ${user.token}`,
       },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch items");
+       .then(async (res) => {
+        if (!res.ok) {
+          // if inventory-only user hitting unauthorized project
+          if (res.status === 403) {
+            const errRes = await res.json();
+            throw new Error(errRes.message || "Access denied: You cannot access this project");
+          }
+          throw new Error("Failed to fetch items");
+        }
         return res.json();
       })
       .then((json) => {
@@ -282,38 +289,29 @@ export default function InventoryManager() {
       : `${API_URL}/api/${projectKey}/${modal.id}`;
     
     // Format the data to handle nested fields
-    const formattedData = formatNestedFields(modal.data, projectKey);
-    
-    // Debug logs to see what data is being sent
-    console.log('Project:', projectKey);
-    console.log('Update data:', formattedData);
-    console.log('Update fields:', Object.keys(formattedData));
-    
-    const opts = {
-      method: modal.mode === "add" ? "POST" : "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify(formattedData),
-    };
+     const formattedData = formatNestedFields(modal.data, projectKey);
 
     try {
-      const res = await fetch(url, opts);
+      const res = await fetch(url, {
+        method: modal.mode === "add" ? "POST" : "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(formattedData),
+      });
       if (!res.ok) {
         const err = await res.json();
-        console.error('Server error response:', err);
         throw new Error(err.message || "Save failed");
       }
       toast.success(`Item ${modal.mode === "add" ? "created" : "updated"}!`);
       closeModal();
-      // refresh
-      const refreshed = await (await fetch(
-        `${API_URL}/api/${projectKey}`,
-        {
+      // refresh list
+      const refreshed = await (
+        await fetch(`${API_URL}/api/${projectKey}`, {
           headers: { Authorization: `Bearer ${user.token}` },
-        }
-      )).json();
+        })
+      ).json();
       setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
     } catch (err) {
       toast.error(err.message);
@@ -322,17 +320,28 @@ export default function InventoryManager() {
     }
   };
 
+  // Loading spinner
   if (loading) return <Spinner />;
-  if (error)
-    return (
-      <div className="error-container">
-        <h3>Error: {error}</h3>
-        <button onClick={closeModal} className="btn">
-          Dismiss
-        </button>
-      </div>
-    );
 
+  if (error) {
+    return (
+      <div
+        className="error-container"
+        style={{
+          color: "red",
+          fontSize: "1rem",
+          fontWeight: "bold",
+          padding: 16,
+          margin: 20,
+        }}
+      >
+       <p>{error}</p>
+      <div style={{ marginTop: 12 }}>
+        <BackButton url="/" />
+      </div>
+    </div>
+    );
+  }
   const cfg = PROJECTS[projectKey] || null; 
   const descKey = cfg?.columns?.[0]?.key ?? ""; // first column
 

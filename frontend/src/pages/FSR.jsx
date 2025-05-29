@@ -111,8 +111,8 @@ function ViewFSR() {
         <div className="ticket-headings">
           <div>FSR ID</div>
           <div>Date</div>
-          <div>Customer</div>
-          <div>Site</div>
+          <div>Project Name</div>
+          <div>Engineer Name</div>
           <div></div>
         </div>
 
@@ -121,8 +121,8 @@ function ViewFSR() {
             <div className="ticket" key={fsr._id}>
               <div data-label="FSR ID">{fsr.fsrId}</div>
               <div data-label="Date">{new Date(fsr.createdAt).toLocaleDateString()}</div>
-              <div data-label="Customer">{fsr.customerName}</div>
-              <div data-label="Site">{fsr.installationAddress}</div>
+              <div data-label="Project Name">{fsr.customerName}</div>
+              <div data-label="Engineer Name">{fsr.engineerName}</div>
               <div>
                 <button
                   className="btn btn-sm btn-outline"

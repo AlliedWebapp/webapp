@@ -65,11 +65,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/reports", reportRoutes);
+app.use('/api',  inventoryActions);
 app.use('/api', spareRoutes);
 app.use('/api/formats', FormatsRoutes);
 app.use('/api/qa', qaRoutes);
 app.use('/api', SummaryRoutes);
-app.use('/api', inventoryActions);
 
 
 // 📌 Default Root Route
