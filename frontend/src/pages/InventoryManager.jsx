@@ -497,19 +497,20 @@ export default function InventoryManager() {
                 {isOpen && (
                   <div
                     style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      right: 0,
+                      position: "fixed",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
                       backgroundColor: "lightgrey",
                       border: "black 1px solid",
-                      borderRadius: "0 0 8px 8px",
-                      maxHeight: "200px",
+                      borderRadius: "8px",
+                      maxHeight: "80vh",
                       overflowY: "auto",
                       overflowX: "hidden",
                       zIndex: 1000,
-                      marginTop: "2px",
-                      width: "400px"
+                      width: "90%",
+                      maxWidth: "400px",
+                      WebkitOverflowScrolling: "touch"
                     }}
                   >
                     {filteredItems.map((it) => {
@@ -527,9 +528,11 @@ export default function InventoryManager() {
                             setIsOpen(false);
                           }}
                           style={{
-                            padding: "6px 12px",
+                            padding: "12px",
                             cursor: "pointer",
                             wordBreak: "break-word",
+                            borderBottom: "1px solid #ccc",
+                            touchAction: "manipulation",
                             ":hover": {
                               backgroundColor: "#e0e0e0"
                             }
