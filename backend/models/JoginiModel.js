@@ -13,7 +13,8 @@ Make: {
     "CLOSING STOCK ( NOS )": { type: Number, default: 0 },
     "MSL (Maximum Stock Level - To be required always at site as per urgency) ( QTY )": { type: Number, default: 0 },
     SIGN: { type: String, trim: true },
-    spareCount: { type: Number, default: 0 } // ✅ Added Spareount field
+    spareCount: { type: Number, default: 0 },
+    picture: { data: Buffer, contentType: String },
 }, { timestamps: true, collection: "Jogini" });
 
 joginiSchema.pre("validate", async function(next) {

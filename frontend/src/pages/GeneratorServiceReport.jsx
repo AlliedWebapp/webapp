@@ -16,8 +16,6 @@ const GeneratorServiceReport = () => {
   const [formData, setFormData] = useState({
     srNo: "",
     customerName: "",
-    installationAddress: "", 
-    siteId: "",
     commissioningDate: "",   
     instanceId: "",
     state: "",
@@ -33,6 +31,7 @@ const GeneratorServiceReport = () => {
     checklist: "",
     engineerRemarks: "",
     customerRemarks: "",
+    recommendations: "",
     engineerName: "",
     customerContact: "",
     customerEmail: "",

@@ -14,7 +14,8 @@ const shongSchema = new mongoose.Schema({
   "In Stock": { type: String, required: true }, // "In Stock"
   Remarks: { type: String, default: "" }, // "Remarks"
   Types: { type: String, default: "" }, // "Types"
-  spareCount: { type: Number, default: 0 }
+  spareCount: { type: Number, default: 0 },
+   picture: { data: Buffer, contentType: String },
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
 
 // 🚀 Pre-validate hook to auto-increment sNo

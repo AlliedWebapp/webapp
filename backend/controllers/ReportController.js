@@ -52,9 +52,8 @@ exports.submitFSR = async (req, res, next) => {
     }
 
     const {
+      srNo,
       customerName,
-      installationAddress,
-      siteId,
       commissioningDate,
       instanceId,
       state,
@@ -70,13 +69,14 @@ exports.submitFSR = async (req, res, next) => {
       checklist,
       engineerRemarks,
       customerRemarks,
+      recommendations,
       engineerName,
       customerContact,
       customerEmail,
     } = req.body;
 
     // Validate required fields
-    if (!customerName || !installationAddress || !siteId || !engineerName) {
+    if (!customerName || !engineerName) {
       console.error("Missing required fields:", { customerName, installationAddress, siteId, engineerName });
       throw new ErrorHandler(400, "Missing required fields");
     }
@@ -117,9 +117,8 @@ const workPhotos = req.files["workPhotos"]
     const newReport = new FSR({
       fsrId,
       ticketId,
+      srNo,
       customerName,
-      installationAddress,
-      siteId,
       commissioningDate,
       instanceId,
       state,
@@ -135,6 +134,7 @@ const workPhotos = req.files["workPhotos"]
       checklist,
       engineerRemarks,
       customerRemarks,
+      recommendations,
       engineerName,
       customerContact,
       customerEmail,

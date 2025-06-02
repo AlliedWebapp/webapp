@@ -13,8 +13,10 @@ const kuwarsiSchema = new mongoose.Schema({
   MAKE: {
     MANUFACTURE: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
   },
+  vendor: { type: String, default: "" }, // "vendor"
   REMARKS: { type: String, default: "" }, // "REMARKS"
-  spareCount: { type: Number, default: 0 } 
+  spareCount: { type: Number, default: 0 },
+ picture: { data: Buffer, contentType: String },
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
 
 // 🚀 Auto-increment srNo on new docs

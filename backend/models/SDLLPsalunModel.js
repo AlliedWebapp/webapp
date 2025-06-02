@@ -13,8 +13,10 @@ const sdllpSalunSchema = new mongoose.Schema({
   MAKE: {
     MANUFACTURE: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
   },
+  vendor: { type: String, default: "" }, // "vendor"
   Types: { type: String, default: "" }, // "Types"
-  spareCount: { type: Number, default: 0 }
+  spareCount: { type: Number, default: 0 },
+ picture: { data: Buffer, contentType: String },
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically
 
 // auto-increment srNo
