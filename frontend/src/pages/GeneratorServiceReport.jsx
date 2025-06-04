@@ -61,31 +61,29 @@ const GeneratorServiceReport = () => {
       return;
     }
 
-    console.log("Submitting FSR for user:", user);
-    console.log("Form data before submission:", formData);
-
-    const submitData = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === "workPhotos") {
-        if (value && value.length > 0) {
-          value.forEach((file) => {
-            console.log("Appending work photo:", file.name);
-            submitData.append("workPhotos", file);
-          });
-        }
-      } else if (value != null) {
-        console.log(`Appending ${key}:`, value);
-        submitData.append(key, value);
-      }
-    });
-
-    // Add ticketId to the form data
-    submitData.append("ticketId", ticketId);
-    console.log("Added ticketId:", ticketId);
+    // Disable submit button to prevent double submission
+    const submitButton = e.target.querySelector('.submit-btn');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
 
     try {
-      console.log("Submitting FSR with data:", Object.fromEntries(submitData));
-      const res = await fetch(`${API_URL}/api/reports/submit-fsr`, {
+      const submitData = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "workPhotos") {
+          if (value && value.length > 0) {
+            value.forEach((file) => {
+              submitData.append("workPhotos", file);
+            });
+          }
+        } else if (value != null) {
+          submitData.append(key, value);
+        }
+      });
+
+      // Add ticketId to the form data
+      submitData.append("ticketId", ticketId);
+
+      const response = await fetch(`${API_URL}/api/reports/submit-fsr`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${user.token}`
@@ -93,19 +91,20 @@ const GeneratorServiceReport = () => {
         body: submitData,
       });
 
-      const json = await res.json();
-      console.log("FSR submission response:", json);
+      const data = await response.json();
 
-      if (res.ok) {
+      if (response.ok) {
         alert("Report submitted successfully!");
         window.location.href = "/fsr";
       } else {
-        console.error("FSR submission failed:", json);
-        throw new Error(json.message || json.error || "Submit failed");
+        throw new Error(data.message || "Failed to submit report");
       }
     } catch (error) {
       console.error("Error submitting FSR:", error);
-      alert(error.message);
+      alert(error.message || "Failed to submit report. Please try again.");
+      // Re-enable submit button on error
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit Report';
     }
   };
 
