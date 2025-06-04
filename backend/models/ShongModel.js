@@ -5,15 +5,20 @@ const shongSchema = new mongoose.Schema({
  "Description of Material": { type: String, required: true }, // "Description of Material"
   Make: { type: String, required: true }, // "Make"
   Vendor: { type: String, required: true }, // "Vendor"
+  "Opening Balance": { type: String, required: true }, // "Opening Balance"
+  "Received during Month": { type: String, default: "" }, // "Received during Month"
+  "Issued during Month": { type: String, default: "" }, // "Issued during Month"
+  "Issued during Year": { type: String, default: "" }, // "Issued during Year"
+  "Closing Balance": { type: String, required: true }, // "Closing Balance"
   Code: {
     Specification: { type: String, default: "" } // "Code" -> "Specification"
   },
   Place: { type: String, required: true }, // "Place"
   Rate: { type: String, default: "" }, // "Rate"
-  Qty: { type: String, default: "No." }, // "Qty."
   "In Stock": { type: String, required: true }, // "In Stock"
   Remarks: { type: String, default: "" }, // "Remarks"
   Types: { type: String, default: "" }, // "Types"
+  Remarks: { type: String, default: "" }, // "Remarks"
   spareCount: { type: Number, default: 0 },
    picture: { data: Buffer, contentType: String },
 }, { timestamps: true }); // Adds createdAt & updatedAt fields automatically

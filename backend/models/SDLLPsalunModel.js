@@ -5,7 +5,6 @@ const sdllpSalunSchema = new mongoose.Schema({
   "NAME OF MATERIALS": { type: String, required: true }, // "NAME OF MATERIALS"
   "OPENING BALANCE": { type: String, required: true }, // "OPENING BALANCE"
   "RECEIVED DURING THE MONTH": { type: String, default: "Nil" }, // "RECEIVED DURING THE MONTH"
-   TOTAL: { type: [Schema.Types.Mixed], default: [] },
   "ISSUE DURING THE MONTH": { type: String, default: "Nil" }, // "ISSUE DURING THE MONTH"
   "ISSUE DURING THE YEAR (from 1st Jan 2025)": { type: String, default: "Nil" }, // "ISSUE DURING THE YEAR (from 1st Jan 2025)"
   "CLOSING BALANCE": { type: String, required: true }, // "CLOSING BALANCE"
@@ -14,6 +13,10 @@ const sdllpSalunSchema = new mongoose.Schema({
     MANUFACTURE: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
   },
   vendor: { type: String, default: "" }, // "vendor"
+  Place: { type: String, required: true }, // "Place"
+  Rate: { type: String, default: "" }, // "Rate"
+  "IN STOCK": { type: String, required: true }, // "IN STOCK"
+  Remarks: { type: String, default: "" }, // "Remarks"
   Types: { type: String, default: "" }, // "Types"
   spareCount: { type: Number, default: 0 },
  picture: { data: Buffer, contentType: String },
@@ -33,5 +36,6 @@ sdllpSalunSchema.pre("validate", async function(next) {
   next();
 });
 
-const SDLLPsalun = mongoose.model("SDLLPsalun", sdllpSalunSchema, "SDLLPsalun"); 
+const SDLLPsalun = mongoose.models.SDLLPsalun || mongoose.model("SDLLPsalun", sdllpSalunSchema, "SDLLPsalun");
+
 module.exports = SDLLPsalun;

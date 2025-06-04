@@ -5,7 +5,6 @@ const kuwarsiSchema = new mongoose.Schema({
   "NAME OF MATERIALS": { type: String, required: true }, // "NAME OF MATERIALS"
   "OPENING BALANCE": { type: String, required: true }, // "OPENING BALANCE"
   "RECEIVED DURING THE MONTH": { type: String, default: "Nil" }, // "RECEIVED DURING THE MONTH"
-  TOTAL: { type: [String], default: [] }, // "TOTAL" (Array with two values)
   "ISSUE DURING THE MONTH": { type: String, default: "Nil" }, // "ISSUE DURING THE MONTH"
   "ISSUE DURING THE YEAR ( from 1 jan 2025)": { type: String, default: "Nil" }, // "ISSUE DURING THE YEAR (from 1 Jan 2025)"
   "CLOSING BALANCE": { type: String, required: true }, // "CLOSING BALANCE"
@@ -14,6 +13,10 @@ const kuwarsiSchema = new mongoose.Schema({
     MANUFACTURE: { type: String, default: "" }, // "MAKE" -> "MANUFACTURE"
   },
   vendor: { type: String, default: "" }, // "vendor"
+  Place: { type: String, required: true }, // "Place"
+  Rate: { type: String, default: "" }, // "Rate"
+  "In Stock": { type: String, required: true }, // "IN STOCK"
+  Types: { type: String, default: "" }, // "Types"
   REMARKS: { type: String, default: "" }, // "REMARKS"
   spareCount: { type: Number, default: 0 },
  picture: { data: Buffer, contentType: String },

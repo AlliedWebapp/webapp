@@ -511,7 +511,7 @@ select:focus {
 
 /* Table container to handle horizontal scrolling */
 .table-container {
-  width: 100%;
+  width: 80%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
@@ -534,7 +534,8 @@ th, td {
   white-space: normal;
   word-wrap: break-word;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 2;
+  width: 80px;
 }
 
 th {
@@ -555,8 +556,8 @@ td {
 /* Specific styles for shong and solding tables */
 .table-container.shong-table,
 .table-container.solding-table {
-  width: 100%;
-  margin: 0;
+  width: 80%;
+  margin: 0 auto;
   padding: 0;
 }
 
@@ -578,8 +579,8 @@ td {
 /* Responsive styles for mobile devices */
 @media (max-width: 768px) {
   .table-container {
-    width: 100%;
-    margin: 0;
+    width: 90%;
+    margin: 0 auto;
     padding: 0;
   }
 
@@ -2822,13 +2823,13 @@ mark {
   transition: top 0.1s, left 0.1s;
 }
 
-/* (Optional) Tweak the nav buttons’ spacing so they’re easy to hit */
+/* (Optional) Tweak the nav buttons' spacing so they're easy to hit */
 .nav-button {
   margin: 0 0.5rem;
   cursor: pointer;
 }
 
-/* (Optional) If you want the “active” match highlighted differently: */
+/* (Optional) If you want the "active" match highlighted differently: */
 mark.active-match {
   background-color: hsl(57, 40%, 52%); /* a bit brighter for the current one */
 }
@@ -2857,7 +2858,7 @@ mark.active-match {
     padding: 0 2.5rem 0 0.75rem;
   }
 
-  /* 3) Tuck the clear “×” inside properly */
+  /* 3) Tuck the clear "×" inside properly */
   .clear-search {
     position: relative !important;
     right: 1rem !important;
@@ -2865,7 +2866,7 @@ mark.active-match {
     transform: translateY(-50%) !important;
   }
 
-  /* 4) Drop “No matches found” below the bar */
+  /* 4) Drop "No matches found" below the bar */
   .no-matches-inline {
     position: static !important;
     display: block;
