@@ -115,7 +115,7 @@ export default function InventoryManager() {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  
+
 
   useEffect(() => {
     if (!user?.token) {
@@ -327,12 +327,12 @@ export default function InventoryManager() {
 
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
   if (!user?.token) {
     return toast.error("Not authorized");
   }
 
-  setLoading(true);
+    setLoading(true);
 
 
   const formData = new FormData();
@@ -372,27 +372,27 @@ export default function InventoryManager() {
       body: formData,
     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Save failed");
-    }
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Save failed");
+      }
 
     toast.success(modal.mode === "add" ? "Item created!" : "Item updated!");
-    closeModal();
+      closeModal();
 
     
     const refreshed = await (
       await fetch(`${API_URL}/api/${projectKey}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
+          headers: { Authorization: `Bearer ${user.token}` },
       })
     ).json();
-    setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
-  } catch (err) {
-    toast.error(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <Spinner />;
 
@@ -430,39 +430,39 @@ export default function InventoryManager() {
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
       <div style={{ padding: 20 }}>
-        <BackButton url="/" />
+      <BackButton url="/" />
         <h1 style={{ marginBottom: 50 }}>Manage Inventory</h1>
 
-        {/* Project selector */}
-        <div style={{ fontSize: "1.3rem", fontWeight: "bold", marginBottom: 12 }}>
-          Select Project:&nbsp;
-          <select
-            value={projectKey}
-            onChange={(e) => setProjectKey(e.target.value)}
-            style={{
-              fontSize: "1rem",
-              padding: "0.5rem 1rem",
-              borderStyle: "solid",
-              borderWidth: "2px",
-              borderColor: "grey",
-              borderRadius: "8px",
-              cursor: "pointer",
+      {/* Project selector */}
+<div style={{ fontSize: "1.3rem", fontWeight: "bold", marginBottom: 12 }}>
+  Select Project:&nbsp;
+  <select
+    value={projectKey}
+    onChange={(e) => setProjectKey(e.target.value)}
+    style={{
+      fontSize: "1rem",
+      padding: "0.5rem 1rem",
+      borderStyle: "solid",
+      borderWidth: "2px",
+      borderColor: "grey",
+      borderRadius: "8px",
+      cursor: "pointer",
               color: "black",
-              marginBottom: 52,
-            }}
-          >
+      marginBottom: 52,
+    }}
+  >
             <option value="" disabled>
               Select a project
             </option>
-            {Object.entries(PROJECTS).map(([key, { label }]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+    {Object.entries(PROJECTS).map(([key, { label }]) => (
+      <option key={key} value={key}>
+        {label}
+      </option>
+    ))}
+  </select>
+</div>
 
-        {/* Instructional text */}
+{/* Instructional text */}
         <div
           style={{
             marginBottom: 20,
@@ -471,31 +471,31 @@ export default function InventoryManager() {
             fontStyle: "italic",
           }}
         >
-          To add a new item, click the button below:
-        </div>
+  To add a new item, click the button below:
+</div>
 
-        {/* Add‐new button */}
-        <div style={{ marginBottom: 50 }}>
-          <button
-            onClick={openAdd}
-            style={{
-              fontSize: "1rem",
-              padding: "0.5rem 1rem",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              cursor: "pointer",
-              backgroundColor: "#4CAF50",
-              color: "white",
+{/* Add‐new button */}
+<div style={{ marginBottom: 50 }}>
+  <button
+    onClick={openAdd}
+    style={{
+      fontSize: "1rem",
+      padding: "0.5rem 1rem",
+      fontWeight: "bold",
+      borderRadius: "8px",
+      cursor: "pointer",
+      backgroundColor: "#4CAF50",
+      color: "white",
               border: "black 1px solid",
-            }}
-          >
-            Add New Item
-          </button>
-        </div>
+    }}
+  >
+    Add New Item
+  </button>
+</div>
 
-        {/* Load existing dropdown */}
+      {/* Load existing dropdown */}
         {cfg && (
-          <div style={{ marginBottom: 32 }}>
+      <div style={{ marginBottom: 32 }}>
             <div
               style={{
                 marginRight: 8,
@@ -505,20 +505,20 @@ export default function InventoryManager() {
                 fontStyle: "italic",
               }}
             >
-              To update an item, click the dropdown below:
-            </div>
+          To update an item, click the dropdown below:
+        </div>
             <div style={{ position: 'relative', marginBottom: "250px" }}>
               <div
                 onClick={() => setIsOpen(!isOpen)}
-                style={{
+          style={{
                   display: "inline-block",
-                  padding: "6px 12px",
-                  borderRadius: 8,
+            padding: "6px 12px",
+            borderRadius: 8,
                   border: "black 1px solid",
-                  width: 300,
-                  fontSize: "1rem",
-                  cursor: "pointer",
-                  backgroundColor: "lightgrey",
+            width: 300,
+            fontSize: "1rem",
+            cursor: "pointer",
+            backgroundColor: "lightgrey",
                   position: "relative",
                   backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')",
                   backgroundRepeat: "no-repeat",
@@ -566,10 +566,10 @@ export default function InventoryManager() {
                     {filteredItems.map((it) => {
                       let label = it;
                       descKey
-                        .split(/[\.\[\]]/)
-                        .filter(Boolean)
+              .split(/[\.\[\]]/)
+              .filter(Boolean)
                         .forEach((k) => (label = label ? label[k] : ""));
-                      return (
+            return (
                         <div
                           key={it._id}
                           onClick={() => {
@@ -588,33 +588,33 @@ export default function InventoryManager() {
                             }
                           }}
                         >
-                          {label}
+                {label}
                         </div>
-                      );
-                    })}
+            );
+          })}
                   </div>
                 )}
               </div>
             </div>
-          </div>
+      </div>
         )}
 
         {/* Modal for Add/Edit */}
         {modal.mode && cfg && (
-          <div
-            style={{
-              position: "fixed",
-              top: 40,
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "#fff",
-              padding: 24,
-              width: 400,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              zIndex: 1000,
-              borderRadius: 6,
-            }}
-          >
+        <div
+          style={{
+            position: "fixed",
+            top: 40,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#fff",
+            padding: 24,
+            width: 400,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            zIndex: 1000,
+            borderRadius: 6,
+          }}
+        >
             <div style={{ position: "relative" }}>
               <button
                 onClick={closeModal}
@@ -637,9 +637,9 @@ export default function InventoryManager() {
               >
                 ×
               </button>
-              <h3 style={{ marginTop: 0 }}>
-                {modal.mode === "add" ? "Add New" : "Edit"} {cfg.label}
-              </h3>
+          <h3 style={{ marginTop: 0 }}>
+            {modal.mode === "add" ? "Add New" : "Edit"} {cfg.label}
+          </h3>
             </div>
 
           
@@ -651,42 +651,42 @@ export default function InventoryManager() {
                 paddingRight: 8,
               }}
             >
-              <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
            
-                {cfg.columns.map((c) => {
-                  let value = modal.data;
-                  c.key
-                    .split(/[\.\[\]]/)
-                    .filter(Boolean)
-                    .forEach((k) => (value = value ? value[k] : ""));
+            {cfg.columns.map((c) => {
+              let value = modal.data;
+              c.key
+                .split(/[\.\[\]]/)
+                .filter(Boolean)
+                .forEach((k) => (value = value ? value[k] : ""));
 
-                  return (
-                    <div
-                      key={c.key}
-                      style={{ marginBottom: 12, display: "flex" }}
-                    >
-                      <label
-                        style={{
-                          width: 140,
-                          lineHeight: "32px",
-                        }}
-                      >
-                        {c.label}:
-                      </label>
-                      <input
-                        name={c.key}
-                        value={value ?? ""}
-                        onChange={handleChange}
-                        style={{
-                          flex: 1,
-                          padding: "6px 8px",
-                          borderRadius: 4,
-                          border: "1px solid #ccc",
-                        }}
-                      />
-                    </div>
-                  );
-                })}
+              return (
+                <div
+                  key={c.key}
+                  style={{ marginBottom: 12, display: "flex" }}
+                >
+                  <label
+                    style={{
+                      width: 140,
+                      lineHeight: "32px",
+                    }}
+                  >
+                    {c.label}:
+                  </label>
+                  <input
+                    name={c.key}
+                    value={value ?? ""}
+                    onChange={handleChange}
+                    style={{
+                      flex: 1,
+                      padding: "6px 8px",
+                      borderRadius: 4,
+                      border: "1px solid #ccc",
+                    }}
+                  />
+                </div>
+              );
+            })}
 
               
                 <div
@@ -717,41 +717,41 @@ export default function InventoryManager() {
                   />
                 </div>
 
-                
-                <div style={{ textAlign: "right", marginTop: 16 }}>
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    style={{
-                      padding: "6px 12px",
-                      marginRight: 8,
-                      background: "#6c757d",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 4,
+
+            <div style={{ textAlign: "right", marginTop: 16 }}>
+              <button
+                type="button"
+                onClick={closeModal}
+                style={{
+                  padding: "6px 12px",
+                  marginRight: 8,
+                  background: "#6c757d",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 4,
                       cursor: "pointer",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    style={{
-                      padding: "6px 12px",
-                      background: "#007bff",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 4,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={{
+                  padding: "6px 12px",
+                  background: "#007bff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 4,
                       cursor: "pointer",
-                    }}
-                  >
-                    {modal.mode === "add" ? "Create" : "Update"}
-                  </button>
-                </div>
-              </form>
+                }}
+              >
+                {modal.mode === "add" ? "Create" : "Update"}
+              </button>
             </div>
-          </div>
-        )}
+          </form>
+            </div>
+        </div>
+      )}
       </div>
     </div>
   );

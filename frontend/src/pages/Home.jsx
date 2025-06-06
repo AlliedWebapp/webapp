@@ -24,6 +24,10 @@ function Home() {
         <FaEdit />  Manage Inventory
       </Link>
 
+      <Link to="/consumables" className="btn btn-block">
+        <FaBoxOpen />  Consumable Inventory
+      </Link>
+
       <Link to="/FSR" className="btn btn-block">
         <FaFileAlt /> View FSR
       </Link>

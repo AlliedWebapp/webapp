@@ -148,7 +148,7 @@ const GeneratorServiceReport = () => {
       <input type="text" name="engineModel" value={formData.engineModel} onChange={handleChange} />
     </div>
     <div className="form-group">
-      <label>Engine Serial Number</label>
+      <label>Machine Serial Number</label>
       <input type="text" name="engineSerial" value={formData.engineSerial} onChange={handleChange} />
     </div>
     <div className="form-group">

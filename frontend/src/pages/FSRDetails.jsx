@@ -186,7 +186,7 @@ function FSRDetails() {
               <td>{fsr.rating}</td>
               <td className="fsr-label">Model No.</td>
               <td>{fsr.engineModel}</td>
-              <td className="fsr-label"> Engine Serial No.</td>
+              <td className="fsr-label"> Machine Serial No.</td>
               <td>{fsr.engineSerial}</td>
             </tr>
             <tr>

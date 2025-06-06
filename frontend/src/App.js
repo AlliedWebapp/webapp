@@ -25,6 +25,7 @@ import Formats from './pages/Formats';
 import QASubmit from './pages/QASubmit';
 import QAList from './pages/QAList';
 import InventoryManager from './pages/InventoryManager';
+import Consumables from './pages/consumables';
 
 function App() {
   return (
@@ -58,7 +59,8 @@ function App() {
               <Route path="/formats" element={<Formats />} />
               <Route path="/qa" element={<QASubmit />} />
               <Route path="/qa/list" element={<QAList />} /> 
-              <Route path="/inventory-manager" element={<InventoryManager />} />   
+              <Route path="/inventory-manager" element={<InventoryManager />} />  
+              <Route path="/consumables" element={<Consumables />} /> 
             </Route>
           </Routes>
         </div>

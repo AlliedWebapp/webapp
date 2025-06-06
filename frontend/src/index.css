@@ -2829,14 +2829,14 @@ mark.active-match {
     width: 100%   !important;
     right: 250px  !important;
     margin: 90px    !important;
-  }
+}
 
   /* 2) Make the input fill its container */
   .search-input {
     width: 100% !important;
-    height: 40px;
+  height: 40px;
     padding: 0 2.5rem 0 0.75rem;
-  }
+}
 
   /* 3) Tuck the clear "×" inside properly */
   .clear-search {
@@ -2844,7 +2844,7 @@ mark.active-match {
     right: 1rem !important;
     top: 10px   !important;
     transform: translateY(-50%) !important;
-  }
+}
 
   /* 4) Drop "No matches found" below the bar */
   .no-matches-inline {
@@ -2854,7 +2854,7 @@ mark.active-match {
     margin: 0.8rem 0 0.5rem 0px;
     color: red;
     font-size: 1rem;
-  }
+}
 
   /* 5) Float the nav arrows fixed atthe bottom center */
   .search-controls {
@@ -2866,12 +2866,70 @@ mark.active-match {
     padding: 0.4rem 0.6rem;
     border-radius: 9px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    gap: 0.5rem;
+  gap: 0.5rem;
     z-index: 1002;
-  }
+}
 
   /* 6) Slightly enlarge touch targets on mobile */
   .nav-button {
     padding: 0.4rem 0.6rem;
+}
+}
+
+/* Consumables.css */
+
+/* Table styles for desktop/laptop */
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  display: table;
+}
+
+.records-table th,
+.records-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.records-table thead tr {
+  background-color: #f1f1f1;
+}
+
+/* Hide mobile cards on desktop */
+.mobile-records-list {
+  display: none;
+}
+
+/* Responsive styles for mobile */
+@media (max-width: 900px) {
+  .records-table {
+    display: none;
+  }
+  .mobile-records-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .mobile-record-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+    padding: 18px;
+    font-size: 15px;
+    border: 1px solid #eee;
+  }
+  .mobile-record-card .field-label {
+    font-weight: bold;
+    color: #555;
+    margin-right: 6px;
+  }
+  .mobile-record-card .field-row {
+    margin-bottom: 7px;
+    display: flex;
+    flex-wrap: wrap;
   }
 }

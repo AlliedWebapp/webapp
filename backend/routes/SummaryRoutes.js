@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Ticket = require('../models/ticketModel');
 const FSR = require('../models/FSRModel');
-const { protect, blockInventoryOnly } = require('../middleware/authMiddleware');
+const Consumable = require('../models/ConsumableModel');
 
-router.use(protect, blockInventoryOnly);
+const { protect, blockInventoryOnly} = require('../middleware/authMiddleware');
+
+router.use(protect);
 
 const adminEmails = ["bhaskarudit02@gmail.com", "ss@gmail.com"];
 
@@ -16,7 +18,7 @@ const projectEmailMap = {
   Kuwarsi: "kuwarsi@alliedwebapp",
 };
 
-router.get('/monthly-summary', async (req, res) => {
+router.get('/monthly-summary', blockInventoryOnly, async (req, res) => {
   const year = parseInt(req.query.year);
   const month = parseInt(req.query.month);
   const project = req.query.project;
@@ -29,29 +31,42 @@ router.get('/monthly-summary', async (req, res) => {
 
   let ticketFilter = { createdAt: { $gte: start, $lt: end } };
   let fsrFilter = { createdAt: { $gte: start, $lt: end } };
+  let consumableFilter = { date: { $gte: start, $lt: end } };
 
-   const isAdmin = adminEmails.includes(userEmail);
+  const isAdmin = adminEmails.includes(userEmail);
 
   if (isAdmin) {
-   
     if (project && projectEmailMap[project]) {
       ticketFilter.createdBy = projectEmailMap[project];
       fsrFilter.createdBy = projectEmailMap[project];
+      consumableFilter.createdBy = projectEmailMap[project];
     }
   } else {
     ticketFilter.createdBy = userEmail;
     fsrFilter.createdBy = userEmail;
+    consumableFilter.createdBy = userEmail;
   }
 
   try {
-    const [openTicketsCount, closedTicketsCount, fsrCreatedCount, tickets, fsrs] = await Promise.all([
+    const [openTicketsCount, closedTicketsCount, fsrCreatedCount, consumablesCount, tickets, fsrs, consumables] = await Promise.all([
       Ticket.countDocuments({ ...ticketFilter, status: 'new' }),
       Ticket.countDocuments({ ...ticketFilter, status: 'close' }),
       FSR.countDocuments(fsrFilter),
+      Consumable.countDocuments(consumableFilter),
       Ticket.find(ticketFilter),
       FSR.find(fsrFilter),
+      Consumable.find(consumableFilter)
     ]);
-    res.json({ openTicketsCount, closedTicketsCount, fsrCreatedCount, tickets, fsrs });
+    
+    res.json({ 
+      openTicketsCount, 
+      closedTicketsCount, 
+      fsrCreatedCount, 
+      consumablesCount,
+      tickets, 
+      fsrs,
+      consumables 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

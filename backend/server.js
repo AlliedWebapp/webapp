@@ -19,6 +19,7 @@ const FormatsRoutes = require('./routes/FormatsRoutes');
 const qaRoutes = require('./routes/qaRoutes');
 const SummaryRoutes = require('./routes/SummaryRoutes');
 const inventoryActions = require('./routes/InventoryActions');
+const consumableRoutes = require('./routes/consumable');
 
 // 📌 Load Environment Variables
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
@@ -70,6 +71,7 @@ app.use('/api', spareRoutes);
 app.use('/api/formats', FormatsRoutes);
 app.use('/api/qa', qaRoutes);
 app.use('/api', SummaryRoutes);
+app.use('/api/consumables', consumableRoutes);
 
 
 // 📌 Default Root Route

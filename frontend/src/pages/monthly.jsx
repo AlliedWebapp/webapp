@@ -147,6 +147,11 @@ const MonthlySummary = () => {
             <div className="summary-box-label">FSR Created</div>
             <div className="summary-box-value">{summary.fsrCreatedCount ?? 0}</div>
           </div>
+          <div className="summary-box">
+          <div className="summary-box-label">Consumables Added</div>
+         <div className="summary-box-value">{summary.consumablesCount ?? 0}</div>
+       </div>
+
         </div>
       )}
 
@@ -165,6 +170,7 @@ const MonthlySummary = () => {
           >
             <option value="tickets">Tickets List</option>
             <option value="fsrs">FSR List</option>
+            <option value="consumables">Consumables List</option>
           </select>
         </div>
       )}
@@ -199,7 +205,7 @@ const MonthlySummary = () => {
           <thead>
             <tr>
               <th>FSR ID</th>
-              <th>Installation Address</th>
+              <th>Project Name</th>
               <th>Engineer</th>
               <th>Created At</th>
             </tr>
@@ -208,7 +214,7 @@ const MonthlySummary = () => {
             {summary.fsrs.map(fsr => (
               <tr key={fsr._id}>
                 <td>{fsr.fsrId}</td>
-                <td>{fsr.installationAddress}</td>
+                <td>{fsr.customerName}</td>
                 <td>{fsr.engineerName}</td>
                 <td>{new Date(fsr.createdAt).toLocaleDateString()}</td>
               </tr>
@@ -216,7 +222,34 @@ const MonthlySummary = () => {
           </tbody>
         </table>
       )}
+
+      {displayList === "consumables" && summary?.consumables && summary.consumables.length > 0 && (
+  <table className="summary-table">
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Date</th>
+        <th>Issued Qty</th>
+        <th>Vendor</th>
+        <th>Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {summary.consumables.map(cons => (
+        <tr key={cons._id}>
+          <td>{cons.item_name}</td>
+          <td>{new Date(cons.date).toLocaleDateString()}</td>
+          <td>{cons.issued_qty}</td>
+          <td>{cons.vendor}</td>
+          <td>{cons.cost}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
     </div>
+    
   );
 };
 
