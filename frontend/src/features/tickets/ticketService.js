@@ -23,12 +23,7 @@ const createTicket = async (ticketData, token) => {
 
 // Get user tickets with caching
 const getTickets = async token => {
-  // Check if we have a valid cache
-  const now = Date.now();
-  if (ticketsCache && lastFetchTime && (now - lastFetchTime < CACHE_DURATION)) {
-    return ticketsCache;
-  }
-
+  // Always fetch fresh data when getting tickets
   const config = {
     headers: {
       Authorization: `Bearer ${token}`
@@ -39,7 +34,7 @@ const getTickets = async token => {
     const response = await axios.get(API_URL, config);
     // Update cache
     ticketsCache = response.data;
-    lastFetchTime = now;
+    lastFetchTime = Date.now();
     return response.data;
   } catch (error) {
     // If there's an error but we have cached data, return it

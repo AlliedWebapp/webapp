@@ -94,6 +94,33 @@ const GeneratorServiceReport = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Send email notification
+        const emailData = new FormData();
+        emailData.append("_subject", `New Service Report Submitted`);
+        
+        const details = `Service Report Details:
+ 
+        FSR ID: ${data.fsrId}
+Project Name: ${formData.customerName}
+Instance ID: ${formData.instanceId}
+Engineer Name: ${formData.engineerName}
+Problem Summary: ${formData.problemSummary}
+Task Start: ${formData.taskStart}
+Task End: ${formData.taskEnd}
+Customer Email: ${formData.customerEmail}
+Created By: ${user.email}`;
+
+        emailData.append("Details", details);
+        emailData.append("_captcha", "false");
+
+        await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+          method: "POST",
+          body: emailData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
         alert("Report submitted successfully!");
         window.location.href = "/fsr";
       } else {

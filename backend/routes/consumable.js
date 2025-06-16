@@ -31,4 +31,42 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleted = await Consumable.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Not found" });
+
+    // Get all remaining consumables sorted by sr_no
+    const remainingConsumables = await Consumable.find().sort({ sr_no: 1 });
+    
+    // Update sr_no for all remaining records
+    for (let i = 0; i < remainingConsumables.length; i++) {
+      await Consumable.findByIdAndUpdate(
+        remainingConsumables[i]._id,
+        { sr_no: i + 1 }
+      );
+    }
+
+    res.json({ message: "Consumable deleted and serial numbers updated" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch("/:id", async (req, res) => {
+  try {
+    const updated = await Consumable.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+
+
 module.exports = router;

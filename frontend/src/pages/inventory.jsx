@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import BackButton from "../components/BackButton";
+import OrientationAlert from "../components/OrientationAlert";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -245,6 +246,216 @@ const Inventory = () => {
     return null;
   };
 
+  // Add this function at the top level of the component
+  const findItemNameField = (item, collection) => {
+    // Debug log the raw item
+    console.log("Finding name field for item:", {
+      id: item._id,
+      collection,
+      allFields: Object.keys(item)
+    });
+
+    const fieldMappings = {
+      jogini: [
+        "Spare Discription",
+        "Spare Description",
+        "spare discription",
+        "spare description",
+        "SPARE DISCRIPTION",
+        "SPARE DESCRIPTION"
+      ],
+      shong: [
+        "Description of Material",
+        "description of material",
+        "DESCRIPTION OF MATERIAL",
+        "Description",
+        "description"
+      ],
+      solding: [
+        "Description of Material",
+        "description of material",
+        "DESCRIPTION OF MATERIAL",
+        "Description",
+        "description"
+      ],
+      SDLLPsalun: [
+        "NAME OF MATERIALS",
+        "name of materials",
+        "Name of Materials",
+        "Name",
+        "name"
+      ],
+      Kuwarsi: [
+        "NAME OF MATERIALS",
+        "name of materials",
+        "Name of Materials",
+        "Name",
+        "name"
+      ]
+    };
+
+    // Get the fields to check for this collection
+    const fieldsToCheck = fieldMappings[collection.toLowerCase()] || ["item_name", "name", "Name"];
+
+    // First check if any of the expected fields exist
+    const existingField = fieldsToCheck.find(field => item[field] !== undefined);
+
+    if (!existingField) {
+      // No name field exists at all
+      return null;
+    }
+
+    // Now check if the existing field has a non-empty value
+    const value = item[existingField];
+    if (value === null || value === undefined || value === "") {
+      // Field exists but is empty
+      return "Unnamed";
+    }
+
+    // Field exists and has a value
+    return value;
+  };
+
+  // Update the checkLowStockAndNotify function to use findItemNameField
+  const checkLowStockAndNotify = async (items) => {
+    const lowStockThreshold = 10;
+    
+    console.log("Starting stock check for:", selectedCollection);
+    console.log("Total items to check:", items.length);
+    
+    // Get previous state from localStorage
+    const previousState = JSON.parse(localStorage.getItem('inventoryState') || '{}');
+    const currentState = {};
+    const lowStockItems = [];
+
+    // Process current items
+    items.forEach((item, index) => {
+      const itemId = item._id;
+      let currentStock;
+      
+      // Handle different types of spareCount values
+      if (typeof item.spareCount === 'number') {
+        currentStock = item.spareCount;
+      } else if (typeof item.spareCount === 'string') {
+        currentStock = parseInt(item.spareCount);
+      } else {
+        currentStock = 0;
+      }
+
+      // Find the item name using our helper function
+      const itemName = findItemNameField(item, selectedCollection);
+      
+      // Only add to currentState if we have a valid number
+      if (!isNaN(currentStock)) {
+        currentState[itemId] = currentStock;
+        
+        // Only add to lowStockItems if stock is below threshold AND not 0 AND name is present
+        // This is for notifications only
+        if (currentStock > 0 && currentStock < lowStockThreshold && itemName) {
+          console.log(`Low stock item found in ${selectedCollection}:`, {
+            id: itemId,
+            name: itemName,
+            stock: currentStock,
+            threshold: lowStockThreshold
+          });
+          
+          lowStockItems.push({
+            name: itemName,
+            stock: currentStock
+          });
+        }
+      }
+    });
+
+    // Update low stock items list for UI display
+    // This will show ALL items below threshold (including 0) in the table
+    const filteredItems = items.filter(item => {
+      let stock;
+      
+      if (typeof item.spareCount === 'number') {
+        stock = item.spareCount;
+      } else if (typeof item.spareCount === 'string') {
+        stock = parseInt(item.spareCount);
+      } else {
+        stock = 0;
+      }
+
+      const itemName = findItemNameField(item, selectedCollection);
+      
+      // Show in table if stock is below threshold (including 0) and name exists
+      return !isNaN(stock) && stock < lowStockThreshold && itemName;
+    });
+
+    console.log("Final filtered items:", {
+      totalItems: items.length,
+      filteredCount: filteredItems.length,
+      lowStockItems: filteredItems.map(item => ({
+        id: item._id,
+        name: findItemNameField(item, selectedCollection),
+        stock: item.spareCount,
+        rawItem: item
+      }))
+    });
+    setLowStockItems(filteredItems);
+
+    // Check if we need to send notification
+    let shouldSendNotification = false;
+
+    // Check if this is first load
+    if (Object.keys(previousState).length === 0) {
+      shouldSendNotification = lowStockItems.length > 0;
+      console.log("First load, notification needed:", shouldSendNotification);
+    } else {
+      // Check if any stock levels have changed
+      const changedItems = Object.keys(currentState).filter(itemId => 
+        currentState[itemId] !== previousState[itemId]
+      );
+      shouldSendNotification = changedItems.length > 0 && lowStockItems.length > 0;
+      console.log("Stock changes detected:", {
+        changedItems,
+        shouldSendNotification,
+        lowStockItemsCount: lowStockItems.length
+      });
+    }
+
+    // Save current state
+    localStorage.setItem('inventoryState', JSON.stringify(currentState));
+
+    // Send notification if needed
+    if (shouldSendNotification && lowStockItems.length > 0) {
+      console.log("Preparing to send notification for:", {
+        collection: selectedCollection,
+        lowStockItems
+      });
+
+      const emailData = new FormData();
+      emailData.append("_subject", `Low Stock Alert - ${selectedCollection}`);
+      
+      const details = `Low Stock Items in ${selectedCollection}:\n\n` +
+        lowStockItems.map(item => 
+          `Item: ${item.name}\nCurrent Stock: ${item.stock}\n`
+        ).join("\n");
+
+      emailData.append("Details", details);
+      emailData.append("_captcha", "false");
+      emailData.append("_template", "table");
+      emailData.append("_autoresponse", "false");
+
+      try {
+        await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+          method: "POST",
+          body: emailData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        console.log("Low stock notification sent successfully");
+      } catch (error) {
+        console.error("Error sending low stock notification:", error);
+      }
+    }
+  };
+
   const fetchInventory = useCallback(async () => {
     if (!selectedCollection) return;
 
@@ -272,10 +483,11 @@ const Inventory = () => {
 
       setInventory(items);
 
+      // Check for low stock items after fetching
+      await checkLowStockAndNotify(items);
+
       const details = getCollectionDetails(selectedCollection);
       setHeaders(details.headers);
-
-      setLowStockItems(items.filter((item) => item.spareCount < 10));
     } catch (err) {
       console.error("Error fetching inventory:", err);
       setInventory([]);
@@ -370,6 +582,7 @@ const Inventory = () => {
 
   return (
     <div>
+      <OrientationAlert />
       <BackButton url="/" />
       <h2>View Inventory</h2>
 
@@ -446,8 +659,23 @@ const Inventory = () => {
                                 .split(".")
                                 .reduce((obj, key) => obj?.[key], item)
                             : item?.[field] ?? "N/A";
-                          if (Array.isArray(value)) value = value.join(", ");
-                          return <td key={idx}>{value ?? "N/A"}</td>;
+                          
+                          // Handle different types of values
+                          if (value === null || value === undefined) {
+                            value = "N/A";
+                          } else if (typeof value === 'object') {
+                            // If it's an object, try to stringify it
+                            try {
+                              value = JSON.stringify(value);
+                            } catch (e) {
+                              value = "N/A";
+                            }
+                          } else {
+                            // Convert any other type to string
+                            value = String(value);
+                          }
+                          
+                          return <td key={idx}>{value}</td>;
                         }
                       )}
                       {/* Picture Button Cell */}
@@ -520,8 +748,23 @@ const Inventory = () => {
                               .split(".")
                               .reduce((obj, key) => obj?.[key], item)
                           : item?.[field] ?? "N/A";
-                        if (Array.isArray(value)) value = value.join(", ");
-                        return <td key={idx}>{value ?? "N/A"}</td>;
+                        
+                        // Handle different types of values
+                        if (value === null || value === undefined) {
+                          value = "N/A";
+                        } else if (typeof value === 'object') {
+                          // If it's an object, try to stringify it
+                          try {
+                            value = JSON.stringify(value);
+                          } catch (e) {
+                            value = "N/A";
+                          }
+                        } else {
+                          // Convert any other type to string
+                          value = String(value);
+                        }
+                        
+                        return <td key={idx}>{value}</td>;
                       }
                     )}
                     {/* Picture Button Column */}

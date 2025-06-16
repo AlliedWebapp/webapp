@@ -71,9 +71,6 @@ const MaintenanceReport = () => {
       }
     });
 
-    // Debug logging
-    console.log("Form Data:", Object.fromEntries(data));
-  
     try {
       const response = await fetch(`${API_URL}/api/reports/submit-maintenance-report`, {
         method: "POST",
@@ -84,10 +81,37 @@ const MaintenanceReport = () => {
       });
   
       if (response.ok) {
-        const result = await response.json();
-        console.log("Success Response:", result);
+        const data = await response.json();
+        // Send email notification
+        const emailData = new FormData();
+        emailData.append("_subject", `New Maintenance Report Submitted`);
+        
+        const details = `Maintenance Report Details:
+Report ID: ${data.mrId}
+Unit: ${formData.unit}
+Outage Date: ${formData.outageDate}
+Outage Time: ${formData.outageTime}
+Defect Reported: ${formData.defectReported}
+Investigation Outcome: ${formData.investigationOutcome}
+Corrective Action: ${formData.correctiveAction}
+Follow Up: ${formData.followUp}
+Repair Cost: ${formData.repairCost}
+Generation Loss: ${formData.generationLoss}
+Created By: ${user.email}`;
+
+        emailData.append("Details", details);
+        emailData.append("_captcha", "false");
+
+        await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+          method: "POST",
+          body: emailData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
         alert("Maintenance Report submitted successfully!");
-        window.location.href = "/view-maintenance-reports"; // Redirect to view page
+        window.location.href = "/view-maintenance-reports";
       } else {
         const errorData = await response.json();
         console.error("Error Response:", errorData);

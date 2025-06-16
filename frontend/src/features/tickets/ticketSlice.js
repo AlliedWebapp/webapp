@@ -154,6 +154,7 @@ export const ticketSlice = createSlice({
       })
       .addCase(getTickets.pending, (state) => {
         state.isLoading = true
+        state.tickets = [] // Clear tickets while loading
       })
       .addCase(getTickets.fulfilled, (state, action) => {
         state.isLoading = false

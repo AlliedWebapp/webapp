@@ -2933,3 +2933,66 @@ mark.active-match {
     flex-wrap: wrap;
   }
 }
+
+.slow-network-alert {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideDown 0.3s ease-out;
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+}
+
+.alert-message {
+  flex: 1;
+}
+
+.alert-message p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+}
+
+.alert-close-button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #856404;
+  padding: 0.5rem;
+  margin-left: 1rem;
+  transition: color 0.2s ease;
+}
+
+.alert-close-button:hover {
+  color: #533f03;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+} 

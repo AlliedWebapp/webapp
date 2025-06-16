@@ -7,44 +7,96 @@ import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 
 function NewTicket() {
-  const { user} = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const { isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.tickets
   );
 
-  const [projectname,setprojectname] = useState("");
-  const [sitelocation,setsitelocation] = useState("");
-  const [projectlocation,setprojectlocation] = useState("");
-  const [fault,setfault] = useState("");
-  const [issue,setissue] = useState("");
+  const [projectname, setprojectname] = useState("");
+  const [sitelocation, setsitelocation] = useState("");
+  const [projectlocation, setprojectlocation] = useState("");
+  const [fault, setfault] = useState("");
+  const [issue, setissue] = useState("");
   const [description, setdescription] = useState("");
   const [date, setdate] = useState("");
   const [spare, setspare] = useState("");
   const [rating, setrating] = useState("");
   const [images, setImages] = useState([]);
-  
- 
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+const sendEmailNotification = async () => {
+  const formData = new FormData();
 
-  useEffect(() => {
-    if (isError) {
-      toast.error(message);
-    }
+  // Set the subject dynamically
+  formData.append("_subject", `New ticket created by project: ${projectname}`);
 
-    if (isSuccess) {
-      dispatch(reset());
+  // Create a custom details body
+  const details = `
+    Project Name: ${projectname}
+Site Location: ${sitelocation}
+Project Location: ${projectlocation}
+Fault: ${fault}
+Date to attend: ${date}
+Spare Needed: ${spare}
+DG Rating: ${rating}
+User Email: ${user?.email || ""}`;
+
+  formData.append(" Ticket Details", details);
+
+  // Optionally, keep other fields if you want them as separate fields
+  // formData.append("Project Name", projectname);
+  // formData.append("Site Location", sitelocation);
+  // ...etc
+
+  formData.append("_captcha", "false");
+
+  try {
+    await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+      method: "POST",
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+  } catch (error) {
+    // handle error if needed
+  }
+};
+
+
+useEffect(() => {
+  if (isError) {
+    toast.error(message);
+  }
+
+  if (isSuccess) {
+    sendEmailNotification();
+    dispatch(reset());
+    // Add a small delay before navigation to ensure loading state is shown
+    setTimeout(() => {
       navigate("/tickets");
-    }
-  }, [dispatch, isError, isSuccess, navigate, message]);
+    }, 100);
+  }
+  // eslint-disable-next-line
+}, [dispatch, isError, isSuccess, navigate, message]);
 
   const onSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validate required fields
-    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating) {
-      toast.error('Please fill in all fields');
+    if (
+      !projectname ||
+      !sitelocation ||
+      !projectlocation ||
+      !fault ||
+      !issue ||
+      !description ||
+      !date ||
+      !spare ||
+      !rating
+    ) {
+      toast.error("Please fill in all fields");
       return;
     }
 
@@ -58,7 +110,7 @@ function NewTicket() {
     formData.append("date", date);
     formData.append("spare", spare);
     formData.append("rating", rating);
-  
+
     images.forEach((image) => {
       formData.append("images", image);
     });
@@ -77,24 +129,25 @@ function NewTicket() {
       </section>
 
       <form onSubmit={onSubmit}>
+       
         <section className="form">
           <div className="form-group">
             <label htmlFor="projectname">Project Name</label>
             <select
-                name="projectname"
-                id="projectname"
-                value={projectname}
-                onChange={(e) => setprojectname(e.target.value)}
-              >
-                <option value="" disabled>
-                  Select from the options below
-                </option>
-                <option value="Shong">Shong</option>
-                <option value="Solding">Solding</option>
-                <option value="Jogini-II">Jogini-II</option>
-                <option value="JHP Kuwarsi-II">JHP Kuwarsai</option>
-                <option value="SDLLP Salun">SDLLP Salun</option>
-              </select>
+              name="projectname"
+              id="projectname"
+              value={projectname}
+              onChange={(e) => setprojectname(e.target.value)}
+            >
+              <option value="" disabled>
+                Select from the options below
+              </option>
+              <option value="Shong">Shong</option>
+              <option value="Solding">Solding</option>
+              <option value="Jogini-II">Jogini-II</option>
+              <option value="JHP Kuwarsi-II">JHP Kuwarsai</option>
+              <option value="SDLLP Salun">SDLLP Salun</option>
+            </select>
           </div>
         </section>
 
@@ -102,14 +155,14 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="sitelocation">Site Location</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={sitelocation}
-                name="Site Location"
-                id="sitelocation"
-                onChange={(e) => setsitelocation(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={sitelocation}
+              name="Site Location"
+              id="sitelocation"
+              onChange={(e) => setsitelocation(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
@@ -117,14 +170,14 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="projectlocation">Project Location</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={projectlocation}
-                name="Project Location"
-                id="projectlocation"
-                onChange={(e) => setprojectlocation(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={projectlocation}
+              name="Project Location"
+              id="projectlocation"
+              onChange={(e) => setprojectlocation(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
@@ -132,14 +185,14 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="fault">Fault</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={fault}
-                name="Fault"
-                id="fault"
-                onChange={(e) => setfault(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={fault}
+              name="Fault"
+              id="fault"
+              onChange={(e) => setfault(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
@@ -147,14 +200,14 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="issue">Issue</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={issue}
-                name="Issue"
-                id="issue"
-                onChange={(e) => setissue(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={issue}
+              name="Issue"
+              id="issue"
+              onChange={(e) => setissue(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
@@ -162,14 +215,14 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="description">Description</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={description}
-                name="Description"
-                id="description"
-                onChange={(e) => setdescription(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={description}
+              name="Description"
+              id="description"
+              onChange={(e) => setdescription(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
@@ -177,15 +230,15 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="date">Date to attend</label>
             <input
-                type="date"
-                className="form-control"
-                placeholder=""
-                value={date}
-                name="Date to attend"
-                id="date"
-                onChange={(e) => setdate(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></input>
+              type="date"
+              className="form-control"
+              placeholder=""
+              value={date}
+              name="Date to attend"
+              id="date"
+              onChange={(e) => setdate(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></input>
           </div>
         </section>
 
@@ -193,14 +246,14 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="spare">Spare Needed</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={spare}
-                name="Spare Needed"
-                id="spare"
-                onChange={(e) => setspare(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={spare}
+              name="Spare Needed"
+              id="spare"
+              onChange={(e) => setspare(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
@@ -208,39 +261,38 @@ function NewTicket() {
           <div className="form-group">
             <label htmlFor="rating">DG Rating</label>
             <textarea
-                className="form-control"
-                placeholder=""
-                value={rating}
-                name="DG Rating"
-                id="rating"
-                onChange={(e) => setrating(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
-              ></textarea>
+              className="form-control"
+              placeholder=""
+              value={rating}
+              name="DG Rating"
+              id="rating"
+              onChange={(e) => setrating(e.target.value)}
+              style={{ width: "100%", height: "50px", resize: "none" }}
+            ></textarea>
           </div>
         </section>
 
         <section className="form">
-            <div className="form-group">
-              <label htmlFor="images">Upload Photos</label>
-              <input
-                  type="file"
-                  id="images"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const selectedFiles = Array.from(e.target.files);
-                    if (selectedFiles.length > 4) {
-                      toast.error("You can only upload up to 4 images");
-                      // Clear file input
-                      e.target.value = "";
-                      return;
-                    }
-            
-                    setImages(selectedFiles);
-                  }}
-                />
-              </div>
-            </section>
+          <div className="form-group">
+            <label htmlFor="images">Upload Photos</label>
+            <input
+              type="file"
+              id="images"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const selectedFiles = Array.from(e.target.files);
+                if (selectedFiles.length > 4) {
+                  toast.error("You can only upload up to 4 images");
+                  // Clear file input
+                  e.target.value = "";
+                  return;
+                }
+                setImages(selectedFiles);
+              }}
+            />
+          </div>
+        </section>
 
         <div className="form-group">
           <button className="btn btn-block">Submit</button>

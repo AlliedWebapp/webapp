@@ -92,9 +92,6 @@ useEffect(() => {
     if (hodSign) data.append("hodSign", hodSign);
     if (plantSign) data.append("plantSign", plantSign);
   
-    // Debug logging
-    console.log("Form Data:", Object.fromEntries(data));
-  
     try {
       const response = await fetch(`${API_URL}/api/reports/submit-improvement-report`, {
         method: "POST",
@@ -105,10 +102,38 @@ useEffect(() => {
       });
   
       if (response.ok) {
-        const result = await response.json();
-        console.log("Success Response:", result);
+        const data = await response.json();
+        // Send email notification
+        const emailData = new FormData();
+        emailData.append("_subject", `New Improvement Report submitted`);
+        
+        const details = `Improvement Report Details:
+Report ID: ${data.irId}
+Department: ${formData.department}
+Location: ${formData.location}
+Objectives: ${formData.objectives}
+Concept Date: ${formData.concept_date}
+Implementation Date: ${formData.implementation_date}
+Resources Used: ${formData.resources}
+Man-Days: ${formData.mandays}
+Cost: ${formData.cost}
+Payback Period: ${formData.payback}
+End Result: ${formData.end_result}
+Created By: ${user.email}`;
+
+        emailData.append("Details", details);
+        emailData.append("_captcha", "false");
+
+        await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+          method: "POST",
+          body: emailData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
         alert("Improvement Report submitted successfully!");
-        window.location.href = "/view-improvement-reports"; // Redirect to view page
+        window.location.href = "/view-improvement-reports";
       } else {
         const errorData = await response.json();
         console.error("Error Response:", errorData);

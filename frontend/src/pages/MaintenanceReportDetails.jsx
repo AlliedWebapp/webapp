@@ -11,6 +11,7 @@ const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 
 
+
 const MaintenanceReportDetails = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -112,6 +113,22 @@ const MaintenanceReportDetails = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'N/A';
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -173,7 +190,7 @@ const MaintenanceReportDetails = () => {
             </tr>
             <tr>
               <td className="report-label">Outage Date</td>
-              <td className="report-value">{new Date(report.outageDate).toLocaleDateString()}</td>
+              <td className="report-value">{formatDate(report.outageDate)}</td>
               <td className="report-label">Outage Time</td>
               <td className="report-value">{report.outageTime}</td>
             </tr>

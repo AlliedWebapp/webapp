@@ -4,21 +4,22 @@ import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import { getTickets, reset } from "../features/tickets/ticketSlice";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 const TICKETS_PER_PAGE = 5; // Reduced page size for faster loading
 
 function Tickets() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { tickets, isLoading, isError, message } = useSelector(
     (state) => state.tickets
   );
-  const [hasFetched, setHasFetched] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState("createdAt");
   const [displayedTickets, setDisplayedTickets] = useState([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Memoized checkFSR function
   const checkFSR = useCallback(async (ticketId) => {
@@ -53,17 +54,19 @@ function Tickets() {
   useEffect(() => {
     const loadInitialTickets = async () => {
       try {
+        setIsInitialLoad(true);
         await dispatch(getTickets()).unwrap();
-        setHasFetched(true);
       } catch (error) {
         console.error("Error loading tickets:", error);
+      } finally {
+        setIsInitialLoad(false);
       }
     };
     loadInitialTickets();
     return () => {
       dispatch(reset());
     };
-  }, [dispatch]);
+  }, [dispatch, location.key]); // Add location.key to dependencies
 
   // Update displayed tickets when tickets or sort field changes
   useEffect(() => {
@@ -82,7 +85,18 @@ function Tickets() {
 
   const totalPages = Math.ceil((tickets?.length || 0) / TICKETS_PER_PAGE);
 
-  if (isLoading && !hasFetched) return <Spinner />;
+  if (isLoading || isInitialLoad) {
+    return (
+      <div className="loading-container" style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh' 
+      }}>
+        <Spinner />
+      </div>
+    );
+  }
 
   if (isError) {
     return (
