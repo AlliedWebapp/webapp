@@ -102,6 +102,17 @@ router.patch(
   }
 );
 
+// DELETE /api/inventory/jogini/:id
+router.delete("/jogini/:id", async (req, res) => {
+  try {
+    const deleted = await Jogini.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Jogini not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // ── Shong CRUD ─────────────────────────────────────────────────────────────────
 // POST /api/inventory/shong
 router.post(
@@ -178,6 +189,17 @@ router.patch(
     }
   }
 );
+
+// DELETE /api/inventory/shong/:id
+router.delete("/shong/:id", async (req, res) => {
+  try {
+    const deleted = await Shong.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Shong not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 // ── Solding CRUD ───────────────────────────────────────────────────────────────
 // POST /api/inventory/solding
@@ -256,6 +278,17 @@ router.patch(
   }
 );
 
+// DELETE /api/inventory/solding/:id
+router.delete("/solding/:id", async (req, res) => {
+  try {
+    const deleted = await Solding.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Solding not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // ── SDLLPsalun CRUD ────────────────────────────────────────────────────────────
 // POST /api/inventory/sdllpsalun
 router.post(
@@ -333,6 +366,17 @@ router.patch(
   }
 );
 
+// DELETE /api/inventory/sdllpsalun/:id
+router.delete("/sdllpsalun/:id", async (req, res) => {
+  try {
+    const deleted = await SDLLPsalun.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "SDLLPsalun not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // ── Kuwarsi CRUD ────────────────────────────────────────────────────────────────
 // POST /api/inventory/kuwarsi
 router.post(
@@ -409,5 +453,16 @@ router.patch(
     }
   }
 );
+
+// DELETE /api/inventory/kuwarsi/:id
+router.delete("/kuwarsi/:id", async (req, res) => {
+  try {
+    const deleted = await Kuwarsi.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: "Kuwarsi not found" });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 module.exports = router;

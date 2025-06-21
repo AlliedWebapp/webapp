@@ -208,6 +208,9 @@ const Inventory = () => {
   const [isImageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState("");
 
+  const [editedCounts, setEditedCounts] = useState({}); // { [id]: value }
+  const [savingId, setSavingId] = useState(null);
+
   useEffect(() => {
     if (selectedCollection) {
       localStorage.setItem("selectedCollection", selectedCollection);
@@ -519,20 +522,21 @@ const Inventory = () => {
     localStorage.setItem("selectedCollection", collection);
   }, []);
 
-  const updatespareCount = async (id, increment) => {
+  // New function to update spare count to a specific value
+  const updateSpareCountTo = async (id, newCount) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       if (!user || !user.token) {
         console.error("No user token found. Please log in.");
         return;
       }
-
+      setSavingId(id);
       const response = await axios.put(
         `${API_URL}/api/update-spare/`,
         {
           collectionName: selectedCollection,
           id,
-          increment,
+          increment: Number(newCount) - Number(inventory.find((item) => item._id === id)?.spareCount || 0),
         },
         {
           headers: {
@@ -540,7 +544,6 @@ const Inventory = () => {
           },
         }
       );
-
       if (response.data.success) {
         setInventory((prevInventory) =>
           prevInventory.map((item) =>
@@ -557,12 +560,16 @@ const Inventory = () => {
           );
           return updated.filter((item) => item.spareCount < 10);
         });
+        setEditedCounts((prev) => ({ ...prev, [id]: undefined }));
       }
     } catch (error) {
       console.error("Error updating spares count:", error);
       if (error.response?.status === 401) {
         console.error("Please log in again");
       }
+      alert(error.response?.data?.message || error.message || "Failed to update count");
+    } finally {
+      setSavingId(null);
     }
   };
 
@@ -642,8 +649,8 @@ const Inventory = () => {
                     {headers.map((header, index) => (
                       <th key={index}>{header}</th>
                     ))}
+                    <th>Adjust count</th>
                     <th>Picture</th>
-                    <th>Adjust</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -678,7 +685,48 @@ const Inventory = () => {
                           return <td key={idx}>{value}</td>;
                         }
                       )}
-                      {/* Picture Button Cell */}
+                      <td className="spares-btn-container">
+                        <input
+                          type="number"
+                          min={0}
+                          style={{ width: 70, padding: "4px 6px", fontSize: 14, borderRadius: 4, border: "1px solid #ccc", marginRight: 8 }}
+                          value={
+                            editedCounts[item._id] !== undefined
+                              ? editedCounts[item._id]
+                              : item.spareCount
+                          }
+                          disabled={savingId === item._id}
+                          onChange={e => {
+                            const val = e.target.value;
+                            if (/^\d*$/.test(val)) {
+                              setEditedCounts(prev => ({ ...prev, [item._id]: val }));
+                            }
+                          }}
+                          onBlur={e => {
+                            if (e.target.value === "") {
+                              setEditedCounts(prev => ({ ...prev, [item._id]: item.spareCount }));
+                            }
+                          }}
+                        />
+                        {(editedCounts[item._id] !== undefined && String(editedCounts[item._id]) !== String(item.spareCount)) && (
+                          <button
+                            onClick={() => updateSpareCountTo(item._id, editedCounts[item._id])}
+                            disabled={savingId === item._id || editedCounts[item._id] === ""}
+                            style={{
+                              padding: "4px 10px",
+                              background: "#4CAF50",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              fontSize: 14,
+                              cursor: savingId === item._id ? "not-allowed" : "pointer",
+                              marginLeft: 2,
+                            }}
+                          >
+                            {savingId === item._id ? "Saving..." : "Save"}
+                          </button>
+                        )}
+                      </td>
                       <td>
                         {item.picture && item.picture.data ? (
                           <button
@@ -697,21 +745,6 @@ const Inventory = () => {
                         ) : (
                           "—"
                         )}
-                      </td>
-
-                      <td className="spares-btn-container">
-                        <button
-                          className="spares-btn"
-                          onClick={() => updatespareCount(item._id, 1)}
-                        >
-                          ➕
-                        </button>
-                        <button
-                          className="spares-btn minus"
-                          onClick={() => updatespareCount(item._id, -1)}
-                        >
-                          ➖
-                        </button>
                       </td>
                     </tr>
                   ))}
@@ -733,8 +766,8 @@ const Inventory = () => {
                 {headers.map((header, index) => (
                   <th key={index}>{header}</th>
                 ))}
+                <th>Adjust count</th>
                 <th>Picture</th>
-                <th>Adjust</th>
               </tr>
             </thead>
             <tbody>
@@ -767,7 +800,48 @@ const Inventory = () => {
                         return <td key={idx}>{value}</td>;
                       }
                     )}
-                    {/* Picture Button Column */}
+                    <td className="spares-btn-container">
+                      <input
+                        type="number"
+                        min={0}
+                        style={{ width: 70, padding: "4px 6px", fontSize: 14, borderRadius: 4, border: "1px solid #ccc", marginRight: 8 }}
+                        value={
+                          editedCounts[item._id] !== undefined
+                            ? editedCounts[item._id]
+                            : item.spareCount
+                        }
+                        disabled={savingId === item._id}
+                        onChange={e => {
+                          const val = e.target.value;
+                          if (/^\d*$/.test(val)) {
+                            setEditedCounts(prev => ({ ...prev, [item._id]: val }));
+                          }
+                        }}
+                        onBlur={e => {
+                          if (e.target.value === "") {
+                            setEditedCounts(prev => ({ ...prev, [item._id]: item.spareCount }));
+                          }
+                        }}
+                      />
+                      {(editedCounts[item._id] !== undefined && String(editedCounts[item._id]) !== String(item.spareCount)) && (
+                        <button
+                          onClick={() => updateSpareCountTo(item._id, editedCounts[item._id])}
+                          disabled={savingId === item._id || editedCounts[item._id] === ""}
+                          style={{
+                            padding: "4px 10px",
+                            background: "#4CAF50",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            fontSize: 14,
+                            cursor: savingId === item._id ? "not-allowed" : "pointer",
+                            marginLeft: 2,
+                          }}
+                        >
+                          {savingId === item._id ? "Saving..." : "Save"}
+                        </button>
+                      )}
+                    </td>
                     <td>
                       {item.picture && item.picture.data ? (
                         <button
@@ -787,20 +861,6 @@ const Inventory = () => {
                       ) : (
                         "—"
                       )}
-                    </td>
-                    <td className="spares-btn-container">
-                      <button
-                        className="spares-btn"
-                        onClick={() => updatespareCount(item._id, 1)}
-                      >
-                        ➕
-                      </button>
-                      <button
-                        className="spares-btn minus"
-                        onClick={() => updatespareCount(item._id, -1)}
-                      >
-                        ➖
-                      </button>
                     </td>
                   </tr>
                 ))

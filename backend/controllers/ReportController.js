@@ -18,9 +18,24 @@ const bufferToDataUrl = (imgObj) => {
   return `data:${imgObj.contentType || 'image/jpeg'};base64,${Buffer.from(imgObj.data).toString('base64')}`;
 };
 
-// Function to generate a 4-digit unique fsr_id
-function generateFSRId() {
-  return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
+// Function to generate a 4-digit unique fsr_id with retry logic
+async function generateUniqueFSRId() {
+  let attempts = 0;
+  const maxAttempts = 10;
+  
+  while (attempts < maxAttempts) {
+    const fsrId = Math.floor(1000 + Math.random() * 9000);
+    
+    // Check if this ID already exists
+    const existingFSR = await FSR.findOne({ fsrId });
+    if (!existingFSR) {
+      return fsrId;
+    }
+    
+    attempts++;
+  }
+  
+  throw new Error("Unable to generate unique FSR ID after multiple attempts");
 }
 
 // Generate a 4-digit unique irId
@@ -35,6 +50,7 @@ function generateMRId() {
 
 //fsr
 exports.submitFSR = async (req, res, next) => {
+  let session;
   try {
     console.log("Submitting FSR for user:", req.user._id);
     console.log("Request body:", req.body);
@@ -42,10 +58,15 @@ exports.submitFSR = async (req, res, next) => {
 
     const { ticketId } = req.body;
 
+    // Start a database session for transaction
+    session = await mongoose.startSession();
+    session.startTransaction();
+
     // Check if FSR already exists for this ticket
-    const existingFSR = await FSR.findOne({ ticketId });
+    const existingFSR = await FSR.findOne({ ticketId }).session(session);
     if (existingFSR) {
       console.log("FSR already exists for ticket:", ticketId);
+      await session.abortTransaction();
       return res.status(400).json({ 
         message: "A Service Report already exists for this ticket ID" 
       });
@@ -77,31 +98,32 @@ exports.submitFSR = async (req, res, next) => {
 
     // Validate required fields
     if (!customerName || !engineerName) {
-      console.error("Missing required fields:", { customerName, installationAddress, siteId, engineerName });
+      console.error("Missing required fields:", { customerName, engineerName });
+      await session.abortTransaction();
       throw new ErrorHandler(400, "Missing required fields");
     }
 
     // Retrieve image buffers and content types for signatures and work photos
-const customerSignature = req.files["customerSignature"]?.[0]
-  ? {
-      data: req.files["customerSignature"][0].buffer,
-      contentType: req.files["customerSignature"][0].mimetype,
-    }
-  : null;
+    const customerSignature = req.files["customerSignature"]?.[0]
+      ? {
+          data: req.files["customerSignature"][0].buffer,
+          contentType: req.files["customerSignature"][0].mimetype,
+        }
+      : null;
 
-const engineerSignature = req.files["engineerSignature"]?.[0]
-  ? {
-      data: req.files["engineerSignature"][0].buffer,
-      contentType: req.files["engineerSignature"][0].mimetype,
-    }
-  : null;
+    const engineerSignature = req.files["engineerSignature"]?.[0]
+      ? {
+          data: req.files["engineerSignature"][0].buffer,
+          contentType: req.files["engineerSignature"][0].mimetype,
+        }
+      : null;
 
-const workPhotos = req.files["workPhotos"]
-  ? req.files["workPhotos"].map(file => ({
-      data: file.buffer,
-      contentType: file.mimetype,
-    }))
-  : [];
+    const workPhotos = req.files["workPhotos"]
+      ? req.files["workPhotos"].map(file => ({
+          data: file.buffer,
+          contentType: file.mimetype,
+        }))
+      : [];
 
     console.log("Files processed:", {
       hasCustomerSignature: !!customerSignature,
@@ -109,9 +131,9 @@ const workPhotos = req.files["workPhotos"]
       workPhotosCount: workPhotos.length
     });
 
-    // Generate a 4-digit fsr_id for each report
-    const fsrId = generateFSRId();
-    console.log("Generated FSR ID:", fsrId);
+    // Generate a unique 4-digit fsr_id with retry logic
+    const fsrId = await generateUniqueFSRId();
+    console.log("Generated unique FSR ID:", fsrId);
 
     // Create new FSR report with generated fsr_id
     const newReport = new FSR({
@@ -151,12 +173,16 @@ const workPhotos = req.files["workPhotos"]
       user: newReport.user
     });
 
-    // Save the new report to the database
-    const savedReport = await newReport.save();
+    // Save the new report to the database within the transaction
+    const savedReport = await newReport.save({ session });
     console.log("FSR report saved successfully:", {
       id: savedReport._id,
       fsrId: savedReport.fsrId
     });
+
+    // Commit the transaction
+    await session.commitTransaction();
+    console.log("Transaction committed successfully");
 
     res.status(201).json({ 
       message: "FSR submitted successfully!",
@@ -164,7 +190,41 @@ const workPhotos = req.files["workPhotos"]
     });
   } catch (err) {
     console.error("Error in submitFSR:", err);
+    
+    // Abort transaction if it exists
+    if (session) {
+      try {
+        await session.abortTransaction();
+        console.log("Transaction aborted due to error");
+      } catch (abortError) {
+        console.error("Error aborting transaction:", abortError);
+      }
+    }
+    
+    // Check for specific error types
+    if (err.code === 11000) {
+      // Duplicate key error
+      return res.status(400).json({ 
+        message: "A Service Report already exists for this ticket ID or FSR ID conflict occurred" 
+      });
+    }
+    
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ 
+        message: "Validation error: " + Object.values(err.errors).map(e => e.message).join(', ') 
+      });
+    }
+    
     next(err);
+  } finally {
+    // End session if it exists
+    if (session) {
+      try {
+        await session.endSession();
+      } catch (endError) {
+        console.error("Error ending session:", endError);
+      }
+    }
   }
 };
 

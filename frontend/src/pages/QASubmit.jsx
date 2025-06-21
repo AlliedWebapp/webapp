@@ -9,11 +9,19 @@ const API_URL = process.env.REACT_APP_API_BASE_URL;
 const QASubmit = () => {
   const [form, setForm] = useState({ question: '', answer: '' });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Disable submit button to prevent double submission
+    const submitButton = e.target.querySelector('.submit-btn');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
+    setIsSubmitting(true);
+    
     try {
       await axios.post(`${API_URL}/api/qa`, form, {
         headers: { 'Authorization': `Bearer ${user.token}` }
@@ -30,6 +38,10 @@ const QASubmit = () => {
           'Submission failed'
         );
       }
+      // Re-enable submit button on error
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit';
+      setIsSubmitting(false);
     }
   };
 
@@ -55,7 +67,9 @@ const QASubmit = () => {
           onChange={(e) => setForm({ ...form, answer: e.target.value })}
           required
         />
-        <button type="submit">Submit</button>
+        <button type="submit" className="submit-btn" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit'}
+        </button>
       </form>
     </div>
   );

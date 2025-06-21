@@ -70,7 +70,7 @@ const PROJECTS = {
     label: "SDLLP Salun",
     columns: [
       { key: "NAME OF MATERIALS", label: "Spare Description" },
-      { key: "vendor", label: "Vendor" },
+      { key: "vendor", label: "Vendor" }, 
       { key: "MAKE.MANUFACTURE", label: "Manufacture" },
       { key: "OPENING BALANCE", label: "Opening Balance" },
       { key: "RECEIVED DURING THE MONTH", label: "Received during Month" },
@@ -115,6 +115,8 @@ export default function InventoryManager() {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
 
   useEffect(() => {
@@ -729,11 +731,28 @@ export default function InventoryManager() {
                   color: "#fff",
                   border: "none",
                   borderRadius: 4,
-                      cursor: "pointer",
+                  cursor: "pointer",
                 }}
               >
                 Cancel
               </button>
+              {modal.mode === "edit" && (
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  style={{
+                    padding: "6px 12px",
+                    marginRight: 8,
+                    background: "#dc3545",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                  }}
+                >
+                  Delete
+                </button>
+              )}
               <button
                 type="submit"
                 style={{
@@ -742,7 +761,7 @@ export default function InventoryManager() {
                   color: "#fff",
                   border: "none",
                   borderRadius: 4,
-                      cursor: "pointer",
+                  cursor: "pointer",
                 }}
               >
                 {modal.mode === "add" ? "Create" : "Update"}
@@ -750,6 +769,97 @@ export default function InventoryManager() {
             </div>
           </form>
             </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: 32,
+              borderRadius: 10,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+              minWidth: 320,
+              textAlign: "center",
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 style={{ marginBottom: 16 }}>Confirm Deletion</h3>
+            <p style={{ marginBottom: 24 }}>Are you sure you want to delete this item? </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  padding: "8px 20px",
+                  background: "#6c757d",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                }}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!user?.token) return toast.error("Not authorized");
+                  setDeleting(true);
+                  try {
+                    const res = await fetch(`${API_URL}/api/${projectKey}/${modal.id}`, {
+                      method: "DELETE",
+                      headers: { Authorization: `Bearer ${user.token}` },
+                    });
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json.error || "Delete failed");
+                    toast.success("Item deleted!");
+                    setShowDeleteConfirm(false);
+                    closeModal();
+                    // Refresh list
+                    const refreshed = await (
+                      await fetch(`${API_URL}/api/${projectKey}`, {
+                        headers: { Authorization: `Bearer ${user.token}` },
+                      })
+                    ).json();
+                    setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
+                  } catch (err) {
+                    toast.error(err.message);
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+                style={{
+                  padding: "8px 20px",
+                  background: "#dc3545",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 4,
+                  cursor: deleting ? "not-allowed" : "pointer",
+                  fontSize: "1rem",
+                  opacity: deleting ? 0.7 : 1,
+                }}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
       </div>

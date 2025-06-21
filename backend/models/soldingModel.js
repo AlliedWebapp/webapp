@@ -5,17 +5,17 @@ const soldingSchema = new mongoose.Schema({
   "Description of Material": { type: String, required: true }, // "Description of Material"
   Make: { type: String, required: true }, // "Make"
   Vendor: { type: String, required: true }, // "Vendor"
-  "Opening Balance": { type: Number, required: true }, // "Opening Balance"
-  "Received during Month": { type: Number, default: 0 }, // "Received during Month"
-  "Issued during Month": { type: Number, default: 0 }, // "Issued during Month"
-  "Issued during Year": { type: Number, default: 0 }, // "Issued during Year"
-  "Closing Balance": { type: Number, required: true }, // "Closing Balance
+  "Opening Balance": { type: String, required: true }, // "Opening Balance"
+  "Received during Month": { type: String, default: "0" }, // "Received during Month"
+  "Issued during Month": { type: String, default: "0" }, // "Issued during Month"
+  "Issued during Year": { type: String, default: "0" }, // "Issued during Year"
+  "Closing Balance": { type: String, required: true }, // "Closing Balance"
   Code: {
     Specification: { type: String, default: "" } // "Code" -> "Specification"
   },
   Place: { type: String, required: true }, // "Place"
-  Rate: { type: Number, default: null }, // "Rate"
- "In Stock": { type: Number, required: true }, // "In Stock"
+  Rate: { type: String, default: null }, // "Rate"
+  "In Stock": { type: String, required: true }, // "In Stock"
   Remarks: { type: String, default: "" }, // "Remarks"
   TYPES: { type: String, default: "" }, // "TYPES"
   spareCount: { type: Number, default: 0 },

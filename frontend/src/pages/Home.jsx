@@ -16,6 +16,11 @@ function Home() {
         <FaTicketAlt /> View My Tickets
       </Link>
 
+       <Link to="/FSR" className="btn btn-block">
+        <FaFileAlt /> View FSR
+      </Link>
+      
+
       <Link to="/inventory" className="btn btn-block">
         <FaClipboardList /> View Inventory
       </Link>
@@ -28,9 +33,6 @@ function Home() {
         <FaBoxOpen />  Consumable Inventory
       </Link>
 
-      <Link to="/FSR" className="btn btn-block">
-        <FaFileAlt /> View FSR
-      </Link>
 
       <Link to="/monthly" className="btn btn-block">
         <FaCalendarAlt /> View Monthly Summary

@@ -7,6 +7,7 @@ import BackButton from "../components/BackButton";
 import { useSelector } from "react-redux";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
+const FSR_PER_PAGE = 8; // Show 8 FSRs per page
 
 // Helper function to convert buffer data to a base64 string
 const imageToBase64 = (buffer) => {
@@ -19,6 +20,9 @@ function ViewFSR() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayedFSRs, setDisplayedFSRs] = useState([]);
+  const [sortField, setSortField] = useState("createdAt");
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
@@ -90,6 +94,36 @@ function ViewFSR() {
     };
   }, [user]);
 
+  // Update displayed FSRs when fsrs, sort field, or current page changes
+  useEffect(() => {
+    if (!fsrs) return;
+
+    // Sort the FSRs based on the selected field
+    const sorted = [...fsrs].sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      
+      // Handle date sorting
+      if (sortField === "createdAt") {
+        return new Date(bValue) - new Date(aValue); // Newest first
+      }
+      
+      // Handle string sorting (case-insensitive)
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return aValue.toLowerCase().localeCompare(bValue.toLowerCase());
+      }
+      
+      // Default comparison
+      return aValue > bValue ? -1 : 1;
+    });
+
+    const start = (currentPage - 1) * FSR_PER_PAGE;
+    const end = start + FSR_PER_PAGE;
+    setDisplayedFSRs(sorted.slice(start, end));
+  }, [fsrs, sortField, currentPage]);
+
+  const totalPages = Math.ceil((fsrs?.length || 0) / FSR_PER_PAGE);
+
   // Loading spinner is shown while data is being fetched
   if (isLoading) return <Spinner />;
 
@@ -107,6 +141,20 @@ function ViewFSR() {
     <div className="fsr-container">
       <BackButton url="/" />
       <h1>Service Reports</h1>
+
+      {/* Sort Controls */}
+      <div className="ticket-controls">
+        <select
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+          className="sort-select"
+        >
+          <option value="createdAt">Date</option>
+          <option value="customerName">Project</option>
+          <option value="engineerName">Engineer</option>
+        </select>
+      </div>
+
       <div className="tickets">
         <div className="ticket-headings">
           <div>FSR ID</div>
@@ -116,8 +164,8 @@ function ViewFSR() {
           <div></div>
         </div>
 
-        {fsrs.length > 0 ? (
-          fsrs.map((fsr) => (
+        {displayedFSRs.length > 0 ? (
+          displayedFSRs.map((fsr) => (
             <div className="ticket" key={fsr._id}>
               <div data-label="FSR ID">{fsr.fsrId}</div>
               <div data-label="Date">{new Date(fsr.createdAt).toLocaleDateString()}</div>
@@ -139,6 +187,71 @@ function ViewFSR() {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            Previous
+          </button>
+          <span className="page-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      <style jsx>{`
+        .ticket-controls {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          align-items: center;
+          justify-content: flex-end;
+        }
+
+        .sort-select {
+          padding: 0.25rem;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+        }
+
+        .pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 1rem;
+          margin-top: 2rem;
+        }
+
+        .pagination-btn {
+          padding: 0.5rem 1rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background: #f8f9fa;
+          cursor: pointer;
+        }
+
+        .pagination-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .page-info {
+          font-size: 0.9rem;
+          color: #666;
+        }
+      `}</style>
     </div>
   );
 }

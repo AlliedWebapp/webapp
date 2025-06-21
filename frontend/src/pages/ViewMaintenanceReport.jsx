@@ -10,10 +10,13 @@ function ViewMaintenanceReport() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayedReports, setDisplayedReports] = useState([]);
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
 
   const API_URL = process.env.REACT_APP_API_BASE_URL;
+  const REPORTS_PER_PAGE = 8; // Show 8 reports per page
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -62,6 +65,17 @@ function ViewMaintenanceReport() {
     fetchReports();
   }, [user]);
 
+  // Update displayed reports when reports or current page changes
+  useEffect(() => {
+    if (!reports) return;
+
+    const start = (currentPage - 1) * REPORTS_PER_PAGE;
+    const end = start + REPORTS_PER_PAGE;
+    setDisplayedReports(reports.slice(start, end));
+  }, [reports, currentPage]);
+
+  const totalPages = Math.ceil((reports?.length || 0) / REPORTS_PER_PAGE);
+
   if (isLoading) return <Spinner />;
 
   if (isError) {
@@ -78,8 +92,15 @@ function ViewMaintenanceReport() {
       <BackButton url="/other-reports" />
       <h1>Maintenance Reports</h1>
       <div className="tickets">
-        {reports.length > 0 ? (
-          reports.map((report) => (
+        <div className="ticket-headings">
+          <div>MR ID</div>
+          <div>Created Date</div>
+          <div>Unit</div>
+          <div>Outage Date</div>
+          <div></div>
+        </div>
+        {displayedReports.length > 0 ? (
+          displayedReports.map((report) => (
             <div className="ticket" key={report._id}>
               <div data-label="MR ID">{report.mrId}</div>
               <div data-label="Date">{new Date(report.createdAt).toLocaleDateString()}</div>
@@ -101,8 +122,59 @@ function ViewMaintenanceReport() {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            Previous
+          </button>
+          <span className="page-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      <style jsx>{`
+        .pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 1rem;
+          margin-top: 2rem;
+        }
+
+        .pagination-btn {
+          padding: 0.5rem 1rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background: #f8f9fa;
+          cursor: pointer;
+        }
+
+        .pagination-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .page-info {
+          font-size: 0.9rem;
+          color: #666;
+        }
+      `}</style>
     </div>
   );
 }
 
-export default ViewMaintenanceReport; 
+export default ViewMaintenanceReport;

@@ -12,6 +12,7 @@ const ImprovementReport = () => {
 
   const [previewImage, setPreviewImage] = useState(null);
   const [ticketImages, setTicketImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     number: "",
@@ -82,6 +83,12 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
+    // Disable submit button to prevent double submission
+    const submitButton = e.target.querySelector('.submit-btn');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
+    setIsSubmitting(true);
+  
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value) {
@@ -138,10 +145,18 @@ Created By: ${user.email}`;
         const errorData = await response.json();
         console.error("Error Response:", errorData);
         alert("Failed to submit. Please try again.");
+        // Re-enable submit button on error
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Report';
+        setIsSubmitting(false);
       }
     } catch (err) {
       console.error("Network Error:", err);
       alert("Something went wrong.");
+      // Re-enable submit button on error
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit Report';
+      setIsSubmitting(false);
     }
   };
   
@@ -285,7 +300,9 @@ Created By: ${user.email}`;
           </div>
         </div>
 
-        <button type="submit" className="submit-btn">Submit Report</button>
+        <button type="submit" className="submit-btn" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Submit Report'}
+        </button>
       </form>
 
     

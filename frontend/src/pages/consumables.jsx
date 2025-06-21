@@ -326,7 +326,7 @@ const deleteButtonStyle = {
                 }}
               >
                 Cancel
-              </button>
+        </button>
       </div>
     </form>
   </div>

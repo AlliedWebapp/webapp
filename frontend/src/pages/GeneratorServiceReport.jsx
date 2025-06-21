@@ -83,18 +83,37 @@ const GeneratorServiceReport = () => {
       // Add ticketId to the form data
       submitData.append("ticketId", ticketId);
 
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(`${API_URL}/api/reports/submit-fsr`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${user.token}`
         },
         body: submitData,
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Send email notification
+      // Verify we got a valid response with fsrId
+      if (!data.fsrId) {
+        throw new Error("Invalid response: Missing FSR ID");
+      }
+
+      console.log("FSR submitted successfully with ID:", data.fsrId);
+
+      // Send email notification (don't block on this)
+      try {
         const emailData = new FormData();
         emailData.append("_subject", `New Service Report Submitted`);
         
@@ -113,22 +132,42 @@ Created By: ${user.email}`;
         emailData.append("Details", details);
         emailData.append("_captcha", "false");
 
-        await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+        // Don't await this - let it run in background
+        fetch("https://formsubmit.co/alliedvercel@gmail.com", {
           method: "POST",
           body: emailData,
           headers: {
             'Accept': 'application/json'
           }
+        }).catch(emailError => {
+          console.warn("Email notification failed:", emailError);
+          // Don't fail the whole submission for email issues
         });
-
-        alert("Report submitted successfully!");
-        window.location.href = "/fsr";
-      } else {
-        throw new Error(data.message || "Failed to submit report");
+      } catch (emailError) {
+        console.warn("Email notification error:", emailError);
+        // Continue with success flow even if email fails
       }
+
+      alert(`Report submitted successfully! FSR ID: ${data.fsrId}`);
+      
+      // Add a small delay before redirect to ensure user sees the success message
+      setTimeout(() => {
+        window.location.href = "/fsr";
+      }, 1000);
+
     } catch (error) {
       console.error("Error submitting FSR:", error);
-      alert(error.message || "Failed to submit report. Please try again.");
+      
+      let errorMessage = "Failed to submit report. Please try again.";
+      
+      if (error.name === 'AbortError') {
+        errorMessage = "Request timed out. Please check your connection and try again.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+      
       // Re-enable submit button on error
       submitButton.disabled = false;
       submitButton.textContent = 'Submit Report';
