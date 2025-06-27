@@ -327,542 +327,583 @@ export default function InventoryManager() {
     return out;
   };
 
+  // Define required fields for each project
+  const requiredFieldsByProject = {
+    jogini: ["Spare Discription", "Make.Vendor"],
+    shong: [
+      "Description of Material", "Make", "Vendor",
+      "Opening Balance", "Closing Balance", "Place", "In Stock"
+    ],
+    solding: [
+      "Description of Material", "Make", "Vendor",
+      "Opening Balance", "Closing Balance", "Place", "In Stock"
+    ],
+    sdllpsalun: [
+      "NAME OF MATERIALS", "OPENING BALANCE", "CLOSING BALANCE", "Place", "IN STOCK"
+    ],
+    kuwarsi: [
+      "NAME OF MATERIALS", "OPENING BALANCE", "CLOSING BALANCE", "Place", "In Stock"
+    ]
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  if (!user?.token) {
-    return toast.error("Not authorized");
-  }
+    if (!user?.token) {
+      return toast.error("Not authorized");
+    }
 
     setLoading(true);
 
-
-  const formData = new FormData();
-  let url = "";
-  let method = "";
-
-  if (modal.mode === "add") {
-    
-    url = `${API_URL}/api/${projectKey}`;
-    method = "POST";
-
-
-    const filtered = formatNestedFields(modal.data, projectKey);
-    Object.entries(filtered).forEach(([key, val]) => {
-      formData.append(key, val);
-    });
-  } else {
-    url = `${API_URL}/api/${projectKey}/${modal.id}`;
-    method = "PATCH"; 
-    const filtered = formatNestedFields(modal.data, projectKey);
-    Object.entries(filtered).forEach(([key, val]) => {
-      formData.append(key, val);
-    });
-    
-  }
-
-  if (modal.data.pictureFile instanceof File) {
-    formData.append("picture", modal.data.pictureFile);
-  }
-
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: formData,
-    });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Save failed");
+    // Define required fields for the current project
+    const requiredFields = requiredFieldsByProject[projectKey] || [];
+    const isAnyRequiredFieldEmpty = requiredFields.some(
+      (field) => {
+        // Handle nested fields like "Make.Vendor"
+        if (field.includes(".")) {
+          const [parent, child] = field.split(".");
+          return !modal.data[parent] || !modal.data[parent][child] || modal.data[parent][child].trim() === "";
+        }
+        return !modal.data[field] || modal.data[field].trim() === "";
       }
-
-    toast.success(modal.mode === "add" ? "Item created!" : "Item updated!");
-      closeModal();
-
-    
-    const refreshed = await (
-      await fetch(`${API_URL}/api/${projectKey}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-      })
-    ).json();
-      setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) return <Spinner />;
-
-  if (error) {
-    return (
-      <div
-        style={{
-          color: "red",
-          fontSize: "1rem",
-          fontWeight: "bold",
-          padding: 16,
-          margin: 20,
-        }}
-      >
-        <p>{error}</p>
-        <div style={{ marginTop: 12 }}>
-          <BackButton url="/" />
-        </div>
-      </div>
     );
-  }
 
-  const cfg = PROJECTS[projectKey] || null;
-  const descKey = cfg?.columns?.[0]?.key ?? "";
+    if (isAnyRequiredFieldEmpty) {
+      setLoading(false);
+      toast.error("All fields are required.");
+      return;
+    }
 
-  const filteredItems = items.filter(item => {
-    let label = item;
-    descKey
-      .split(/[\.\[\]]/)
-      .filter(Boolean)
-      .forEach(k => (label = label ? label[k] : ""));
-    return String(label).toLowerCase().includes(searchTerm.toLowerCase());
-  });
+    const formData = new FormData();
+    let url = "";
+    let method = "";
 
-  return (
-    <div style={{ fontFamily: "Arial, sans-serif" }}>
-      <div style={{ padding: 20 }}>
-      <BackButton url="/" />
-        <h1 style={{ marginBottom: 50 }}>Manage Inventory</h1>
+    if (modal.mode === "add") {
+      
+      url = `${API_URL}/api/${projectKey}`;
+      method = "POST";
 
-      {/* Project selector */}
-<div style={{ fontSize: "1.3rem", fontWeight: "bold", marginBottom: 12 }}>
-  Select Project:&nbsp;
-  <select
-    value={projectKey}
-    onChange={(e) => setProjectKey(e.target.value)}
-    style={{
-      fontSize: "1rem",
-      padding: "0.5rem 1rem",
-      borderStyle: "solid",
-      borderWidth: "2px",
-      borderColor: "grey",
-      borderRadius: "8px",
-      cursor: "pointer",
-              color: "black",
-      marginBottom: 52,
-    }}
-  >
-            <option value="" disabled>
-              Select a project
-            </option>
-    {Object.entries(PROJECTS).map(([key, { label }]) => (
-      <option key={key} value={key}>
-        {label}
-      </option>
-    ))}
-  </select>
-</div>
 
-{/* Instructional text */}
+      const filtered = formatNestedFields(modal.data, projectKey);
+      Object.entries(filtered).forEach(([key, val]) => {
+        formData.append(key, val);
+      });
+    } else {
+      url = `${API_URL}/api/${projectKey}/${modal.id}`;
+      method = "PATCH"; 
+      const filtered = formatNestedFields(modal.data, projectKey);
+      Object.entries(filtered).forEach(([key, val]) => {
+        formData.append(key, val);
+      });
+      
+    }
+
+    if (modal.data.pictureFile instanceof File) {
+      formData.append("picture", modal.data.pictureFile);
+    }
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: formData,
+      });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || "Save failed");
+        }
+
+      toast.success(modal.mode === "add" ? "Item created!" : "Item updated!");
+        closeModal();
+
+      
+      const refreshed = await (
+        await fetch(`${API_URL}/api/${projectKey}`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+        })
+      ).json();
+        setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (loading) return <Spinner />;
+
+    if (error) {
+      return (
         <div
           style={{
-            marginBottom: 20,
+            color: "red",
             fontSize: "1rem",
             fontWeight: "bold",
-            fontStyle: "italic",
+            padding: 16,
+            margin: 20,
           }}
         >
-  To add a new item, click the button below:
-</div>
-
-{/* Add‐new button */}
-<div style={{ marginBottom: 50 }}>
-  <button
-    onClick={openAdd}
-    style={{
-      fontSize: "1rem",
-      padding: "0.5rem 1rem",
-      fontWeight: "bold",
-      borderRadius: "8px",
-      cursor: "pointer",
-      backgroundColor: "#4CAF50",
-      color: "white",
-              border: "black 1px solid",
-    }}
-  >
-    Add New Item
-  </button>
-</div>
-
-      {/* Load existing dropdown */}
-        {cfg && (
-      <div style={{ marginBottom: 32 }}>
-            <div
-              style={{
-                marginRight: 8,
-                marginBottom: 25,
-                fontWeight: "bold",
-                fontSize: "1rem",
-                fontStyle: "italic",
-              }}
-            >
-          To update an item, click the dropdown below:
+          <p>{error}</p>
+          <div style={{ marginTop: 12 }}>
+            <BackButton url="/" />
+          </div>
         </div>
-            <div style={{ position: 'relative', marginBottom: "250px" }}>
+      );
+    }
+
+    const cfg = PROJECTS[projectKey] || null;
+    const descKey = cfg?.columns?.[0]?.key ?? "";
+
+    const filteredItems = items.filter(item => {
+      let label = item;
+      descKey
+        .split(/[\.\[\]]/)
+        .filter(Boolean)
+        .forEach(k => (label = label ? label[k] : ""));
+      return String(label).toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    return (
+      <div style={{ fontFamily: "Arial, sans-serif" }}>
+        <div style={{ padding: 20 }}>
+        <BackButton url="/" />
+          <h1 style={{ marginBottom: 50 }}>Manage Inventory</h1>
+
+        {/* Project selector */}
+  <div style={{ fontSize: "1.3rem", fontWeight: "bold", marginBottom: 12 }}>
+    Select Project:&nbsp;
+    <select
+      value={projectKey}
+      onChange={(e) => setProjectKey(e.target.value)}
+      style={{
+        fontSize: "1rem",
+        padding: "0.5rem 1rem",
+        borderStyle: "solid",
+        borderWidth: "2px",
+        borderColor: "grey",
+        borderRadius: "8px",
+        cursor: "pointer",
+                color: "black",
+        marginBottom: 52,
+      }}
+    >
+              <option value="" disabled>
+                Select a project
+              </option>
+      {Object.entries(PROJECTS).map(([key, { label }]) => (
+        <option key={key} value={key}>
+          {label}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  {/* Instructional text */}
+          <div
+            style={{
+              marginBottom: 20,
+              fontSize: "1rem",
+              fontWeight: "bold",
+              fontStyle: "italic",
+            }}
+          >
+    To add a new item, click the button below:
+  </div>
+
+  {/* Add‐new button */}
+  <div style={{ marginBottom: 50 }}>
+    <button
+      onClick={openAdd}
+      style={{
+        fontSize: "1rem",
+        padding: "0.5rem 1rem",
+        fontWeight: "bold",
+        borderRadius: "8px",
+        cursor: "pointer",
+        backgroundColor: "#4CAF50",
+        color: "white",
+                border: "black 1px solid",
+      }}
+    >
+      Add New Item
+    </button>
+  </div>
+
+        {/* Load existing dropdown */}
+          {cfg && (
+        <div style={{ marginBottom: 32 }}>
               <div
-                onClick={() => setIsOpen(!isOpen)}
-          style={{
-                  display: "inline-block",
-            padding: "6px 12px",
-            borderRadius: 8,
-                  border: "black 1px solid",
-            width: 300,
-            fontSize: "1rem",
-            cursor: "pointer",
-            backgroundColor: "lightgrey",
-                  position: "relative",
-                  backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 12px top 50%",
-                  backgroundSize: "12px auto",
-                  paddingRight: "30px"
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder={`-- select ${cfg.columns[0].label} --`}
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setIsOpen(true);
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    background: "transparent",
-                    outline: "none",
-                    cursor: "pointer",
-                  }}
-                />
-                {isOpen && (
-                  <div
-                    style={{
-                      position: "fixed",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      backgroundColor: "lightgrey",
-                      border: "black 1px solid",
-                      borderRadius: "8px",
-                      maxHeight: "80vh",
-                      overflowY: "auto",
-                      overflowX: "hidden",
-                      zIndex: 1000,
-                      width: "90%",
-                      maxWidth: "400px",
-                      WebkitOverflowScrolling: "touch"
-                    }}
-                  >
-                    {filteredItems.map((it) => {
-                      let label = it;
-                      descKey
-              .split(/[\.\[\]]/)
-              .filter(Boolean)
-                        .forEach((k) => (label = label ? label[k] : ""));
-            return (
-                        <div
-                          key={it._id}
-                          onClick={() => {
-                            openEdit(it);
-                            setSearchTerm("");
-                            setIsOpen(false);
-                          }}
-                          style={{
-                            padding: "12px",
-                            cursor: "pointer",
-                            wordBreak: "break-word",
-                            borderBottom: "1px solid #ccc",
-                            touchAction: "manipulation",
-                            ":hover": {
-                              backgroundColor: "#e0e0e0"
-                            }
-                          }}
-                        >
-                {label}
-                        </div>
-            );
-          })}
-                  </div>
-                )}
-              </div>
-            </div>
-      </div>
-        )}
-
-        {/* Modal for Add/Edit */}
-        {modal.mode && cfg && (
-        <div
-          style={{
-            position: "fixed",
-            top: 40,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "#fff",
-            padding: 24,
-            width: 400,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            zIndex: 1000,
-            borderRadius: 6,
-          }}
-        >
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={closeModal}
                 style={{
-                  position: "absolute",
-                  right: -10,
-                  top: -10,
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  border: "1px solid #ccc",
-                  background: "white",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "16px",
-                  padding: 0,
+                  marginRight: 8,
+                  marginBottom: 25,
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  fontStyle: "italic",
                 }}
               >
-                ×
-              </button>
-          <h3 style={{ marginTop: 0 }}>
-            {modal.mode === "add" ? "Add New" : "Edit"} {cfg.label}
-          </h3>
-            </div>
-
-          
-            <div
-              style={{
-                maxHeight: "60vh",
-                overflowY: "auto",
-                overflowX: "hidden",
-                paddingRight: 8,
-              }}
-            >
-          <form onSubmit={handleSubmit}>
-           
-            {cfg.columns.map((c) => {
-              let value = modal.data;
-              c.key
+            To update an item, click the dropdown below:
+          </div>
+              <div style={{ position: 'relative', marginBottom: "250px" }}>
+                <div
+                  onClick={() => setIsOpen(!isOpen)}
+            style={{
+                    display: "inline-block",
+              padding: "6px 12px",
+              borderRadius: 8,
+                    border: "black 1px solid",
+              width: 300,
+              fontSize: "1rem",
+              cursor: "pointer",
+              backgroundColor: "lightgrey",
+                    position: "relative",
+                    backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 12px top 50%",
+                    backgroundSize: "12px auto",
+                    paddingRight: "30px"
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder={`-- select ${cfg.columns[0].label} --`}
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setIsOpen(true);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      width: "100%",
+                      border: "none",
+                      background: "transparent",
+                      outline: "none",
+                      cursor: "pointer",
+                    }}
+                  />
+                  {isOpen && (
+                    <div
+                      style={{
+                        position: "fixed",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        backgroundColor: "lightgrey",
+                        border: "black 1px solid",
+                        borderRadius: "8px",
+                        maxHeight: "80vh",
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                        zIndex: 1000,
+                        width: "90%",
+                        maxWidth: "400px",
+                        WebkitOverflowScrolling: "touch"
+                      }}
+                    >
+                      {filteredItems.map((it) => {
+                        let label = it;
+                        descKey
                 .split(/[\.\[\]]/)
                 .filter(Boolean)
-                .forEach((k) => (value = value ? value[k] : ""));
+                          .forEach((k) => (label = label ? label[k] : ""));
+                      return (
+                          <div
+                            key={it._id}
+                            onClick={() => {
+                              openEdit(it);
+                              setSearchTerm("");
+                              setIsOpen(false);
+                            }}
+                            style={{
+                              padding: "12px",
+                              cursor: "pointer",
+                              wordBreak: "break-word",
+                              borderBottom: "1px solid #ccc",
+                              touchAction: "manipulation",
+                              ":hover": {
+                                backgroundColor: "#e0e0e0"
+                              }
+                            }}
+                          >
+                    {label}
+                          </div>
+                      );
+                    })}
+                    </div>
+                  )}
+                </div>
+              </div>
+        </div>
+          )}
 
-              return (
-                <div
-                  key={c.key}
-                  style={{ marginBottom: 12, display: "flex" }}
+          {/* Modal for Add/Edit */}
+          {modal.mode && cfg && (
+          <div
+            style={{
+              position: "fixed",
+              top: 40,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "#fff",
+              padding: 24,
+              width: 400,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              zIndex: 1000,
+              borderRadius: 6,
+            }}
+          >
+              <div style={{ position: "relative" }}>
+                <button
+                  onClick={closeModal}
+                  style={{
+                    position: "absolute",
+                    right: -10,
+                    top: -10,
+                    width: 24,
+                    height: 24,
+                    borderRadius: "50%",
+                    border: "1px solid #ccc",
+                    background: "white",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    padding: 0,
+                  }}
                 >
-                  <label
-                    style={{
-                      width: 140,
-                      lineHeight: "32px",
-                    }}
-                  >
-                    {c.label}:
-                  </label>
-                  <input
-                    name={c.key}
-                    value={value ?? ""}
-                    onChange={handleChange}
-                    style={{
-                      flex: 1,
-                      padding: "6px 8px",
-                      borderRadius: 4,
-                      border: "1px solid #ccc",
-                    }}
-                  />
-                </div>
-              );
-            })}
+                  ×
+                </button>
+            <h3 style={{ marginTop: 0 }}>
+              {modal.mode === "add" ? "Add New" : "Edit"} {cfg.label}
+            </h3>
+            {modal.mode === "edit" && (
+              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <span style={{ color: '#888', fontSize: '0.95rem' }}>All fields are mandatory.</span>
+              </div>
+            )}
+              </div>
 
-              
-                <div
-  style={{
-    marginBottom: 15,
-    fontSize: "1rem",
-    display: "flex",
-    alignItems: "center",
-  }}
->
-  <label
-    htmlFor="picture"
-    style={{
-      width: 100,      
-      marginRight: 50, 
-      whiteSpace: "nowrap",  
-      lineHeight: "32px",
-    }}
-  >
-    Upload Picture:
-  </label>
-                  <input
-                    type="file"
-                    name="picture"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    style={{ flex: 1 }}
-                  />
-                </div>
-
-
-            <div style={{ textAlign: "right", marginTop: 16 }}>
-              <button
-                type="button"
-                onClick={closeModal}
+            
+              <div
                 style={{
-                  padding: "6px 12px",
-                  marginRight: 8,
-                  background: "#6c757d",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: "pointer",
+                  maxHeight: "60vh",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  paddingRight: 8,
                 }}
               >
-                Cancel
-              </button>
-              {modal.mode === "edit" && (
+            <form onSubmit={handleSubmit}>
+             
+              {cfg.columns.map((c) => {
+                let value = modal.data;
+                c.key
+                  .split(/[\.\[\]]/)
+                  .filter(Boolean)
+                  .forEach((k) => (value = value ? value[k] : ""));
+
+                return (
+                  <div
+                    key={c.key}
+                    style={{ marginBottom: 12, display: "flex" }}
+                  >
+                    <label
+                      style={{
+                        width: 140,
+                        lineHeight: "32px",
+                      }}
+                    >
+                      {c.label}:
+                    </label>
+                    <input
+                      name={c.key}
+                      value={value ?? ""}
+                      onChange={handleChange}
+                      style={{
+                        flex: 1,
+                        padding: "6px 8px",
+                        borderRadius: 4,
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                  </div>
+                );
+              })}
+
+                
+                  <div
+    style={{
+      marginBottom: 15,
+      fontSize: "1rem",
+      display: "flex",
+      alignItems: "center",
+    }}
+  >
+    <label
+      htmlFor="picture"
+      style={{
+        width: 100,      
+        marginRight: 50, 
+        whiteSpace: "nowrap",  
+        lineHeight: "32px",
+      }}
+    >
+      Upload Picture:
+    </label>
+                    <input
+                      type="file"
+                      name="picture"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ flex: 1 }}
+                    />
+                  </div>
+
+
+              <div style={{ textAlign: "right", marginTop: 16 }}>
                 <button
                   type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
+                  onClick={closeModal}
                   style={{
                     padding: "6px 12px",
                     marginRight: 8,
-                    background: "#dc3545",
+                    background: "#6c757d",
                     color: "#fff",
                     border: "none",
                     borderRadius: 4,
                     cursor: "pointer",
                   }}
                 >
-                  Delete
+                  Cancel
                 </button>
-              )}
-              <button
-                type="submit"
-                style={{
-                  padding: "6px 12px",
-                  background: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: "pointer",
-                }}
-              >
-                {modal.mode === "add" ? "Create" : "Update"}
-              </button>
-            </div>
-          </form>
-            </div>
-        </div>
-      )}
+                {modal.mode === "edit" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    style={{
+                      padding: "6px 12px",
+                      marginRight: 8,
+                      background: "#dc3545",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  style={{
+                    padding: "6px 12px",
+                    background: "#007bff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                  }}
+                >
+                  {modal.mode === "add" ? "Create" : "Update"}
+                </button>
+              </div>
+            </form>
+              </div>
+          </div>
+        )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 2000,
-          }}
-        >
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
           <div
             style={{
-              background: "#fff",
-              padding: 32,
-              borderRadius: 10,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-              minWidth: 320,
-              textAlign: "center",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              background: "rgba(0,0,0,0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 2000,
             }}
-            onClick={e => e.stopPropagation()}
           >
-            <h3 style={{ marginBottom: 16 }}>Confirm Deletion</h3>
-            <p style={{ marginBottom: 24 }}>Are you sure you want to delete this item? </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                style={{
-                  padding: "8px 20px",
-                  background: "#6c757d",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: "pointer",
-                  fontSize: "1rem",
-                }}
-                disabled={deleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  if (!user?.token) return toast.error("Not authorized");
-                  setDeleting(true);
-                  try {
-                    const res = await fetch(`${API_URL}/api/${projectKey}/${modal.id}`, {
-                      method: "DELETE",
-                      headers: { Authorization: `Bearer ${user.token}` },
-                    });
-                    const json = await res.json();
-                    if (!res.ok) throw new Error(json.error || "Delete failed");
-                    toast.success("Item deleted!");
-                    setShowDeleteConfirm(false);
-                    closeModal();
-                    // Refresh list
-                    const refreshed = await (
-                      await fetch(`${API_URL}/api/${projectKey}`, {
+            <div
+              style={{
+                background: "#fff",
+                padding: 32,
+                borderRadius: 10,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+                minWidth: 320,
+                textAlign: "center",
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 style={{ marginBottom: 16 }}>Confirm Deletion</h3>
+              <p style={{ marginBottom: 24 }}>Are you sure you want to delete this item? </p>
+              <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  style={{
+                    padding: "8px 20px",
+                    background: "#6c757d",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                    fontSize: "1rem",
+                  }}
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!user?.token) return toast.error("Not authorized");
+                    setDeleting(true);
+                    try {
+                      const res = await fetch(`${API_URL}/api/${projectKey}/${modal.id}`, {
+                        method: "DELETE",
                         headers: { Authorization: `Bearer ${user.token}` },
-                      })
-                    ).json();
-                    setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
-                  } catch (err) {
-                    toast.error(err.message);
-                  } finally {
-                    setDeleting(false);
-                  }
-                }}
-                style={{
-                  padding: "8px 20px",
-                  background: "#dc3545",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: deleting ? "not-allowed" : "pointer",
-                  fontSize: "1rem",
-                  opacity: deleting ? 0.7 : 1,
-                }}
-                disabled={deleting}
-              >
-                {deleting ? "Deleting..." : "Delete"}
-              </button>
+                      });
+                      const json = await res.json();
+                      if (!res.ok) throw new Error(json.error || "Delete failed");
+                      toast.success("Item deleted!");
+                      setShowDeleteConfirm(false);
+                      closeModal();
+                      // Refresh list
+                      const refreshed = await (
+                        await fetch(`${API_URL}/api/${projectKey}`, {
+                          headers: { Authorization: `Bearer ${user.token}` },
+                        })
+                      ).json();
+                      setItems(Array.isArray(refreshed) ? refreshed : refreshed.data || []);
+                    } catch (err) {
+                      toast.error(err.message);
+                    } finally {
+                      setDeleting(false);
+                    }
+                  }}
+                  style={{
+                    padding: "8px 20px",
+                    background: "#dc3545",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: deleting ? "not-allowed" : "pointer",
+                    fontSize: "1rem",
+                    opacity: deleting ? 0.7 : 1,
+                  }}
+                  disabled={deleting}
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
             </div>
           </div>
+        )}
         </div>
-      )}
       </div>
-    </div>
-  );
-}
+    );
+  }

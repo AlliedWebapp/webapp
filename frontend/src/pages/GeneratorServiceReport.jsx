@@ -5,6 +5,7 @@ import "../index.css"; // Global styles
 import BackButton from "../components/BackButton";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -57,7 +58,7 @@ const GeneratorServiceReport = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user?.token) {
-      alert("Please log in to submit the report.");
+      toast.error("Please log in to submit the report.");
       return;
     }
 
@@ -67,6 +68,13 @@ const GeneratorServiceReport = () => {
     submitButton.textContent = 'Submitting...';
 
     try {
+      // Frontend validation for required fields
+      if (!formData.customerName || !formData.engineerName) {
+        toast.error("Please fill in all required fields for the FSR.");
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Report';
+        return;
+      }
       const submitData = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "workPhotos") {
@@ -148,7 +156,7 @@ Created By: ${user.email}`;
         // Continue with success flow even if email fails
       }
 
-      alert(`Report submitted successfully! FSR ID: ${data.fsrId}`);
+      toast.success(`Report submitted successfully! FSR ID: ${data.fsrId}`);
       
       // Add a small delay before redirect to ensure user sees the success message
       setTimeout(() => {
@@ -166,7 +174,7 @@ Created By: ${user.email}`;
         errorMessage = error.message;
       }
       
-      alert(errorMessage);
+      toast.error(errorMessage);
       
       // Re-enable submit button on error
       submitButton.disabled = false;
@@ -180,7 +188,9 @@ Created By: ${user.email}`;
       <header className="header">
         <h2>Plant Fault Report</h2>
         <p><strong>Allied Hydroprojects</strong></p>
-        <p><strong> Report for Ticket ID: {ticketId}</strong></p>
+        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+          <span style={{ color: '#888', fontSize: '0.95rem' }}>All fields are mandatory.</span>
+        </div>
       </header>
 
       <form onSubmit={handleSubmit}>

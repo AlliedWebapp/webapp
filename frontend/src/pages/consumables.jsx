@@ -67,16 +67,27 @@ const Consumables = () => {
 
   const handleSubmit = async (e) => {
      e.preventDefault();
-  try {
-    if (editingId) {
-      // Update existing consumable
-      await axios.patch(`${API_URL}/api/consumables/${editingId}`, formData, config);
-      toast.success("Consumable updated!");
-    } else {
-      // Add new consumable
-      await axios.post(`${API_URL}/api/consumables`, formData, config);
-      toast.success("Consumable added!");
+
+    // Validation: required fields
+    if (!formData.date || !formData.item_name) {
+      toast.error("All required fields must be filled.");
+      return;
     }
+    // Validation: cost must be a number if filled
+    if (formData.cost && isNaN(Number(formData.cost))) {
+      toast.error("Cost must be a number.");
+      return;
+    }
+    try {
+      if (editingId) {
+        // Update existing consumable
+        await axios.patch(`${API_URL}/api/consumables/${editingId}`, formData, config);
+        toast.success("Consumable updated!");
+      } else {
+        // Add new consumable
+        await axios.post(`${API_URL}/api/consumables`, formData, config);
+        toast.success("Consumable added!");
+      }
       setFormData({
         date: "",
         item_name: "",
@@ -90,13 +101,13 @@ const Consumables = () => {
         vendor: "",
         remarks: ""
       });
-   setEditingId(null);
-    setShowForm(false);
-    fetchRecords();
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Failed to save consumable.");
-  }
-};
+      setEditingId(null);
+      setShowForm(false);
+      fetchRecords();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to save consumable.");
+    }
+  };
 
   const handleDelete = async (id) => {
   if (!window.confirm("Are you sure you want to delete this consumable?")) return;
@@ -245,6 +256,11 @@ const deleteButtonStyle = {
     <h3 style={{ marginBottom: '20px', textAlign: 'center' }}>
       {editingId ? "Edit Consumable" : "Add New Consumable"}
     </h3>
+    {!editingId && (
+      <div style={{ textAlign: 'left', marginBottom: '10px' }}>
+        <span style={{ color: '#888', fontSize: '0.95rem' }}>All fields are mandatory.</span>
+      </div>
+    )}
     <form 
       onSubmit={handleSubmit} 
       style={{ maxWidth: '600px', margin: '0 auto' }}
@@ -263,15 +279,17 @@ const deleteButtonStyle = {
           <input
             type={key === "date" ? "date" : "text"}
             name={key}
-                  value={value || ""}
+            value={value || ""}
             onChange={handleChange}
             required={["date", "item_name"].includes(key)}
+            placeholder={key === "cost" ? "Only number allowed e.g. 1000" : undefined}
             style={{
               width: '100%',
               padding: '10px',
               borderRadius: '4px',
               border: '1px solid #ddd',
-              fontSize: '14px'
+              fontSize: '14px',
+              color: key === "cost" && !value ? '#888' : undefined
             }}
           />
         </div>
