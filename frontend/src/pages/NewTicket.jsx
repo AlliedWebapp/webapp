@@ -288,7 +288,7 @@ User Email: ${user?.email || ""}`;
 
         <section className="form">
             <div className="form-group">
-              <label htmlFor="images">Upload Photos</label>
+              <label htmlFor="images">Upload Photos <span style={{ color: '#999999', fontSize: '12px' }}>(upto 4 images only)</span></label>
               <input
                   type="file"
                   id="images"

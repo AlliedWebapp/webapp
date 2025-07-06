@@ -14,13 +14,23 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import NoteItem from "../components/NoteItem";
 import Modal from "react-modal";
-import { FaPlus } from "react-icons/fa";
+import { 
+  FaPlus, 
+  FaTicketAlt, 
+  FaImages,
+  FaComments,
+  FaClipboardList,
+  FaTimes,
+  FaCheckCircle,
+  FaExclamationTriangle
+} from "react-icons/fa";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const customStyles = {
   content: {
-    width: "600px",
+    width: "90%",
+    maxWidth: "600px",
     top: "50%",
     left: "50%",
     right: "auto",
@@ -28,6 +38,15 @@ const customStyles = {
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
     position: "relative",
+    border: "none",
+    borderRadius: "16px",
+    padding: "0",
+    background: "transparent",
+    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+  },
+  overlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backdropFilter: "blur(4px)",
   },
 };
 
@@ -100,26 +119,32 @@ function Ticket() {
     };
   }, [ticketId, dispatch]);
 
- // Show spinner while loading ticket, notes, or FSR check
- if (isLoading || notesIsLoading || isCheckingFSR) return <Spinner />;
+  // Show spinner while loading ticket, notes, or FSR check
+  if (isLoading || notesIsLoading || isCheckingFSR) return <Spinner />;
 
   if (isError)
     return (
       <div className="error-container">
-        <h3>Error: {message}</h3>
-        <button onClick={() => navigate("/tickets")} className="btn">
-          Back to Tickets
-        </button>
+        <div className="error-card">
+          <FaExclamationTriangle className="error-icon" />
+          <h3>Error: {message}</h3>
+          <button onClick={() => navigate("/tickets")} className="btn btn-primary">
+            Back to Tickets
+          </button>
+        </div>
       </div>
     );
 
   if (!ticket)
     return (
       <div className="error-container">
-        <h3>No ticket found</h3>
-        <button onClick={() => navigate("/tickets")} className="btn">
-          Back to Tickets
-        </button>
+        <div className="error-card">
+          <FaExclamationTriangle className="error-icon" />
+          <h3>No ticket found</h3>
+          <button onClick={() => navigate("/tickets")} className="btn btn-primary">
+            Back to Tickets
+          </button>
+        </div>
       </div>
     );
 
@@ -127,7 +152,7 @@ function Ticket() {
     dispatch(closeTicket(ticketId))
       .unwrap()
       .then(() => {
-        toast.success("Ticket Closed");
+        toast.success("Ticket Closed Successfully");
         navigate("/tickets");
       })
       .catch((error) => {
@@ -156,125 +181,187 @@ function Ticket() {
       });
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'open':
+        return <FaExclamationTriangle className="status-icon open" />;
+      case 'close':
+        return <FaCheckCircle className="status-icon closed" />;
+      default:
+        return <FaTicketAlt className="status-icon" />;
+    }
+  };
+
   return (
     <div className="ticket-page">
-      <header className="ticket-header">
-        <BackButton url="/tickets" />
-        <h2>Ticket Details</h2>
-
-        <div className="ticket-info">
-          <div className="info-row">
-            <p>
-              <strong>ID:</strong> {ticket._id}
-            </p>
-            <p>
-              <strong>Status:</strong>{" "}
-              <span className={`status status-${ticket.status}`}>
-                {ticket.status}
+      {/* Header Section */}
+      <div className="ticket-header">
+        <div className="header-content">
+          <BackButton url="/tickets" />
+          <div className="header-main">
+            <div className="header-title">
+              <FaTicketAlt className="header-icon" />
+              <h1>Ticket Details</h1>
+            </div>
+            <div className="header-status">
+              {getStatusIcon(ticket.status)}
+              <span className={`status-badge status-${ticket.status}`}>
+                {ticket.status === 'new' ? 'OPEN' : ticket.status.toUpperCase()}
               </span>
-            </p>
-          </div>
-          <div className="info-row">
-            <p>
-              <strong>Created:</strong>{" "}
-              {new Date(ticket.createdAt).toLocaleString()}
-            </p>
-            <p>
-              <strong>Project:</strong> {ticket.projectname}
-            </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="ticket-details">
-          <h3>Issue Details</h3>
-          <p>
-            <strong>Fault Type:</strong> {ticket.fault}
-          </p>
-          <p>
-            <strong>Issue Description:</strong> {ticket.issue}
-          </p>
-          <p>
-            <strong>Site Location:</strong> {ticket.sitelocation}
-          </p>
-          <p>
-            <strong>Project Location:</strong> {ticket.projectlocation}
-          </p>
-          <p>
-            <strong>Date of Fault:</strong>{" "}
-            {ticket.date && new Date(ticket.date).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Spare Required:</strong> {ticket.spare}
-          </p>
-          <p>
-            <strong>Rating:</strong> {ticket.rating}
-          </p>
+      {/* Main Content */}
+      <div className="ticket-content">
+        {/* Ticket Overview Card */}
+        <div className="ticket-overview-card">
+          <div className="card-header">
+            <h2><FaClipboardList /> Ticket Overview</h2>
+          </div>
+          <div className="overview-grid">
+            <div className="overview-item">
+              <div className="overview-label">
+                <span>Ticket ID</span>
+              </div>
+              <div className="overview-value">{ticket._id}</div>
+            </div>
+            <div className="overview-item">
+              <div className="overview-label">
+                <span>Created at</span>
+              </div>
+              <div className="overview-value">
+                {new Date(ticket.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
+            <div className="overview-item">
+              <div className="overview-label">
+                <span>Project</span>
+              </div>
+              <div className="overview-value">{ticket.projectname}</div>
+            </div>
+            <div className="overview-item">
+              <div className="overview-label">
+                <span>Rating</span>
+              </div>
+              <div className="overview-value">{ticket.rating}</div>
+            </div>
+          </div>
         </div>
 
-        <div className="ticket-description">
-          <h3>Full Description</h3>
-          <p>{ticket.description}</p>
+        {/* Issue Details Card */}
+        <div className="ticket-details-card">
+          <div className="card-header">
+            <h2><FaExclamationTriangle /> Issue Details</h2>
+          </div>
+          <div className="details-grid">
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Fault Type</span>
+              </div>
+              <div className="detail-value">{ticket.fault}</div>
+            </div>
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Site Location</span>
+              </div>
+              <div className="detail-value">{ticket.sitelocation}</div>
+            </div>
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Project Location</span>
+              </div>
+              <div className="detail-value">{ticket.projectlocation}</div>
+            </div>
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Date of Fault</span>
+              </div>
+              <div className="detail-value">
+                {ticket.date ? new Date(ticket.date).toLocaleDateString() : 'Not specified'}
+              </div>
+            </div>
+            <div className="detail-item full-width">
+              <div className="detail-label">
+                <span>Issue Description</span>
+              </div>
+              <div className="detail-value">{ticket.issue}</div>
+            </div>
+            <div className="detail-item full-width">
+              <div className="detail-label">
+                <span>Full Description</span>
+              </div>
+              <div className="detail-value description-text">{ticket.description}</div>
+            </div>
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Spare Required</span>
+              </div>
+              <div className="detail-value">{ticket.spare || 'None'}</div>
+            </div>
+          </div>
         </div>
 
-        {/* Image thumbnails */}
+        {/* Images Section */}
         {ticket.images && ticket.images.length > 0 && (
-          <div className="ticket-images">
-            <h3>Uploaded Images</h3>
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <div className="ticket-images-card">
+            <div className="card-header">
+              <h2><FaImages /> Uploaded Images</h2>
+              <span className="image-count">{ticket.images.length} image{ticket.images.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div className="images-grid">
               {ticket.images.map((_, index) => {
                 const imageUrl = `${API_URL}/api/tickets/${ticket._id}/images/${index}`;
                 return (
-                  <img
-                    key={index}
-                    src={imageUrl}
-                    alt={`Ticket Image ${index + 1}`}
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      objectFit: "cover",
-                      borderRadius: "10px",
-                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-                      cursor: "pointer",
-                      transition: "transform 0.2s ease-in-out",
-                    }}
-                    onClick={() => setPreviewImage(imageUrl)}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.transform = "scale(1.05)")
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.transform = "scale(1)")
-                    }
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      fetch(imageUrl, {
-                        headers: {
-                          'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                        }
-                      })
-                      .then(response => response.blob())
-                      .then(blob => {
-                        e.target.src = URL.createObjectURL(blob);
-                      })
-                      .catch(err => {
-                        console.error('Error loading image:', err);
-                        e.target.src = 'placeholder-image-url'; // Add a placeholder image URL
-                      });
-                    }}
-                  />
+                  <div key={index} className="image-thumbnail" onClick={() => setPreviewImage(imageUrl)}>
+                    <img
+                      src={imageUrl}
+                      alt={`Ticket Image ${index + 1}`}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        fetch(imageUrl, {
+                          headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                          }
+                        })
+                        .then(response => response.blob())
+                        .then(blob => {
+                          e.target.src = URL.createObjectURL(blob);
+                        })
+                        .catch(err => {
+                          console.error('Error loading image:', err);
+                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg2MFY2MEgyMFYyMFoiIGZpbGw9IiNFNUU3RUIiLz4KPHBhdGggZD0iTTI1IDI1SDM1VjM1SDI1VjI1WiIgZmlsbD0iI0M3Q0E5QyIvPgo8cGF0aCBkPSJNMjAgNDVMMzAgMzVINDBMNTAgNDVINjBWMjBIMjBWNDVaIiBmaWxsPSIjQzdDQTlDIi8+Cjwvc3ZnPgo=';
+                        });
+                      }}
+                    />
+                    <div className="image-overlay">
+                      <span>View</span>
+                    </div>
+                  </div>
                 );
               })}
             </div>
           </div>
         )}
 
-        <div className="ticket-notes">
-          <h3>Notes</h3>
-          {ticket.status !== "close" && (
-            <button onClick={openModal} className="btn">
-              <FaPlus /> Add Note
-            </button>
-          )}
-
+        {/* Notes Section */}
+        <div className="ticket-notes-card">
+          <div className="card-header">
+            <h2><FaComments /> Notes</h2>
+            {ticket.status !== "close" && (
+              <button onClick={openModal} className="btn btn-primary btn-sm">
+                <FaPlus /> Add Note
+              </button>
+            )}
+          </div>
+          
           {Array.isArray(notes) && notes.length > 0 ? (
             <div className="notes-list">
               {notes.map((note) => (
@@ -282,102 +369,92 @@ function Ticket() {
               ))}
             </div>
           ) : (
-            <p className="no-notes">No notes yet</p>
+            <div className="no-notes">
+              <FaComments className="no-notes-icon" />
+              <p>No notes yet</p>
+            </div>
           )}
         </div>
 
-        <div className="ticket-actions">
-          {!isCheckingFSR && (
-            <button
-              className="btn btn-outline"
-              onClick={handleCreateFSR}
-            >
-              Create Service Report
-            </button>
-          )}
+        {/* Actions Section */}
+        <div className="ticket-actions-card">
+          <div className="actions-grid">
+            {ticket.status !== "close" && (
+              <button onClick={onTicketClose} className="btn btn-danger btn-large">
+                <FaCheckCircle /> Close Ticket
+              </button>
+            )}
+          </div>
         </div>
+      </div>
 
-        {ticket.status !== "close" && (
-          <button onClick={onTicketClose} className="btn btn-block btn-danger">
-            Close Ticket
-          </button>
-        )}
-      </header>
-
+      {/* Add Note Modal */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="Add Note"
       >
-        <h2>Add Note</h2>
-        <button className="btn-close" onClick={closeModal}>
-          X
-        </button>
-        <form onSubmit={onNoteSubmit}>
-          <div className="form-group">
-            <textarea
-              name="noteText"
-              id="noteText"
-              className="form-control"
-              placeholder="Add your note here..."
-              value={noteText}
-              onChange={(e) => setNoteText(e.target.value)}
-            ></textarea>
-          </div>
-          <div className="form-group">
-            <button type="submit" className="btn">
-              Submit
+        <div className="modal-content">
+          <div className="modal-header">
+            <h2><FaComments /> Add Note</h2>
+            <button className="modal-close" onClick={closeModal}>
+              <FaTimes />
             </button>
           </div>
-        </form>
+          <form onSubmit={onNoteSubmit} className="modal-form">
+            <div className="form-group">
+              <label htmlFor="noteText">Note Content</label>
+              <textarea
+                name="noteText"
+                id="noteText"
+                className="form-control"
+                placeholder="Enter your note here..."
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                rows="6"
+              ></textarea>
+            </div>
+            <div className="modal-actions">
+              <button type="button" onClick={closeModal} className="btn btn-outline">
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary">
+                <FaPlus /> Add Note
+              </button>
+            </div>
+          </form>
+        </div>
       </Modal>
 
-      {/* Image preview overlay */}
+      {/* Image Preview Modal */}
       {previewImage && (
-        <div
-          onClick={() => setPreviewImage(null)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <img
-            src={previewImage}
-            alt="Preview"
-            style={{
-              maxWidth: "90%",
-              maxHeight: "80%",
-              borderRadius: "12px",
-              background: "#fff",
-              padding: "8px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-            }}
-            onError={(e) => {
-              e.target.onerror = null;
-              fetch(previewImage, {
-                headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                }
-              })
-              .then(response => response.blob())
-              .then(blob => {
-                e.target.src = URL.createObjectURL(blob);
-              })
-              .catch(err => {
-                console.error('Error loading preview image:', err);
-                e.target.src = 'placeholder-image-url'; // Add a placeholder image URL
-              });
-            }}
-          />
+        <div className="image-preview-overlay" onClick={() => setPreviewImage(null)}>
+          <div className="image-preview-content" onClick={(e) => e.stopPropagation()}>
+            <button className="preview-close" onClick={() => setPreviewImage(null)}>
+              <FaTimes />
+            </button>
+            <img
+              src={previewImage}
+              alt="Preview"
+              onError={(e) => {
+                e.target.onerror = null;
+                fetch(previewImage, {
+                  headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                  }
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                  e.target.src = URL.createObjectURL(blob);
+                })
+                .catch(err => {
+                  console.error('Error loading preview image:', err);
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgMTAwSDMwMFYyMDBIMTAwVjEwMFoiIGZpbGw9IiNFNUU3RUIiLz4KPHBhdGggZD0iTTEyNSAxMjVIMTc1VjE3NUgxMjVWMTI1WiIgZmlsbD0iI0M3Q0E5QyIvPgo8cGF0aCBkPSJNMTAwIDIyNUwxNTAgMTc1SDI1MEwyMDAgMjI1SDMwMFYxMDBIMTAwVjIyNVoiIGZpbGw9IiNDN0NBOUMiLz4KPC9zdmc+Cg==';
+                });
+              }}
+            />
+          </div>
         </div>
       )}
     </div>

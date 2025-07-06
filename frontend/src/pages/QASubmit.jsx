@@ -46,32 +46,134 @@ const QASubmit = () => {
   };
 
   return (
-    <div style={{ maxWidth: '500px', margin: 'auto' }}>
-        <BackButton url='/' className='back-button' />
-      <h1>Q&A Submission</h1>
-      {error && (
-  <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
-    {error}
-  </div>
-)}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <textarea
-          placeholder="Enter question"
-          value={form.question}
-          onChange={(e) => setForm({ ...form, question: e.target.value })}
-          required
-        />
-        <textarea
-          placeholder="Enter answer"
-          value={form.answer}
-          onChange={(e) => setForm({ ...form, answer: e.target.value })}
-          required
-        />
-        <button type="submit" className="submit-btn" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Submit'}
-        </button>
-      </form>
-    </div>
+    <>
+      <BackButton url='/' className='back-button' />
+      
+      <section className="heading">
+        <h1>Q&A Submission</h1>
+      </section>
+
+      <div style={{ 
+        maxWidth: '500px', 
+        margin: '0 auto', 
+        padding: '0 20px'
+      }}>
+        
+        {error && (
+          <div style={{ 
+            color: '#d32f2f', 
+            backgroundColor: '#ffebee',
+            border: '1px solid #ffcdd2',
+            borderRadius: '4px',
+            padding: '12px 16px', 
+            marginBottom: '20px', 
+            textAlign: 'center',
+            fontSize: '14px'
+          }}>
+            {error}
+          </div>
+        )}
+
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          padding: '24px',
+          borderLeft: '3px solid #6c757d'
+        }}>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <label htmlFor="question" style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontWeight: '600',
+                color: '#333',
+                fontSize: '14px'
+              }}>
+                Question *
+              </label>
+              <textarea
+                id="question"
+                placeholder="Enter your question..."
+                value={form.question}
+                onChange={(e) => setForm({ ...form, question: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '10px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  backgroundColor: '#f8f9fa'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#007bff'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+              />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '24px' }}>
+              <label htmlFor="answer" style={{ 
+                display: 'block', 
+                marginBottom: '6px', 
+                fontWeight: '600',
+                color: '#333',
+                fontSize: '14px'
+              }}>
+                Answer *
+              </label>
+              <textarea
+                id="answer"
+                placeholder="Enter your answer..."
+                value={form.answer}
+                onChange={(e) => setForm({ ...form, answer: e.target.value })}
+                required
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '10px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  backgroundColor: '#f8f9fa'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#007bff'}
+                onBlur={(e) => e.target.style.borderColor = '#ddd'}
+              />
+            </div>
+
+            <div className="form-group" style={{ textAlign: 'center' }}>
+              <button 
+                type="submit" 
+                className="submit-btn btn btn-block" 
+                disabled={isSubmitting}
+                style={{
+                  backgroundColor: isSubmitting ? '#495057' : '#495057',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  minWidth: '120px'
+                }}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
   );
 };
 

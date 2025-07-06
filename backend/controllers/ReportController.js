@@ -626,14 +626,14 @@ exports.getMaintenanceReportByMongoId = async (req, res, next) => {
       };
     }
 
-    // Format dates safely
+    // Keep dates as ISO strings for frontend formatting
     if (reportData.outageDate) {
       const d = new Date(reportData.outageDate);
-      reportData.outageDate = isNaN(d) ? reportData.outageDate : d.toLocaleDateString();
+      reportData.outageDate = isNaN(d) ? reportData.outageDate : d.toISOString();
     }
     if (reportData.createdAt) {
       const d = new Date(reportData.createdAt);
-      reportData.createdAt = isNaN(d) ? reportData.createdAt : d.toLocaleDateString();
+      reportData.createdAt = isNaN(d) ? reportData.createdAt : d.toISOString();
     }
 
     console.log("Sending response with report data");

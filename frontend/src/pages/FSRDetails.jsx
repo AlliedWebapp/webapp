@@ -137,7 +137,7 @@ function FSRDetails() {
       <BackButton url="/fsr" />
       <h1>Service Report Details</h1>
 
-          {/* Download icon button at top left */}
+      {/* Download icon button at top left */}
       <button
         onClick={handleDownload}
         style={{ position: "absolute", top: 380, left: 350, zIndex: 1000, background: "lightgrey", colour: "white", fontSize: "1rem", padding: "0.2rem", borderRadius: "8px", cursor: "pointer", boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)" }}
@@ -148,7 +148,6 @@ function FSRDetails() {
           Download PDF
       </button>
 
-      
       <div className="fsr-details-container" ref={fsrRef}>
         <table className="fsr-table">
           <tbody>
@@ -169,7 +168,7 @@ function FSRDetails() {
             </tr>
             <tr>
               <td className="fsr-label">Customer Email</td>
-              <td colSpan="5">{fsr.customerEmail}</td>
+              <td colSpan="3">{fsr.customerEmail}</td>
             </tr>
 
             {/* Equipment Details */}
@@ -178,22 +177,24 @@ function FSRDetails() {
               <td>{new Date(fsr.commissioningDate).toLocaleDateString()}</td>
               <td className="fsr-label">Instance ID</td>
               <td>{fsr.instanceId}</td>
-              <td className="fsr-label">State</td>
-              <td>{fsr.state}</td>
             </tr>
             <tr>
-              <td className="fsr-label"> Unit Rating</td>
+              <td className="fsr-label">State</td>
+              <td>{fsr.state}</td>
+              <td className="fsr-label">Unit Rating</td>
               <td>{fsr.rating}</td>
+            </tr>
+            <tr>
               <td className="fsr-label">Model No.</td>
               <td>{fsr.engineModel}</td>
-              <td className="fsr-label"> Machine Serial No.</td>
+              <td className="fsr-label">Machine Serial No.</td>
               <td>{fsr.engineSerial}</td>
             </tr>
             <tr>
-              <td className="fsr-label"> Serial No.</td>
+              <td className="fsr-label">Serial No.</td>
               <td>{fsr.gensetSerial}</td>
-              <td className="fsr-label"> Total Running Hours</td>
-              <td colSpan="3">{fsr.runningHours}</td>
+              <td className="fsr-label">Total Running Hours</td>
+              <td>{fsr.runningHours}</td>
             </tr>
 
             {/* Service Details */}
@@ -201,43 +202,43 @@ function FSRDetails() {
               <td className="fsr-label">Task Start Date/Time</td>
               <td>{new Date(fsr.taskStart).toLocaleString()}</td>
               <td className="fsr-label">Task End Date/Time</td>
-              <td colSpan="3">{new Date(fsr.taskEnd).toLocaleString()}</td>
+              <td>{new Date(fsr.taskEnd).toLocaleString()}</td>
             </tr>
             <tr>
               <td className="fsr-label">Fault Summary</td>
-              <td colSpan="5">{fsr.problemSummary}</td>
+              <td colSpan="3">{fsr.problemSummary}</td>
             </tr>
             <tr>
               <td className="fsr-label">Nature of Failure</td>
-              <td colSpan="5">{fsr.natureOfFailure}</td>
+              <td colSpan="3">{fsr.natureOfFailure}</td>
             </tr>
             <tr>
               <td className="fsr-label">Checklist</td>
-              <td colSpan="5">{fsr.checklist}</td>
+              <td colSpan="3">{fsr.checklist}</td>
             </tr>
 
             {/* Remarks */}
             <tr>
               <td className="fsr-label">Engineer Remarks</td>
-              <td colSpan="5">{fsr.engineerRemarks}</td>
+              <td colSpan="3">{fsr.engineerRemarks}</td>
             </tr>
             <tr>
               <td className="fsr-label">Customer Remarks</td>
-              <td colSpan="5">{fsr.customerRemarks}</td>
+              <td colSpan="3">{fsr.customerRemarks}</td>
             </tr>
-              <tr>
+            <tr>
               <td className="fsr-label">Recommendations for future</td>
-              <td colSpan="5">{fsr.recommendations}</td>
+              <td colSpan="3">{fsr.recommendations}</td>
             </tr>
             <tr>
               <td className="fsr-label">Engineer Name</td>
-              <td colSpan="5">{fsr.engineerName}</td>
+              <td colSpan="3">{fsr.engineerName}</td>
             </tr>
 
             {/* Signatures and Photos */}
             <tr>
               <td className="fsr-label">Customer Signature</td>
-              <td colSpan="5">
+              <td colSpan="3">
                 {fsr.customerSignature && (
                   <img 
                     src={bufferToDataUrl(fsr.customerSignature)}
@@ -264,7 +265,7 @@ function FSRDetails() {
             </tr>
             <tr>
               <td className="fsr-label">Engineer Signature</td>
-              <td colSpan="5">
+              <td colSpan="3">
                 {fsr.engineerSignature && (
                   <img 
                     src={bufferToDataUrl(fsr.engineerSignature)}
@@ -291,7 +292,7 @@ function FSRDetails() {
             </tr>
             <tr>
               <td className="fsr-label">Work Photos</td>
-              <td colSpan="5">
+              <td colSpan="3">
                 <div className="work-photos">
                   {fsr.workPhotos && fsr.workPhotos.map((photo, index) => (
                     <img 
