@@ -55,12 +55,13 @@ function App() {
           <Header />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
+              <Route path="/home" element={<Home />} />
               <Route path="/new-ticket" element={<NewTicket />} />
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/ticket/:ticketId" element={<Ticket />} />
