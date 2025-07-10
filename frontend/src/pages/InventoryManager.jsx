@@ -447,7 +447,7 @@ export default function InventoryManager() {
         >
           <p>{error}</p>
           <div style={{ marginTop: 12 }}>
-            <BackButton url="/" />
+            <BackButton url="/home" />
           </div>
         </div>
       );
@@ -468,7 +468,7 @@ export default function InventoryManager() {
     return (
       <div style={{ fontFamily: "Arial, sans-serif" }}>
         <div style={{ padding: 20 }}>
-        <BackButton url="/" />
+        <BackButton url="/home" />
           <h1 style={{ marginBottom: 50 }}>Manage Inventory</h1>
 
         {/* Project selector */}

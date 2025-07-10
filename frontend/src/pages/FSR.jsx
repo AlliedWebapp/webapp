@@ -132,14 +132,14 @@ function ViewFSR() {
     return (
       <div className="error-container">
         <h3 className="text-red-500"> {message}</h3>
-        <BackButton url="/" />
+        <BackButton url="/home" />
       </div>
     );
   }
 
   return (
     <div className="fsr-container">
-      <BackButton url="/" />
+      <BackButton url="/home" />
       <h1>Service Reports</h1>
 
       {/* Sort Controls */}
