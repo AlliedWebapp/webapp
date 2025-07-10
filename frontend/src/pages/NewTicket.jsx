@@ -5,6 +5,16 @@ import { toast } from "react-toastify";
 import { createTicket, reset } from "../features/tickets/ticketSlice";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
+import axios from "axios";
+
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+const PROJECTS = {
+  Shong: "shong",
+  Solding: "solding",
+  "SDLLP Salun": "sdllpsalun",
+  "JHP Kuwarsi-II": "kuwarsi",
+  "Jogini-II": "jogini"
+};
 
 function NewTicket() {
   const { user } = useSelector((state) => state.auth);
@@ -23,6 +33,8 @@ function NewTicket() {
   const [rating, setrating] = useState("");
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [spares, setSpares] = useState([]);
+  const [sparesLoading, setSparesLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,6 +44,10 @@ const sendEmailNotification = async () => {
   // Set the subject dynamically
   formData.append("_subject", `New ticket created by project: ${projectname}`);
 
+  
+  const spareObj = spares.find(item => item._id === spare);
+  const spareName = spareObj ? findItemNameField(spareObj, projectname) : 'Unknown Spare';
+
   // Create a custom details body
   const details = `
     Project Name: ${projectname}
@@ -39,17 +55,11 @@ Site Location: ${sitelocation}
 Project Location: ${projectlocation}
 Fault: ${fault}
 Date to attend: ${date}
-Spare Needed: ${spare}
+Spare Needed: ${spareName}
 DG Rating: ${rating}
 User Email: ${user?.email || ""}`;
 
   formData.append(" Ticket Details", details);
-
-  // Optionally, keep other fields if you want them as separate fields
-  // formData.append("Project Name", projectname);
-  // formData.append("Site Location", sitelocation);
-  // ...etc
-
   formData.append("_captcha", "false");
 
   try {
@@ -65,6 +75,66 @@ User Email: ${user?.email || ""}`;
   }
 };
 
+
+  const findItemNameField = (item, collection) => {
+    const fieldMappings = {
+      jogini: [
+        "Spare Discription",
+      ],
+      shong: [
+        "Description of Material",
+      ],
+      solding: [
+        "Description of Material",
+      ],
+      sdllpsalun: [
+        "NAME OF MATERIALS",
+      ],
+      kuwarsi: [
+        "NAME OF MATERIALS",
+      ]
+    };
+    const fieldsToCheck = fieldMappings[collection?.toLowerCase?.()] || ["item_name", "name", "Name"];
+    const existingField = fieldsToCheck.find(field => item[field] !== undefined);
+    if (!existingField) return null;
+    const value = item[existingField];
+    if (value === null || value === undefined || value === "") return "Unnamed";
+    return value;
+  };
+
+
+  useEffect(() => {
+    const fetchSpares = async () => {
+      setSpares([]);
+      if (!projectname || !PROJECTS[projectname]) {
+        console.log("No project selected or mapping missing:", projectname, PROJECTS[projectname]);
+        return;
+      }
+      setSparesLoading(true);
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const apiUrl = `${API_URL}/api/${PROJECTS[projectname]}`;
+        console.log("Fetching spares from:", apiUrl);
+        const response = await axios.get(apiUrl, {
+          headers: {
+            Authorization: user?.token ? `Bearer ${user.token}` : undefined,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("Spares response:", response.data);
+        const items = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+        setSpares(items);
+      } catch (err) {
+        console.log("Error fetching spares:", err);
+        setSpares([]);
+      } finally {
+        setSparesLoading(false);
+      }
+    };
+    fetchSpares();
+  }, [projectname]);
 
   useEffect(() => {
     if (isError) {
@@ -136,7 +206,7 @@ User Email: ${user?.email || ""}`;
 
   return (
     <>
-      <BackButton url="/" />
+      <BackButton url="/home" />
       <section className="heading">
         <h1>Create New Ticket</h1>
         <p>Fill the details</p>
@@ -159,7 +229,7 @@ User Email: ${user?.email || ""}`;
                 <option value="Shong">Shong</option>
                 <option value="Solding">Solding</option>
                 <option value="Jogini-II">Jogini-II</option>
-                <option value="JHP Kuwarsi-II">JHP Kuwarsai</option>
+                <option value="JHP Kuwarsi-II">JHP Kuwarsi</option>
                 <option value="SDLLP Salun">SDLLP Salun</option>
               </select>
           </div>
@@ -259,15 +329,42 @@ User Email: ${user?.email || ""}`;
         <section className="form">
           <div className="form-group">
             <label htmlFor="spare">Spare Needed</label>
-            <textarea
+            {sparesLoading ? (
+              <div>Loading spares...</div>
+            ) : projectname && spares.length > 0 ? (
+              <select
+  className="form-control"
+  value={spare}
+  name="Spare Needed"
+  id="spare"
+  onChange={(e) => setspare(e.target.value)}
+  required
+>
+  <option value="" disabled>
+    Select a spare
+  </option>
+  {spares.map((item) => {
+    const name = findItemNameField(item, PROJECTS[projectname]);
+    return (
+      <option key={item._id} value={item._id}>
+        {name}
+      </option>
+    );
+  })}
+</select>
+
+            ) : (
+              <textarea
                 className="form-control"
-                placeholder=""
+                placeholder="Select a project to see spares"
                 value={spare}
                 name="Spare Needed"
                 id="spare"
                 onChange={(e) => setspare(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }} 
+                style={{ width: "100%", height: "50px", resize: "none" }}
+                disabled
               ></textarea>
+            )}
           </div>
         </section>
 

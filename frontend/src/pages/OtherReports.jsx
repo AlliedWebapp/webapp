@@ -7,7 +7,7 @@ import BackButton from "../components/BackButton";
 const OtherReports = () => {
     return (
       <div className="report-container">
-        <BackButton url="/" className="back-button" />
+        <BackButton url="/home" className="back-button" />
         <div className="other-reports-header">
           <h2 className="other-reports-heading">Other Reports</h2>
           <p className="other-reports-subheading">

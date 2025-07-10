@@ -92,7 +92,7 @@ const MonthlySummary = () => {
 
   return (
     <div className="monthly-summary">
-      <BackButton url="/" />
+      <BackButton url="/home" />
       <h1 className="monthly-summary__title">Monthly Summary</h1>
       <p className="monthly-summary__subtitle">Choose the year, month{isAdmin ? ', and project' : ''}</p>
       <div className="dropdown-row">

@@ -102,14 +102,14 @@ function Tickets() {
     return (
       <div>
         <h3 className="text-red-500">{message}</h3>
-        <BackButton url="/" />
+        <BackButton url="/home" />
       </div>
     );
   }
 
   return (
     <>
-      <BackButton url="/" />
+      <BackButton url="/home" />
       <h1>Tickets</h1>
 
       {/* Sort Controls */}
