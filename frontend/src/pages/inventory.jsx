@@ -590,7 +590,7 @@ const Inventory = () => {
   return (
     <div>
       <OrientationAlert />
-      <BackButton url="/" />
+      <BackButton url="/home" />
       <h2>View Inventory</h2>
 
       <label>Select Project: </label>

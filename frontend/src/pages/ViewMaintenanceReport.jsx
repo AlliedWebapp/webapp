@@ -82,7 +82,7 @@ function ViewMaintenanceReport() {
     return (
       <div className="error-container">
         <h3 className="text-red-500">Error: {message}</h3>
-        <BackButton url="/" />
+        <BackButton url="/home" />
       </div>
     );
   }
