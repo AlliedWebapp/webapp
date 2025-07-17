@@ -14,6 +14,13 @@ const consumableSchema = new mongoose.Schema({
   cost: { type: Number },
   vendor: { type: String },
   remarks: { type: String },
+  fuel_consumed: { type: Number },
+  total_km_driven: { type: Number },
+  fuel_storage: { type: String },
+  picture: {
+    data: { type: Buffer },
+    contentType: { type: String }
+  },
    createdAt: {
     type: Date,
     default: Date.now,

@@ -45,6 +45,11 @@ const ticketSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please enter spare details']
     },
+    spareQuantity: {
+      type: Number,
+      required: true,
+      default: 1
+    },
     rating: {
       type: String,
       required: [true, 'Please enter DG rating']

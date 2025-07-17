@@ -2,19 +2,29 @@ const express = require("express");
 const router = express.Router();
 const Consumable = require("../models/ConsumableModel");
 const { protect } = require("../middleware/authMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 
 router.use(protect); // ✅ Only protect, nothing else
 
-router.post("/", async (req, res) => {
+router.post("/", upload.single('picture'), async (req, res) => {
   try {
     const userEmail = req.user?.email;
     if (!userEmail) return res.status(401).json({ error: "Unauthorized" });
 
-    const newConsumable = new Consumable({
+    const consumableData = {
       ...req.body,
       createdBy: userEmail
-    });
+    };
 
+    // Add image data if uploaded
+    if (req.file) {
+      consumableData.picture = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      };
+    }
+
+    const newConsumable = new Consumable(consumableData);
     await newConsumable.save();
     res.status(201).json(newConsumable);
   } catch (err) {
@@ -53,11 +63,21 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", upload.single('picture'), async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    
+    // Add image data if uploaded
+    if (req.file) {
+      updateData.picture = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      };
+    }
+
     const updated = await Consumable.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true }
     );
     if (!updated) return res.status(404).json({ error: "Not found" });
@@ -66,7 +86,5 @@ router.patch("/:id", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
-
 
 module.exports = router;

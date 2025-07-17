@@ -52,12 +52,21 @@ const customStyles = {
 
 Modal.setAppElement("#root");
 
+const PROJECTS = {
+  Shong: "shong",
+  Solding: "solding",
+  "SDLLP Salun": "sdllpsalun",
+  "JHP Kuwarsi-II": "kuwarsi",
+  "Jogini-II": "jogini"
+};
+
 function Ticket() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [hasFSR, setHasFSR] = useState(false);
   const [isCheckingFSR, setIsCheckingFSR] = useState(true);
+  const [spareName, setSpareName] = useState("");
 
   const { ticket, isLoading, isError, message } = useSelector(
     (state) => state.tickets
@@ -118,6 +127,46 @@ function Ticket() {
       dispatch(notesReset());
     };
   }, [ticketId, dispatch]);
+
+  useEffect(() => {
+    const fetchSpareName = async () => {
+      if (!ticket || !ticket.spare || !ticket.projectname) return;
+      const projectKey = PROJECTS[ticket.projectname];
+      if (!projectKey) return;
+      try {
+        const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+        const apiUrl = `${API_URL}/api/${projectKey}`;
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization: user?.token ? `Bearer ${user.token}` : undefined,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : data.data || [];
+        const spareObj = items.find(item => item._id === ticket.spare);
+        const findItemNameField = (item, collection) => {
+          const fieldMappings = {
+            jogini: ["Spare Discription"],
+            shong: ["Description of Material"],
+            solding: ["Description of Material"],
+            sdllpsalun: ["NAME OF MATERIALS"],
+            kuwarsi: ["NAME OF MATERIALS"]
+          };
+          const fieldsToCheck = fieldMappings[collection?.toLowerCase?.()] || ["item_name", "name", "Name"];
+          const existingField = fieldsToCheck.find(field => item[field] !== undefined);
+          if (!existingField) return null;
+          const value = item[existingField];
+          if (value === null || value === undefined || value === "") return "Unnamed";
+          return value;
+        };
+        setSpareName(spareObj ? findItemNameField(spareObj, projectKey) : "Unknown Spare");
+      } catch (err) {
+        setSpareName("");
+      }
+    };
+    fetchSpareName();
+  }, [ticket]);
 
   // Show spinner while loading ticket, notes, or FSR check
   if (isLoading || notesIsLoading || isCheckingFSR) return <Spinner />;
@@ -304,7 +353,9 @@ function Ticket() {
               <div className="detail-label">
                 <span>Spare Required</span>
               </div>
-              <div className="detail-value">{ticket.spare || 'None'}</div>
+              <div className="detail-value">
+                {spareName ? `${spareName} (Qty: ${ticket.spareQuantity || 1})` : ticket.spare || 'None'}
+              </div>
             </div>
           </div>
         </div>

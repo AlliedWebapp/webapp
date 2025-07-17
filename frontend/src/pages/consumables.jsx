@@ -19,7 +19,10 @@ const Consumables = () => {
     issued_to: "",
     cost: "",
     vendor: "",
-    remarks: ""
+    remarks: "",
+    fuel_consumed: "",
+    total_km_driven: "",
+    fuel_storage: ""
   });
 
   const [records, setRecords] = useState([]);
@@ -28,6 +31,9 @@ const Consumables = () => {
   const [showForm, setShowForm] = useState(false);
   const [showRecords, setShowRecords] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState("");
   
 
 
@@ -37,6 +43,53 @@ const Consumables = () => {
     headers: {
       Authorization: `Bearer ${user.token}`,
     },
+  };
+
+  // Image utility functions
+  const arrayBufferToBase64 = (bufferArray) => {
+    let binary = "";
+    const bytes = new Uint8Array(bufferArray);
+    bytes.forEach((b) => (binary += String.fromCharCode(b)));
+    return window.btoa(binary);
+  };
+
+  // Given item.picture, return a base64‐only string (no data: prefix)
+  const getBase64FromPicture = (picture) => {
+    if (!picture || !picture.data) return null;
+
+    // Case A: picture.data is already a Base64 string
+    if (typeof picture.data === "string") {
+      return picture.data;
+    }
+
+    // Case B: picture.data is an object like { type: "Buffer", data: [ … ] }
+    if (
+      typeof picture.data === "object" &&
+      Array.isArray(picture.data.data)
+    ) {
+      return arrayBufferToBase64(picture.data.data);
+    }
+
+    // Case C: picture.data is a Buffer array
+    if (Array.isArray(picture.data)) {
+      return arrayBufferToBase64(picture.data);
+    }
+
+    return null;
+  };
+
+  const openImageModal = (rec) => {
+    if (!rec.picture || !rec.picture.data) return;
+    const b64 = getBase64FromPicture(rec.picture);
+    if (!b64) return;
+    const mime = rec.picture.contentType;
+    setModalImageSrc(`data:${mime};base64,${b64}`);
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setModalImageSrc("");
   };
 
   useEffect(() => {
@@ -78,14 +131,50 @@ const Consumables = () => {
       toast.error("Cost must be a number.");
       return;
     }
+    // Validation: fuel_consumed must be a number if filled
+    if (formData.fuel_consumed && isNaN(Number(formData.fuel_consumed))) {
+      toast.error("Fuel consumed must be a number.");
+      return;
+    }
+    // Validation: total_km_driven must be a number if filled
+    if (formData.total_km_driven && isNaN(Number(formData.total_km_driven))) {
+      toast.error("Total km driven must be a number.");
+      return;
+    }
     try {
+      const formDataToSend = new FormData();
+      
+      // Add all form fields
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== "") {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+      
+      // Add image if selected
+      if (selectedImage) {
+        formDataToSend.append('picture', selectedImage);
+      }
+      
       if (editingId) {
         // Update existing consumable
-        await axios.patch(`${API_URL}/api/consumables/${editingId}`, formData, config);
+        await axios.patch(`${API_URL}/api/consumables/${editingId}`, formDataToSend, {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
         toast.success("Consumable updated!");
       } else {
         // Add new consumable
-        await axios.post(`${API_URL}/api/consumables`, formData, config);
+        await axios.post(`${API_URL}/api/consumables`, formDataToSend, {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
         toast.success("Consumable added!");
       }
       setFormData({
@@ -99,8 +188,12 @@ const Consumables = () => {
         issued_to: "",
         cost: "",
         vendor: "",
-        remarks: ""
+        remarks: "",
+        fuel_consumed: "",
+        total_km_driven: "",
+        fuel_storage: ""
       });
+      setSelectedImage(null);
       setEditingId(null);
       setShowForm(false);
       fetchRecords();
@@ -139,8 +232,14 @@ const handleEdit = (rec) => {
       issued_to: rec.issued_to || "",
       cost: rec.cost || "",
       vendor: rec.vendor || "",
-      remarks: rec.remarks || ""
+      remarks: rec.remarks || "",
+      fuel_consumed: rec.fuel_consumed || "",
+      total_km_driven: rec.total_km_driven || "",
+      fuel_storage: rec.fuel_storage || ""
     });
+    
+    // Clear selected image when editing (user can select new image if needed)
+    setSelectedImage(null);
     
   setEditingId(rec._id);
     setShowForm(true);
@@ -282,18 +381,55 @@ const deleteButtonStyle = {
             value={value || ""}
             onChange={handleChange}
             required={["date", "item_name"].includes(key)}
-            placeholder={key === "cost" ? "Only number allowed e.g. 1000" : undefined}
+            placeholder={
+              key === "cost" ? "Only number allowed e.g. 1000" :
+              key === "fuel_consumed" ? "Only number allowed e.g. 50" :
+              key === "total_km_driven" ? "Only number allowed e.g. 500" :
+              undefined
+            }
             style={{
               width: '100%',
               padding: '10px',
               borderRadius: '4px',
               border: '1px solid #ddd',
               fontSize: '14px',
-              color: key === "cost" && !value ? '#888' : undefined
+              color: (key === "cost" || key === "fuel_consumed" || key === "total_km_driven") && !value ? '#888' : undefined
             }}
           />
         </div>
       ))}
+      
+      {/* Image Upload Field */}
+      <div style={{ marginBottom: '15px' }}>
+        <label style={{ 
+          display: 'block', 
+          marginBottom: '5px',
+          fontWeight: 'normal',
+          color: '#333',
+          fontSize: '20px'
+        }}>
+          Image
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setSelectedImage(e.target.files[0] || null)}
+          style={{
+            width: '100%',
+            padding: '10px',
+            borderRadius: '4px',
+            border: '1px solid #ddd',
+            fontSize: '14px'
+          }}
+        />
+        {selectedImage && (
+          <div style={{ marginTop: '10px' }}>
+            <p style={{ fontSize: '14px', color: '#666' }}>
+              Selected: {selectedImage.name}
+            </p>
+          </div>
+        )}
+      </div>
       <div style={{ textAlign: 'center' }}>
         <button
           type="submit"
@@ -327,7 +463,10 @@ const deleteButtonStyle = {
                     issued_to: "",
                     cost: "",
                     vendor: "",
-                    remarks: ""
+                    remarks: "",
+                    fuel_consumed: "",
+                    total_km_driven: "",
+                    fuel_storage: ""
                   });
                 }}
                 style={{
@@ -353,11 +492,8 @@ const deleteButtonStyle = {
       {/* Records Table */}
 {showRecords && (
   <div style={{
-    background: '#f8f9fa',
-    padding: '30px',
-    borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          width: '100%'
+    padding: '20px',
+    width: '100%'
   }}>
     <h3 style={{ marginBottom: '20px' }}>Consumable Records</h3>
     {loading ? (
@@ -371,50 +507,84 @@ const deleteButtonStyle = {
                 <table style={{
                   width: '100%',
                   borderCollapse: 'collapse',
-                  tableLayout: 'fixed',
-                  fontSize: '14px',
-                  minWidth: '1200px'
+                  fontSize: '13px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
                 }}>
             <thead>
               <tr>
-                      <th style={{ width: '4%', padding: '12px', textAlign: 'center', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Sr No</th>
-                      <th style={{ width: '8%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Date</th>
-                      <th style={{ width: '12%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Item Name</th>
-                      <th style={{ width: '12%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Specification</th>
-                      <th style={{ width: '8%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Opening Stock</th>
-                      <th style={{ width: '8%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Received Qty</th>
-                      <th style={{ width: '8%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Issued Qty</th>
-                      <th style={{ width: '8%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Balance Stock</th>
-                      <th style={{ width: '10%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Issued To</th>
-                      <th style={{ width: '10%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Vendor</th>
-                      <th style={{ width: '5%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Cost</th>
-                      <th style={{ width: '5%', padding: '12px', textAlign: 'left', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Remarks</th>
-                      <th style={{ width: '12%', padding: '12px', textAlign: 'center', backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>Actions</th>
+                      <th style={{ padding: '10px', textAlign: 'center', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Sr No</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Date</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Item Name</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Specification</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Opening Stock</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Received Qty</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Issued Qty</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Balance Stock</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Issued To</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Vendor</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Cost</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Fuel Consumed</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Total KM Driven</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Average</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Fuel Storage</th>
+                      <th style={{ padding: '10px', textAlign: 'left', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Remarks</th>
+                      <th style={{ padding: '10px', textAlign: 'center', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Image</th>
+                      <th style={{ padding: '10px', textAlign: 'center', backgroundColor: '#f5f5f5', color: '#333', fontSize: '12px', fontWeight: 'bold' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {records.map((rec, idx) => (
                       <tr key={rec._id} style={{ borderBottom: '1px solid #ddd' }}>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>{rec.sr_no || idx + 1}</td>
-                        <td style={{ padding: '12px', whiteSpace: 'nowrap' }}>{new Date(rec.date).toLocaleDateString()}</td>
-                        <td style={{ padding: '12px' }}>{rec.item_name}</td>
-                        <td style={{ padding: '12px' }}>{rec.specification}</td>
-                        <td style={{ padding: '12px' }}>{rec.opening_stock}</td>
-                        <td style={{ padding: '12px' }}>{rec.received_qty}</td>
-                        <td style={{ padding: '12px' }}>{rec.issued_qty}</td>
-                        <td style={{ padding: '12px' }}>{rec.balance_stock}</td>
-                        <td style={{ padding: '12px' }}>{rec.issued_to}</td>
-                        <td style={{ padding: '12px' }}>{rec.vendor ? String(rec.vendor) : ''}</td>
-                        <td style={{ padding: '12px', whiteSpace: 'nowrap' }}>{rec.cost ? String(rec.cost) : ''}</td>
-                        <td style={{ padding: '12px' }}>{rec.remarks ? String(rec.remarks) : ''}</td>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <td style={{ padding: '10px', textAlign: 'center', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.sr_no || idx + 1}</td>
+                        <td style={{ padding: '10px', whiteSpace: 'nowrap', fontSize: '12px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{new Date(rec.date).toLocaleDateString()}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', maxWidth: '120px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.item_name}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', maxWidth: '120px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.specification}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.opening_stock}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.received_qty}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.issued_qty}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.balance_stock}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', maxWidth: '100px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.issued_to}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', maxWidth: '100px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.vendor ? String(rec.vendor) : ''}</td>
+                        <td style={{ padding: '10px', whiteSpace: 'nowrap', fontSize: '12px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.cost ? String(rec.cost) : ''}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.fuel_consumed ? String(rec.fuel_consumed) : ''}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.total_km_driven ? String(rec.total_km_driven) : ''}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>
+                          {rec.fuel_consumed && rec.total_km_driven && rec.fuel_consumed > 0 
+                            ? (rec.total_km_driven / rec.fuel_consumed).toFixed(2) 
+                            : ''}
+                        </td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', maxWidth: '100px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.fuel_storage ? String(rec.fuel_storage) : ''}</td>
+                        <td style={{ padding: '10px', fontSize: '12px', wordWrap: 'break-word', maxWidth: '120px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>{rec.remarks ? String(rec.remarks) : ''}</td>
+                        <td style={{ padding: '10px', textAlign: 'center', fontSize: '12px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>
+                          {rec.picture && rec.picture.data ? (
+                            <button
+                              onClick={() => openImageModal(rec)}
+                              style={{
+                                padding: '4px 8px',
+                                backgroundColor: 'black',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '10px',
+                              }}
+                            >
+                              View Image
+                            </button>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'center', fontSize: '12px', backgroundColor: idx % 2 === 0 ? '#f9f9f9' : 'white' }}>
   <button
                             style={{
                               ...editButtonStyle,
-                              padding: '10px 20px',
-                              margin: '4px',
-                              fontSize: '15px',
-                              minWidth: '100px'
+                              padding: '8px 16px',
+                              margin: '3px',
+                              fontSize: '11px',
+                              minWidth: '70px'
                             }}
     onClick={() => handleEdit(rec)}
                             onMouseOver={e => e.target.style.background = '#45a049'}
@@ -425,10 +595,10 @@ const deleteButtonStyle = {
   <button
                             style={{
                               ...deleteButtonStyle,
-                              padding: '10px 20px',
-                              margin: '4px',
-                              fontSize: '15px',
-                              minWidth: '100px'
+                              padding: '8px 16px',
+                              margin: '3px',
+                              fontSize: '11px',
+                              minWidth: '70px'
                             }}
     onClick={() => handleDelete(rec._id)}
                             onMouseOver={e => e.target.style.background = '#da190b'}
@@ -451,7 +621,7 @@ const deleteButtonStyle = {
                     padding: '15px',
                     marginBottom: '15px',
                     borderRadius: '8px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    border: '1px solid #ddd'
                   }}>
                     <div style={{ marginBottom: '10px' }}><strong>Sr No:</strong> {rec.sr_no || idx + 1}</div>
                     <div style={{ marginBottom: '10px' }}><strong>Date:</strong> {new Date(rec.date).toLocaleDateString()}</div>
@@ -464,7 +634,33 @@ const deleteButtonStyle = {
                     <div style={{ marginBottom: '10px' }}><strong>Issued To:</strong> {rec.issued_to}</div>
                     <div style={{ marginBottom: '10px' }}><strong>Vendor:</strong> {rec.vendor ? String(rec.vendor) : ''}</div>
                     <div style={{ marginBottom: '10px' }}><strong>Cost:</strong> {rec.cost ? String(rec.cost) : ''}</div>
+                    <div style={{ marginBottom: '10px' }}><strong>Fuel Consumed:</strong> {rec.fuel_consumed ? String(rec.fuel_consumed) : ''}</div>
+                    <div style={{ marginBottom: '10px' }}><strong>Total KM Driven:</strong> {rec.total_km_driven ? String(rec.total_km_driven) : ''}</div>
+                    <div style={{ marginBottom: '10px' }}><strong>Average:</strong> {rec.fuel_consumed && rec.total_km_driven && rec.fuel_consumed > 0 ? (rec.total_km_driven / rec.fuel_consumed).toFixed(2) : ''}</div>
+                    <div style={{ marginBottom: '10px' }}><strong>Fuel Storage:</strong> {rec.fuel_storage ? String(rec.fuel_storage) : ''}</div>
                     <div style={{ marginBottom: '10px' }}><strong>Remarks:</strong> {rec.remarks ? String(rec.remarks) : ''}</div>
+                    <div style={{ marginBottom: '10px' }}>
+                      <strong>Image:</strong> 
+                      {rec.picture && rec.picture.data ? (
+                        <button
+                          onClick={() => openImageModal(rec)}
+                          style={{
+                            padding: '4px 8px',
+                            backgroundColor: 'black',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '10px',
+                            marginLeft: '10px'
+                          }}
+                        >
+                          View Image
+                        </button>
+                      ) : (
+                        " No image"
+                      )}
+                    </div>
                     <div style={{ 
                       display: 'flex', 
                       gap: '10px',
@@ -526,9 +722,65 @@ const deleteButtonStyle = {
               </style>
       </>
     )}
-  </div>
+        </div>
 )}
 
+      {/* Image Modal Overlay */}
+      {isImageModalOpen && (
+        <div
+          onClick={closeImageModal}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: "#fff",
+              padding: "1rem",
+              borderRadius: "8px",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              overflow: "auto",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={closeImageModal}
+              style={{
+                position: "absolute",
+                top: "1rem",
+                right: "1rem",
+                background: "transparent",
+                border: "none",
+                fontSize: "1.5rem",
+                cursor: "pointer",
+              }}
+            >
+              ✖
+            </button>
+            <img
+              src={modalImageSrc}
+              alt="Full view"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "80vh",
+                display: "block",
+                margin: "0 auto",
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

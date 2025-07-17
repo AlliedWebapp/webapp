@@ -99,6 +99,7 @@ const createTicket = asyncHandler(async (req, res) => {
       date, 
       spare, 
       rating,
+      spareQuantity
     } = req.body
 
     const imageFiles = req.files;
@@ -106,6 +107,8 @@ const createTicket = asyncHandler(async (req, res) => {
       data: file.buffer,
       contentType: file.mimetype,
     })) || [];
+
+    const quantity = parseInt(spareQuantity) > 0 ? parseInt(spareQuantity) : 1;
 
     if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating || !imageFiles)  {
       console.log("Missing required fields", req.body, req.files);
@@ -134,7 +137,8 @@ const createTicket = asyncHandler(async (req, res) => {
       images,
       user: req.user.id,
       createdBy: user.email,
-      status: 'new'
+      status: 'new',
+      spareQuantity: quantity
     });
 
     // --- Decrement spare count logic ---
@@ -156,7 +160,7 @@ const createTicket = asyncHandler(async (req, res) => {
       // 1. Decrement in the project inventory using direct $inc
       const updateResult = await collectionModel.updateOne(
         { _id: spare },
-        { $inc: { spareCount: -1 } }
+        { $inc: { spareCount: -quantity } }
       );
       console.log("Direct $inc update result:", updateResult);
 
@@ -178,7 +182,7 @@ const createTicket = asyncHandler(async (req, res) => {
           collectionName,
           itemId: spare
         },
-        { $inc: { spareCount: -1 } },
+        { $inc: { spareCount: -quantity } },
         { upsert: true, new: true }
       );
       const userSpare = await UserSpareCount.findOne({ userId: req.user.id, collectionName, itemId: spare });

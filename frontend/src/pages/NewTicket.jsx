@@ -35,6 +35,7 @@ function NewTicket() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [spares, setSpares] = useState([]);
   const [sparesLoading, setSparesLoading] = useState(false);
+  const [spareQuantity, setSpareQuantity] = useState(1);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ Fault: ${fault}
 Date to attend: ${date}
 Spare Needed: ${spareName}
 DG Rating: ${rating}
+Spare Quantity: ${spareQuantity}
 User Email: ${user?.email || ""}`;
 
   formData.append(" Ticket Details", details);
@@ -177,6 +179,17 @@ User Email: ${user?.email || ""}`;
       toast.error("Please fill in all fields");
       return;
     }
+    if (!spareQuantity || isNaN(spareQuantity) || parseInt(spareQuantity) < 1) {
+      toast.error("Please enter a valid spare quantity (minimum 1)");
+      return;
+    }
+    // Check if requested quantity exceeds available stock
+    const spareObj = spares.find(item => item._id === spare);
+    const availableCount = spareObj && typeof spareObj.spareCount === 'string' ? parseInt(spareObj.spareCount) : spareObj?.spareCount;
+    if (spareObj && availableCount !== undefined && parseInt(spareQuantity) > availableCount) {
+      toast.error(`Requested quantity exceeds available stock (${availableCount}).`);
+      return;
+    }
 
     // Disable submit button to prevent double submission
     const submitButton = e.target.querySelector('.submit-btn');
@@ -194,6 +207,7 @@ User Email: ${user?.email || ""}`;
     formData.append("date", date);
     formData.append("spare", spare);
     formData.append("rating", rating);
+    formData.append("spareQuantity", spareQuantity);
   
     images.forEach((image) => {
       formData.append("images", image);
@@ -327,32 +341,47 @@ User Email: ${user?.email || ""}`;
         </section>
 
         <section className="form">
-          <div className="form-group">
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '10px' }}>
             <label htmlFor="spare">Spare Needed</label>
             {sparesLoading ? (
               <div>Loading spares...</div>
             ) : projectname && spares.length > 0 ? (
-              <select
-  className="form-control"
-  value={spare}
-  name="Spare Needed"
-  id="spare"
-  onChange={(e) => setspare(e.target.value)}
-  required
->
-  <option value="" disabled>
-    Select a spare
-  </option>
-  {spares.map((item) => {
-    const name = findItemNameField(item, PROJECTS[projectname]);
-    return (
-      <option key={item._id} value={item._id}>
-        {name}
-      </option>
-    );
-  })}
-</select>
-
+              <>
+                <select
+                  className="form-control"
+                  value={spare}
+                  name="Spare Needed"
+                  id="spare"
+                  onChange={(e) => setspare(e.target.value)}
+                  required
+                  style={{ width: '100%' }}
+                >
+                  <option value="" disabled>
+                    Select a spare
+                  </option>
+                  {spares.map((item) => {
+                    const name = findItemNameField(item, PROJECTS[projectname]);
+                    return (
+                      <option key={item._id} value={item._id}>
+                        {name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <label htmlFor="spareQuantity" style={{ marginTop: '8px' }}>Spare Quantity</label>
+                <input
+                  type="number"
+                  id="spareQuantity"
+                  name="spareQuantity"
+                  min="1"
+                  value={spareQuantity}
+                  onChange={e => setSpareQuantity(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="form-control"
+                  style={{ width: '100%' }}
+                  required
+                  placeholder="Enter quantity"
+                />
+              </>
             ) : (
               <textarea
                 className="form-control"
