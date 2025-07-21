@@ -26,14 +26,12 @@ function getCollectionModel(projectname) {
   }
 }
 
-// Helper to compare ObjectId or string
+
 function isTicketOwner(ticketUser, reqUserId) {
   return ticketUser.toString() === reqUserId.toString();
 }
 
-// @desc    Get user tickets (admin: all, user: own)
-// @route   GET /api/tickets
-// @access  Private
+
 const getTickets = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -53,9 +51,7 @@ const getTickets = asyncHandler(async (req, res) => {
   res.status(200).json(tickets);
 });
 
-// @desc    Get user ticket (admin: any, user: own)
-// @route   GET /api/tickets/:id
-// @access  Private
+
 const getTicket = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -71,7 +67,7 @@ const getTicket = asyncHandler(async (req, res) => {
 
   const userEmail = (req.user.email || "").toLowerCase();
 
-  // Admin can view any ticket; user only their own
+ 
   if (
     !adminEmails.includes(userEmail) &&
     !isTicketOwner(ticket.user, req.user.id)
@@ -83,9 +79,7 @@ const getTicket = asyncHandler(async (req, res) => {
   res.status(200).json(ticket);
 });
 
-// @desc    Create new ticket
-// @route   POST /api/tickets
-// @access  Private
+
 const createTicket = asyncHandler(async (req, res) => {
   console.log("[TICKET] Ticket creation attempt received at", new Date().toISOString());
   try {
@@ -99,7 +93,9 @@ const createTicket = asyncHandler(async (req, res) => {
       date, 
       spare, 
       rating,
-      spareQuantity
+      spareQuantity,
+      consumable,
+      fuel_consumed
     } = req.body
 
     const imageFiles = req.files;
@@ -123,7 +119,6 @@ const createTicket = asyncHandler(async (req, res) => {
       throw new Error('User not found')
     }
 
-    // Create the ticket
     const ticket = await Ticket.create({
       projectname,
       sitelocation,
@@ -138,10 +133,11 @@ const createTicket = asyncHandler(async (req, res) => {
       user: req.user.id,
       createdBy: user.email,
       status: 'new',
-      spareQuantity: quantity
+      spareQuantity: quantity,
+      consumable,
+      fuel_consumed: fuel_consumed ? Number(fuel_consumed) : 0
     });
 
-    // --- Decrement spare count logic ---
     try {
       const collectionModel = getCollectionModel(projectname);
 
@@ -156,15 +152,12 @@ const createTicket = asyncHandler(async (req, res) => {
         console.log(`SPARE ID: ${spare}`);
         console.log("SPARE NOT FOUND BEFORE DECREMENT");
       }
-
-      // 1. Decrement in the project inventory using direct $inc
       const updateResult = await collectionModel.updateOne(
         { _id: spare },
         { $inc: { spareCount: -quantity } }
       );
       console.log("Direct $inc update result:", updateResult);
 
-      // Fetch the spare document again to log count after decrement
       const spareDocAfter = await collectionModel.findById(spare);
       if (spareDocAfter) {
         console.log(`COUNT AFTER DECREMENT: ${spareDocAfter.spareCount}`);
@@ -178,7 +171,7 @@ const createTicket = asyncHandler(async (req, res) => {
       const collectionName = collectionModel.collection.collectionName.toLowerCase();
       await UserSpareCount.findOneAndUpdate(
         {
-          userId: req.user.id, // or req.user._id, ensure consistency
+          userId: req.user.id, 
           collectionName,
           itemId: spare
         },
@@ -190,7 +183,41 @@ const createTicket = asyncHandler(async (req, res) => {
     } catch (err) {
       console.error("Error decrementing spare count:", err);
     }
-    // --- End decrement logic ---
+
+    try {
+      if (consumable && fuel_consumed) {
+        const Consumable = require('../models/ConsumableModel');
+        const consumableDoc = await Consumable.findById(consumable);
+        if (consumableDoc) {
+          let currentStorage = Number(consumableDoc.fuel_storage);
+          let toSubtract = Number(fuel_consumed);
+          let prevConsumed = Number(consumableDoc.fuel_consumed) || 0;
+          let prevKm = Number(consumableDoc.total_km_driven) || 0;
+          let addKm = Number(req.body.total_km_driven) || 0;
+          if (!isNaN(currentStorage) && !isNaN(toSubtract)) {
+            const newStorage = currentStorage - toSubtract;
+            console.log(`[CONSUMABLE] Fuel storage before: ${currentStorage}, to subtract: ${toSubtract}, after: ${newStorage}`);
+            consumableDoc.fuel_storage = newStorage.toString();
+            // Increment total fuel_consumed
+            consumableDoc.fuel_consumed = prevConsumed + toSubtract;
+            // Increment total_km_driven
+            consumableDoc.total_km_driven = prevKm + addKm;
+            // Update avg
+            if ((prevKm + addKm) > 0 && (prevConsumed + toSubtract) > 0) {
+              consumableDoc.avg = ((prevKm + addKm) / (prevConsumed + toSubtract)).toFixed(2);
+            }
+            await consumableDoc.save();
+          } else {
+            console.warn('[CONSUMABLE] fuel_storage or fuel_consumed is not a number');
+          }
+        } else {
+          console.warn('[CONSUMABLE] Consumable not found for ID', consumable);
+        }
+      }
+    } catch (err) {
+      console.error('Error decrementing consumable fuel_storage:', err);
+    }
+
 
     res.status(201).json(ticket)
   } catch (error) {
@@ -205,9 +232,7 @@ const createTicket = asyncHandler(async (req, res) => {
 
 
 
-// @desc    Delete ticket (admin: any, user: own)
-// @route   DELETE /api/tickets/:id
-// @access  Private
+
 const deleteTicket = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -223,7 +248,6 @@ const deleteTicket = asyncHandler(async (req, res) => {
 
   const userEmail = (req.user.email || "").toLowerCase();
 
-  // Admin can delete any ticket; user only their own
   if (
     !adminEmails.includes(userEmail) &&
     !isTicketOwner(ticket.user, req.user.id)
@@ -237,9 +261,6 @@ const deleteTicket = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true });
 });
 
-// @desc    Update ticket (admin: any, user: own)
-// @route   PUT /api/tickets/:id
-// @access  Private
 const updateTicket = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -255,7 +276,6 @@ const updateTicket = asyncHandler(async (req, res) => {
 
   const userEmail = (req.user.email || "").toLowerCase();
 
-  // Admin can update any ticket; user only their own
   if (
     !adminEmails.includes(userEmail) &&
     !isTicketOwner(ticket.user, req.user.id)

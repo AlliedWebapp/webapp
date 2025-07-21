@@ -50,6 +50,16 @@ const ticketSchema = new mongoose.Schema(
       required: true,
       default: 1
     },
+
+    consumable: {
+      type: String,
+      required: false
+    },
+    fuel_consumed: {
+      type: Number,
+      required: false,
+      default: 0
+    },
     rating: {
       type: String,
       required: [true, 'Please enter DG rating']
@@ -80,7 +90,7 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
-// 🔁 PRE-SAVE HOOK to generate 4-digit ticket ID
+
 ticketSchema.pre('validate', async function (next) {
   if (!this.ticket_id) {
     let isUnique = false;

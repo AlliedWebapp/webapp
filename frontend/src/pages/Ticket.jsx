@@ -1,4 +1,4 @@
-// Ticket.jsx — For viewing individual ticket
+
 
 import { useDispatch, useSelector } from "react-redux";
 import BackButton from "../components/BackButton";
@@ -67,6 +67,7 @@ function Ticket() {
   const [hasFSR, setHasFSR] = useState(false);
   const [isCheckingFSR, setIsCheckingFSR] = useState(true);
   const [spareName, setSpareName] = useState("");
+  const [consumableName, setConsumableName] = useState("");
 
   const { ticket, isLoading, isError, message } = useSelector(
     (state) => state.tickets
@@ -168,7 +169,29 @@ function Ticket() {
     fetchSpareName();
   }, [ticket]);
 
-  // Show spinner while loading ticket, notes, or FSR check
+  useEffect(() => {
+    const fetchConsumableName = async () => {
+      if (!ticket || !ticket.consumable) return;
+      try {
+        const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+        const apiUrl = `${API_URL}/api/consumables`;
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization: user?.token ? `Bearer ${user.token}` : undefined,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : data.data || [];
+        const consumableObj = items.find(item => item._id === ticket.consumable);
+        setConsumableName(consumableObj ? consumableObj.item_name : "Unknown Consumable");
+      } catch (err) {
+        setConsumableName("");
+      }
+    };
+    fetchConsumableName();
+  }, [ticket]);
+
   if (isLoading || notesIsLoading || isCheckingFSR) return <Spinner />;
 
   if (isError)
@@ -243,7 +266,7 @@ function Ticket() {
 
   return (
     <div className="ticket-page">
-      {/* Header Section */}
+  
       <div className="ticket-header">
         <div className="header-content">
           <BackButton url="/tickets" />
@@ -262,9 +285,9 @@ function Ticket() {
         </div>
       </div>
 
-      {/* Main Content */}
+
       <div className="ticket-content">
-        {/* Ticket Overview Card */}
+        
         <div className="ticket-overview-card">
           <div className="card-header">
             <h2><FaClipboardList /> Ticket Overview</h2>
@@ -305,7 +328,6 @@ function Ticket() {
           </div>
         </div>
 
-        {/* Issue Details Card */}
         <div className="ticket-details-card">
           <div className="card-header">
             <h2><FaExclamationTriangle /> Issue Details</h2>
@@ -357,10 +379,27 @@ function Ticket() {
                 {spareName ? `${spareName} (Qty: ${ticket.spareQuantity || 1})` : ticket.spare || 'None'}
               </div>
             </div>
+        
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Consumable Required</span>
+              </div>
+              <div className="detail-value">
+                {ticket.consumable ? `${consumableName}` : 'None'}
+              </div>
+            </div>
+   
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Fuel Consumed</span>
+              </div>
+              <div className="detail-value">
+                {ticket.fuel_consumed !== undefined && ticket.fuel_consumed !== null && ticket.fuel_consumed !== "" ? ticket.fuel_consumed : 'None'}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Images Section */}
         {ticket.images && ticket.images.length > 0 && (
           <div className="ticket-images-card">
             <div className="card-header">
@@ -402,7 +441,7 @@ function Ticket() {
           </div>
         )}
 
-        {/* Notes Section */}
+       
         <div className="ticket-notes-card">
           <div className="card-header">
             <h2><FaComments /> Notes</h2>
@@ -427,7 +466,6 @@ function Ticket() {
           )}
         </div>
 
-        {/* Actions Section */}
         <div className="ticket-actions-card">
           <div className="actions-grid">
             {ticket.status !== "close" && (
@@ -439,7 +477,6 @@ function Ticket() {
         </div>
       </div>
 
-      {/* Add Note Modal */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -478,7 +515,6 @@ function Ticket() {
         </div>
       </Modal>
 
-      {/* Image Preview Modal */}
       {previewImage && (
         <div className="image-preview-overlay" onClick={() => setPreviewImage(null)}>
           <div className="image-preview-content" onClick={(e) => e.stopPropagation()}>

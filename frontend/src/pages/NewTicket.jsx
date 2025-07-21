@@ -36,20 +36,23 @@ function NewTicket() {
   const [spares, setSpares] = useState([]);
   const [sparesLoading, setSparesLoading] = useState(false);
   const [spareQuantity, setSpareQuantity] = useState(1);
+  const [consumables, setConsumables] = useState([]);
+  const [consumablesLoading, setConsumablesLoading] = useState(false);
+  const [consumable, setConsumable] = useState("");
+  const [fuel_consumed, setFuelConsumed] = useState("");
+  const [total_km_driven, setTotalKmDriven] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 const sendEmailNotification = async () => {
   const formData = new FormData();
 
-  // Set the subject dynamically
   formData.append("_subject", `New ticket created by project: ${projectname}`);
 
   
   const spareObj = spares.find(item => item._id === spare);
   const spareName = spareObj ? findItemNameField(spareObj, projectname) : 'Unknown Spare';
 
-  // Create a custom details body
   const details = `
     Project Name: ${projectname}
 Site Location: ${sitelocation}
@@ -73,7 +76,7 @@ User Email: ${user?.email || ""}`;
       }
     });
   } catch (error) {
-    // handle error if needed
+   
   }
 };
 
@@ -139,9 +142,32 @@ User Email: ${user?.email || ""}`;
   }, [projectname]);
 
   useEffect(() => {
+    const fetchConsumables = async () => {
+      setConsumables([]);
+      setConsumablesLoading(true);
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const apiUrl = `${API_URL}/api/consumables`;
+        const response = await axios.get(apiUrl, {
+          headers: {
+            Authorization: user?.token ? `Bearer ${user.token}` : undefined,
+            "Content-Type": "application/json",
+          },
+        });
+        setConsumables(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        setConsumables([]);
+      } finally {
+        setConsumablesLoading(false);
+      }
+    };
+    fetchConsumables();
+  }, []);
+
+  useEffect(() => {
     if (isError) {
       toast.error(message);
-    // Re-enable submit button on error
+  
     const submitButton = document.querySelector('.submit-btn');
     if (submitButton) {
       submitButton.disabled = false;
@@ -153,18 +179,17 @@ User Email: ${user?.email || ""}`;
     if (isSuccess) {
     sendEmailNotification();
       dispatch(reset());
-    // Add a small delay before navigation to ensure loading state is shown
+ 
     setTimeout(() => {
       navigate("/tickets");
     }, 100);
     }
-  // eslint-disable-next-line
+
   }, [dispatch, isError, isSuccess, navigate, message]);
 
   const onSubmit = (e) => {
     e.preventDefault();
     
-    // Validate required fields
     if (
       !projectname ||
       !sitelocation ||
@@ -183,7 +208,7 @@ User Email: ${user?.email || ""}`;
       toast.error("Please enter a valid spare quantity (minimum 1)");
       return;
     }
-    // Check if requested quantity exceeds available stock
+
     const spareObj = spares.find(item => item._id === spare);
     const availableCount = spareObj && typeof spareObj.spareCount === 'string' ? parseInt(spareObj.spareCount) : spareObj?.spareCount;
     if (spareObj && availableCount !== undefined && parseInt(spareQuantity) > availableCount) {
@@ -191,7 +216,16 @@ User Email: ${user?.email || ""}`;
       return;
     }
 
-    // Disable submit button to prevent double submission
+    if (fuel_consumed === "" || isNaN(Number(fuel_consumed)) || Number(fuel_consumed) < 0) {
+      toast.error("Fuel consumed is required and must be a non-negative number.");
+      return;
+    }
+
+    if (total_km_driven === "" || isNaN(Number(total_km_driven)) || Number(total_km_driven) < 0) {
+      toast.error("Total KM Driven is required and must be a non-negative number.");
+      return;
+    }
+
     const submitButton = e.target.querySelector('.submit-btn');
     submitButton.disabled = true;
     submitButton.textContent = 'Submitting...';
@@ -208,6 +242,9 @@ User Email: ${user?.email || ""}`;
     formData.append("spare", spare);
     formData.append("rating", rating);
     formData.append("spareQuantity", spareQuantity);
+    formData.append("fuel_consumed", fuel_consumed);
+    formData.append("total_km_driven", total_km_driven);
+    formData.append("consumable", consumable);
   
     images.forEach((image) => {
       formData.append("images", image);
@@ -398,6 +435,70 @@ User Email: ${user?.email || ""}`;
         </section>
 
         <section className="form">
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '10px' }}>
+            <label htmlFor="consumable">Consumable Required</label>
+            {consumablesLoading ? (
+              <div>Loading consumables...</div>
+            ) : consumables.length > 0 ? (
+              <>
+                <select
+                  className="form-control"
+                  value={consumable}
+                  name="Consumable Required"
+                  id="consumable"
+                  onChange={(e) => setConsumable(e.target.value)}
+                  required
+                  style={{ width: '100%' }}
+                >
+                  <option value="" disabled>
+                    Select a consumable
+                  </option>
+                  {consumables.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.item_name}
+                    </option>
+                  ))}
+                </select>
+                <label htmlFor="fuel_consumed" style={{ marginTop: '8px' }}>Fuel Consumed</label>
+                <input
+                  type="number"
+                  id="fuel_consumed"
+                  name="fuel_consumed"
+                  min="0"
+                  value={fuel_consumed}
+                  onChange={e => setFuelConsumed(e.target.value.replace(/[^0-9.]/g, ''))}
+                  className="form-control"
+                  style={{ width: '100%' }}
+                  placeholder="Enter fuel consumed"
+                  required
+                />
+                <label htmlFor="total_km_driven" style={{ marginTop: '8px' }}>Total KM Driven</label>
+                <input
+                  type="number"
+                  id="total_km_driven"
+                  name="total_km_driven"
+                  min="0"
+                  value={total_km_driven}
+                  onChange={e => setTotalKmDriven(e.target.value.replace(/[^0-9.]/g, ''))}
+                  className="form-control"
+                  style={{ width: '100%' }}
+                  placeholder="Enter total km driven"
+                  required
+                />
+              </>
+            ) : (
+              <textarea
+                className="form-control"
+                placeholder="No consumables available"
+                value=""
+                disabled
+                style={{ width: "100%", height: "50px", resize: "none" }}
+              ></textarea>
+            )}
+          </div>
+        </section>
+
+        <section className="form">
           <div className="form-group">
             <label htmlFor="rating">DG Rating</label>
             <textarea
@@ -424,7 +525,7 @@ User Email: ${user?.email || ""}`;
                     const selectedFiles = Array.from(e.target.files);
                     if (selectedFiles.length > 4) {
                       toast.error("You can only upload up to 4 images");
-                      // Clear file input
+                     
                       e.target.value = "";
                       return;
                     }
