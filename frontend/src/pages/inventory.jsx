@@ -203,6 +203,8 @@ const Inventory = () => {
   const [error, setError] = useState(null);
   const [lowStockItems, setLowStockItems] = useState([]);
   const [showLowStock, setShowLowStock] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Modal state for showing a clicked image
   const [isImageModalOpen, setImageModalOpen] = useState(false);
@@ -472,7 +474,8 @@ const Inventory = () => {
         return;
       }
 
-      const apiUrl = `${API_URL}/api/${selectedCollection.toLowerCase()}`;
+      // Add pagination params
+      const apiUrl = `${API_URL}/api/${selectedCollection.toLowerCase()}?page=${page}&limit=100`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -480,11 +483,12 @@ const Inventory = () => {
         },
       });
 
+      // Support both old and new backend responses
       const items = Array.isArray(response.data)
         ? response.data
         : response.data.data || [];
-
       setInventory(items);
+      setTotalPages(response.data.totalPages || 1);
 
       // Check for low stock items after fetching
       await checkLowStockAndNotify(items);
@@ -508,7 +512,7 @@ const Inventory = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedCollection]);
+  }, [selectedCollection, page]);
 
   useEffect(() => {
     if (selectedCollection) {
@@ -873,6 +877,16 @@ const Inventory = () => {
               )}
             </tbody>
           </table>
+          {/* Pagination Controls */}
+          <div style={{ margin: '1rem 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ marginRight: 8 }}>
+              Previous
+            </button>
+            <span>Page {page} of {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ marginLeft: 8 }}>
+              Next
+            </button>
+          </div>
         </div>
       )}
 

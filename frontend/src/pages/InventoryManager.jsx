@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import BackButton from "../components/BackButton";
 import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -117,6 +118,10 @@ export default function InventoryManager() {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const dropdownRef = useRef(null);
 
 
   useEffect(() => {
@@ -129,15 +134,15 @@ export default function InventoryManager() {
       setError("");
       return;
     }
-
     setLoading(true);
-    fetch(`${API_URL}/api/${projectKey}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
-      .then(async (res) => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/${projectKey}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
         if (!res.ok) {
           if (res.status === 403) {
             const errRes = await res.json();
@@ -145,9 +150,7 @@ export default function InventoryManager() {
           }
           throw new Error("Failed to fetch items");
         }
-        return res.json();
-      })
-      .then((json) => {
+        const json = await res.json();
         const data = Array.isArray(json)
           ? json
           : json.success && Array.isArray(json.data)
@@ -155,14 +158,58 @@ export default function InventoryManager() {
           : [];
         setItems(data);
         setError("");
-      })
-      .catch((e) => {
+      } catch (e) {
         setError(e.message);
         toast.error(e.message);
         setItems([]);
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [projectKey, user]);
+
+  // Async search for dropdown
+  useEffect(() => {
+    if (!projectKey || !searchTerm) {
+      setSearchResults([]);
+      setSearchError("");
+      return;
+    }
+    let cancel;
+    setSearchLoading(true);
+    setSearchError("");
+    (async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/${projectKey}/search?query=${encodeURIComponent(searchTerm)}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+          cancelToken: new axios.CancelToken(c => (cancel = c)),
+        });
+        setSearchResults(res.data || []);
+        setSearchError("");
+      } catch (e) {
+        if (axios.isCancel(e)) return;
+        setSearchError(e.response?.data?.error || e.message);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    })();
+    return () => cancel && cancel();
+  }, [projectKey, searchTerm, user]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   const openAdd = () => setModal({ mode: "add", data: {}, id: null });
   const openEdit = (item) => setModal({ mode: "edit", data: { ...item }, id: item._id });
@@ -456,15 +503,6 @@ export default function InventoryManager() {
     const cfg = PROJECTS[projectKey] || null;
     const descKey = cfg?.columns?.[0]?.key ?? "";
 
-    const filteredItems = items.filter(item => {
-      let label = item;
-      descKey
-        .split(/[\.\[\]]/)
-        .filter(Boolean)
-        .forEach(k => (label = label ? label[k] : ""));
-      return String(label).toLowerCase().includes(searchTerm.toLowerCase());
-    });
-
     return (
       <div style={{ fontFamily: "Arial, sans-serif" }}>
         <div style={{ padding: 20 }}>
@@ -543,11 +581,14 @@ export default function InventoryManager() {
                   fontStyle: "italic",
                 }}
               >
-            To update an item, click the dropdown below:
+            To update an item, search and select below:
           </div>
               <div style={{ position: 'relative', marginBottom: "250px" }}>
                 <div
-                  onClick={() => setIsOpen(!isOpen)}
+                  ref={dropdownRef}
+                  onClick={() => {
+                    if (searchTerm.length > 0) setIsOpen(true);
+                  }}
             style={{
                     display: "inline-block",
               padding: "6px 12px",
@@ -558,7 +599,7 @@ export default function InventoryManager() {
               cursor: "pointer",
               backgroundColor: "lightgrey",
                     position: "relative",
-                    backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')",
+                    backgroundImage: "url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "right 12px top 50%",
                     backgroundSize: "12px auto",
@@ -567,7 +608,7 @@ export default function InventoryManager() {
                 >
                   <input
                     type="text"
-                    placeholder={`-- select ${cfg.columns[0].label} --`}
+                    placeholder={`-- search ${cfg.columns[0].label} --`}
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -582,6 +623,11 @@ export default function InventoryManager() {
                       cursor: "pointer",
                     }}
                   />
+                  {isOpen && searchTerm.length === 0 && (
+                    <div style={{ fontSize: '0.85rem', color: '#888', marginTop: 4, marginLeft: 2 }}>
+                      (Type to search)
+                    </div>
+                  )}
                   {isOpen && (
                     <div
                       style={{
@@ -601,35 +647,41 @@ export default function InventoryManager() {
                         WebkitOverflowScrolling: "touch"
                       }}
                     >
-                      {filteredItems.map((it) => {
-                        let label = it;
-                        descKey
-                .split(/[\.\[\]]/)
-                .filter(Boolean)
-                          .forEach((k) => (label = label ? label[k] : ""));
-                      return (
-                          <div
-                            key={it._id}
-                            onClick={() => {
-                              openEdit(it);
-                              setSearchTerm("");
-                              setIsOpen(false);
-                            }}
-                            style={{
-                              padding: "12px",
-                              cursor: "pointer",
-                              wordBreak: "break-word",
-                              borderBottom: "1px solid #ccc",
-                              touchAction: "manipulation",
-                              ":hover": {
-                                backgroundColor: "#e0e0e0"
-                              }
-                            }}
-                          >
-                    {label}
-                          </div>
-                      );
-                    })}
+                      {searchLoading ? (
+                        <div style={{ padding: 12 }}>Loading...</div>
+                      ) : searchError ? (
+                        <div style={{ color: 'red', padding: 12 }}>{searchError}</div>
+                      ) : (
+                        searchResults.map((it) => {
+                          let label = it;
+                          descKey
+                            .split(/[\.\[\]]/)
+                            .filter(Boolean)
+                            .forEach((k) => (label = label ? label[k] : ""));
+                          return (
+                            <div
+                              key={it._id}
+                              onClick={() => {
+                                openEdit(it);
+                                setSearchTerm("");
+                                setIsOpen(false);
+                              }}
+                              style={{
+                                padding: "12px",
+                                cursor: "pointer",
+                                wordBreak: "break-word",
+                                borderBottom: "1px solid #ccc",
+                                touchAction: "manipulation",
+                                ":hover": {
+                                  backgroundColor: "#e0e0e0"
+                                }
+                              }}
+                            >
+                              {label}
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   )}
                 </div>

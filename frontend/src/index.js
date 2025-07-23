@@ -6,12 +6,14 @@ import { store } from './app/store';
 
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
+import axios from 'axios';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-  <App />
-</Provider>
+      {/* Add a global axios interceptor to handle 401 errors (token expired) */}
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

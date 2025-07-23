@@ -141,16 +141,20 @@ Created By: ${user.email}`;
         emailData.append("_captcha", "false");
 
         // Don't await this - let it run in background
-        fetch("https://formsubmit.co/alliedvercel@gmail.com", {
-          method: "POST",
-          body: emailData,
-          headers: {
-            'Accept': 'application/json'
+        (async () => {
+          try {
+            await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+              method: "POST",
+              body: emailData,
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+          } catch (emailError) {
+            console.warn("Email notification failed:", emailError);
+            // Don't fail the whole submission for email issues
           }
-        }).catch(emailError => {
-          console.warn("Email notification failed:", emailError);
-          // Don't fail the whole submission for email issues
-        });
+        })();
       } catch (emailError) {
         console.warn("Email notification error:", emailError);
         // Continue with success flow even if email fails

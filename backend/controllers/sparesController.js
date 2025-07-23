@@ -23,13 +23,22 @@ const getSpareInventory = async (req, res) => {
 const getAllSolding = async (req, res) => {
     console.log("Getting Solding data...");
     try {
-// Restrict access for inventoryOnly users
+        // Restrict access for inventoryOnly users
         if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'solding') {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
         const userId = req.user._id;
-        const data = await solding.find();
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100;
+        const skip = (page - 1) * limit;
+
+        // Exclude picture field for list
+        const [data, total] = await Promise.all([
+            solding.find({}, { picture: 0 }).skip(skip).limit(limit),
+            solding.countDocuments()
+        ]);
         
         // Get user-specific spare counts
         const userSpareCounts = await UserSpareCount.find({
@@ -49,11 +58,14 @@ const getAllSolding = async (req, res) => {
             spareCount: spareCountMap[item._id.toString()] || 0
         }));
 
-        console.log("Solding Data Found:", updatedData);
+        console.log("Solding Data Found:", updatedData.length);
         res.status(200).json({
             success: true,
             data: updatedData,
             count: updatedData.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
             message: "Data fetched successfully"
         });
     } catch (error) {
@@ -78,7 +90,15 @@ const getAllShong = async (req, res) => {
         }
 
         const userId = req.user._id;
-        const data = await Shong.find();
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100;
+        const skip = (page - 1) * limit;
+        // Exclude picture field for list
+        const [data, total] = await Promise.all([
+            Shong.find({}, { picture: 0 }).skip(skip).limit(limit),
+            Shong.countDocuments()
+        ]);
         
         // Get user-specific spare counts
         const userSpareCounts = await UserSpareCount.find({
@@ -98,11 +118,14 @@ const getAllShong = async (req, res) => {
             spareCount: spareCountMap[item._id.toString()] || 0
         }));
 
-        console.log("Shong Data Found:", updatedData);
+        console.log("Shong Data Found:", updatedData.length);
         res.status(200).json({
             success: true,
             data: updatedData,
             count: updatedData.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
             message: "Data fetched successfully"
         });
     } catch (error) {
@@ -127,7 +150,15 @@ const getAllJogini = async (req, res) => {
         }
 
         const userId = req.user._id;
-        const data = await Jogini.find();
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100;
+        const skip = (page - 1) * limit;
+        // Exclude picture field for list
+        const [data, total] = await Promise.all([
+            Jogini.find({}, { picture: 0 }).skip(skip).limit(limit),
+            Jogini.countDocuments()
+        ]);
         
         // Get user-specific spare counts
         const userSpareCounts = await UserSpareCount.find({
@@ -150,8 +181,16 @@ const getAllJogini = async (req, res) => {
         if (!updatedData.length) {
             console.log("⚠️ No Jogini data found in DB.");
         }
-        console.log("✅ Jogini Data Found:", updatedData);
-        res.status(200).json({ success: true, data: updatedData, count: updatedData.length });
+        console.log("✅ Jogini Data Found:", updatedData.length);
+        res.status(200).json({
+            success: true,
+            data: updatedData,
+            count: updatedData.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            message: "Data fetched successfully"
+        });
     } catch (error) {
         console.error("❌ Error in getAllJogini:", error);
         res.status(500).json({
@@ -173,7 +212,15 @@ const getAllSDLLPsalun = async (req, res) => {
         }
 
         const userId = req.user._id;
-        const data = await SDLLPsalun.find();
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100;
+        const skip = (page - 1) * limit;
+        // Exclude picture field for list
+        const [data, total] = await Promise.all([
+            SDLLPsalun.find({}, { picture: 0 }).skip(skip).limit(limit),
+            SDLLPsalun.countDocuments()
+        ]);
         
         // Get user-specific spare counts
         const userSpareCounts = await UserSpareCount.find({
@@ -193,11 +240,14 @@ const getAllSDLLPsalun = async (req, res) => {
             spareCount: spareCountMap[item._id.toString()] || 0
         }));
 
-        console.log("SDLLPsalun Data Found:", updatedData);
+        console.log("SDLLPsalun Data Found:", updatedData.length);
         res.status(200).json({
             success: true,
             data: updatedData,
             count: updatedData.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
             message: "Data fetched successfully"
         });
     } catch (error) {
@@ -222,7 +272,15 @@ const getAllKuwarsi = async (req, res) => {
         }
 
         const userId = req.user._id;
-        const data = await Kuwarsi.find();
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100;
+        const skip = (page - 1) * limit;
+        // Exclude picture field for list
+        const [data, total] = await Promise.all([
+            Kuwarsi.find({}, { picture: 0 }).skip(skip).limit(limit),
+            Kuwarsi.countDocuments()
+        ]);
         
         // Get user-specific spare counts
         const userSpareCounts = await UserSpareCount.find({
@@ -242,11 +300,14 @@ const getAllKuwarsi = async (req, res) => {
             spareCount: spareCountMap[item._id.toString()] || 0
         }));
 
-        console.log("Kuwarsi Data Found:", updatedData);
+        console.log("Kuwarsi Data Found:", updatedData.length);
         res.status(200).json({
             success: true,
             data: updatedData,
             count: updatedData.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
             message: "Data fetched successfully"
         });
     } catch (error) {
@@ -378,6 +439,111 @@ const getUserSpareCounts = async (req, res) => {
     }
 };
 
+// --- SEARCH ENDPOINTS FOR AUTOCOMPLETE ---
+
+// Helper: build regex for case-insensitive partial match
+const buildRegex = (q) => new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+
+// Jogini search
+const searchJogini = async (req, res) => {
+    try {
+        const q = req.query.query || '';
+        if (!q) return res.json([]);
+        const results = await Jogini.find({
+            $or: [
+                { "Spare Discription": buildRegex(q) },
+                { specification: buildRegex(q) },
+                { manufacture: buildRegex(q) },
+                { type: buildRegex(q) },
+                { place: buildRegex(q) }
+            ]
+        }, { picture: 0 }).limit(50);
+        res.json(results);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// Shong search
+const searchShong = async (req, res) => {
+    try {
+        const q = req.query.query || '';
+        if (!q) return res.json([]);
+        const results = await Shong.find({
+            $or: [
+                { "Description of Material": buildRegex(q) },
+                { "Code.Specification": buildRegex(q) },
+                { Make: buildRegex(q) },
+                { Vendor: buildRegex(q) },
+                { Place: buildRegex(q) }
+            ]
+        }, { picture: 0 }).limit(50);
+        res.json(results);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// Solding search
+const searchSolding = async (req, res) => {
+    try {
+        const q = req.query.query || '';
+        if (!q) return res.json([]);
+        const results = await solding.find({
+            $or: [
+                { "Description of Material": buildRegex(q) },
+                { "Code.Specification": buildRegex(q) },
+                { Make: buildRegex(q) },
+                { Vendor: buildRegex(q) },
+                { Place: buildRegex(q) }
+            ]
+        }, { picture: 0 }).limit(50);
+        res.json(results);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// SDLLPsalun search
+const searchSDLLPsalun = async (req, res) => {
+    try {
+        const q = req.query.query || '';
+        if (!q) return res.json([]);
+        const results = await SDLLPsalun.find({
+            $or: [
+                { "NAME OF MATERIALS": buildRegex(q) },
+                { SPECIFICATION: buildRegex(q) },
+                { "MAKE.MANUFACTURE": buildRegex(q) },
+                { vendor: buildRegex(q) },
+                { Place: buildRegex(q) }
+            ]
+        }, { picture: 0 }).limit(50);
+        res.json(results);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// Kuwarsi search
+const searchKuwarsi = async (req, res) => {
+    try {
+        const q = req.query.query || '';
+        if (!q) return res.json([]);
+        const results = await Kuwarsi.find({
+            $or: [
+                { "NAME OF MATERIALS": buildRegex(q) },
+                { SPECIFICATION: buildRegex(q) },
+                { "MAKE.MANUFACTURE": buildRegex(q) },
+                { vendor: buildRegex(q) },
+                { Place: buildRegex(q) }
+            ]
+        }, { picture: 0 }).limit(50);
+        res.json(results);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
 module.exports = {
     getSpareInventory,
     getAllSolding,
@@ -386,5 +552,10 @@ module.exports = {
     getAllSDLLPsalun,
     getAllKuwarsi,
     updatespareCount,
-    getUserSpareCounts
+    getUserSpareCounts,
+    searchJogini,
+    searchShong,
+    searchSolding,
+    searchSDLLPsalun,
+    searchKuwarsi
 };

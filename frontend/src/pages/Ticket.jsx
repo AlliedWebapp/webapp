@@ -220,37 +220,33 @@ function Ticket() {
       </div>
     );
 
-  const onTicketClose = () => {
-    dispatch(closeTicket(ticketId))
-      .unwrap()
-      .then(() => {
-        toast.success("Ticket Closed Successfully");
-        navigate("/tickets");
-      })
-      .catch((error) => {
-        toast.error(error.message || "Failed to close ticket");
-      });
+  const onTicketClose = async () => {
+    try {
+      await dispatch(closeTicket(ticketId)).unwrap();
+      toast.success("Ticket Closed Successfully");
+      navigate("/tickets");
+    } catch (error) {
+      toast.error(error.message || "Failed to close ticket");
+    }
   };
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
-  const onNoteSubmit = (e) => {
+  const onNoteSubmit = async (e) => {
     e.preventDefault();
     if (!noteText.trim()) {
       toast.error("Please enter a note");
       return;
     }
-    dispatch(createNote({ ticketId, noteText }))
-      .unwrap()
-      .then(() => {
-        toast.success("Note added successfully");
-        setNoteText("");
-        closeModal();
-      })
-      .catch((error) => {
-        toast.error(error.message || "Failed to add note");
-      });
+    try {
+      await dispatch(createNote({ ticketId, noteText })).unwrap();
+      toast.success("Note added successfully");
+      setNoteText("");
+      closeModal();
+    } catch (error) {
+      toast.error(error.message || "Failed to add note");
+    }
   };
 
   const getStatusIcon = (status) => {
@@ -414,21 +410,20 @@ function Ticket() {
                     <img
                       src={imageUrl}
                       alt={`Ticket Image ${index + 1}`}
-                      onError={(e) => {
+                      onError={async (e) => {
                         e.target.onerror = null;
-                        fetch(imageUrl, {
-                          headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                          }
-                        })
-                        .then(response => response.blob())
-                        .then(blob => {
+                        try {
+                          const response = await fetch(imageUrl, {
+                            headers: {
+                              'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                            }
+                          });
+                          const blob = await response.blob();
                           e.target.src = URL.createObjectURL(blob);
-                        })
-                        .catch(err => {
+                        } catch (err) {
                           console.error('Error loading image:', err);
                           e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg2MFY2MEgyMFYyMFoiIGZpbGw9IiNFNUU3RUIiLz4KPHBhdGggZD0iTTI1IDI1SDM1VjM1SDI1VjI1WiIgZmlsbD0iI0M3Q0E5QyIvPgo8cGF0aCBkPSJNMjAgNDVMMzAgMzVINDBMNTAgNDVINjBWMjBIMjBWNDVaIiBmaWxsPSIjQzdDQTlDIi8+Cjwvc3ZnPgo=';
-                        });
+                        }
                       }}
                     />
                     <div className="image-overlay">
@@ -524,21 +519,20 @@ function Ticket() {
             <img
               src={previewImage}
               alt="Preview"
-              onError={(e) => {
+              onError={async (e) => {
                 e.target.onerror = null;
-                fetch(previewImage, {
-                  headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                  }
-                })
-                .then(response => response.blob())
-                .then(blob => {
+                try {
+                  const response = await fetch(previewImage, {
+                    headers: {
+                      'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                    }
+                  });
+                  const blob = await response.blob();
                   e.target.src = URL.createObjectURL(blob);
-                })
-                .catch(err => {
+                } catch (err) {
                   console.error('Error loading preview image:', err);
                   e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgMTAwSDMwMFYyMDBIMTAwVjEwMFoiIGZpbGw9IiNFNUU3RUIiLz4KPHBhdGggZD0iTTEyNSAxMjVIMTc1VjE3NUgxMjVWMTI1WiIgZmlsbD0iI0M3Q0E5QyIvPgo8cGF0aCBkPSJNMTAwIDIyNUwxNTAgMTc1SDI1MEwyMDAgMjI1SDMwMFYxMDBIMTAwVjIyNVoiIGZpbGw9IiNDN0NBOUMiLz4KPC9zdmc+Cg==';
-                });
+                }
               }}
             />
           </div>

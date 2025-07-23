@@ -27,15 +27,14 @@ export function register(config) {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
       if (isLocalhost) {
-        checkValidServiceWorker(swUrl, config);
+        await checkValidServiceWorker(swUrl, config);
         navigator.serviceWorker.ready.then(() => {
           console.log("App is being served cache-first by a service worker.");
         });
       } else {
-        registerValidSW(swUrl, config);
+        await registerValidSW(swUrl, config);
       }
 
-      // ✅ Connect Frontend with Backend (API Health Check)
       await checkBackendConnection();
     });
   }
@@ -64,58 +63,59 @@ async function checkBackendConnection() {
   }
 }
 
-function registerValidSW(swUrl, config) {
-  navigator.serviceWorker
-    .register(swUrl)
-    .then((registration) => {
-      console.log("✅ Service Worker registered successfully:", registration);
+async function registerValidSW(swUrl, config) {
+  try {
+    const registration = await navigator.serviceWorker.register(swUrl);
+    console.log("✅ Service Worker registered successfully:", registration);
 
-      registration.onupdatefound = () => {
-        const installingWorker = registration.installing;
-        if (!installingWorker) return;
+    registration.onupdatefound = () => {
+      const installingWorker = registration.installing;
+      if (!installingWorker) return;
 
-        installingWorker.onstatechange = () => {
-          if (installingWorker.state === "installed") {
-            if (navigator.serviceWorker.controller) {
-              console.log("🔄 New content available, will be used after page refresh.");
-
-              if (config?.onUpdate) {
-                config.onUpdate(registration);
-              }
-            } else {
-              console.log("📦 Content is cached for offline use.");
-
-              if (config?.onSuccess) {
-                config.onSuccess(registration);
-              }
-            }
+      installingWorker.onstatechange = () => {
+        if (installingWorker.state === "installed") {
+          if (navigator.serviceWorker.controller) {
+            console.log("🔄 New content available, will be used after page refresh.");
+            if (config?.onUpdate) config.onUpdate(registration);
+          } else {
+            console.log("📦 Content is cached for offline use.");
+            if (config?.onSuccess) config.onSuccess(registration);
           }
-        };
+        }
       };
-    })
-    .catch((error) => console.error("❌ Service Worker registration failed:", error));
+    };
+  } catch (error) {
+    console.error("❌ Service Worker registration failed:", error);
+  }
 }
 
-function checkValidServiceWorker(swUrl, config) {
-  fetch(swUrl, { headers: { "Service-Worker": "script" } })
-    .then((response) => {
-      const contentType = response.headers.get("content-type");
-
-      if (response.status === 404 || (contentType && !contentType.includes("javascript"))) {
-        navigator.serviceWorker.ready
-          .then((registration) => registration.unregister())
-          .then(() => window.location.reload());
-      } else {
-        registerValidSW(swUrl, config);
-      }
-    })
-    .catch(() => console.warn("⚠ No internet connection. App is running in offline mode."));
+async function checkValidServiceWorker(swUrl, config) {
+  try {
+    const response = await fetch(swUrl, { headers: { "Service-Worker": "script" } });
+    const contentType = response.headers.get("content-type");
+    if (
+      response.status === 404 ||
+      (contentType && !contentType.includes("javascript"))
+    ) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.unregister();
+      window.location.reload();
+    } else {
+      await registerValidSW(swUrl, config);
+    }
+  } catch (error) {
+    console.warn("⚠ No internet connection. App is running in offline mode.");
+  }
 }
 
-export function unregister() {
+export async function unregister() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.ready
-      .then((registration) => registration.unregister())
-      .then(() => console.log("❌ Service Worker unregistered."));
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.unregister();
+      console.log("❌ Service Worker unregistered.");
+    } catch (error) {
+      // Optionally log error
+    }
   }
 }
