@@ -4,7 +4,7 @@ const Consumable = require("../models/ConsumableModel");
 const { protect } = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 
-router.use(protect); // ✅ Only protect, nothing else
+router.use(protect); 
 
 router.post("/", upload.single('picture'), async (req, res) => {
   try {
@@ -46,7 +46,6 @@ router.delete("/:id", async (req, res) => {
     const deleted = await Consumable.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: "Not found" });
 
-    // Get all remaining consumables sorted by sr_no
     const remainingConsumables = await Consumable.find().sort({ sr_no: 1 });
     
     // Update sr_no for all remaining records
