@@ -479,7 +479,7 @@ const searchJogini = async (req, res) => {
     }
 };
 
-// Shong search
+
 const searchShong = async (req, res) => {
     try {
         const q = req.query.query || '';

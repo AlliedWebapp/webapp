@@ -142,7 +142,7 @@ User Email: ${user?.email || ""}`;
       } finally {
         setSparesLoading(false);
       }
-    }, 400); // 400ms debounce
+    }, 400); 
 
     setSpareSearchTimeout(timeout);
 
