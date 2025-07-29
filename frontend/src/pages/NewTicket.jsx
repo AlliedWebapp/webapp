@@ -6,6 +6,7 @@ import { createTicket, reset } from "../features/tickets/ticketSlice";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import axios from "axios";
+import { useRef } from "react";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 const PROJECTS = {
@@ -41,6 +42,10 @@ function NewTicket() {
   const [consumable, setConsumable] = useState("");
   const [fuel_consumed, setFuelConsumed] = useState("");
   const [total_km_driven, setTotalKmDriven] = useState("");
+  const [spareSearch, setSpareSearch] = useState(""); // NEW: search input state
+  const [spareSearchTimeout, setSpareSearchTimeout] = useState(null); // NEW: debounce
+  const [spareDropdownOpen, setSpareDropdownOpen] = useState(false); // NEW: dropdown control
+  const spareInputRef = useRef(null); // NEW: for focus
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -109,37 +114,41 @@ User Email: ${user?.email || ""}`;
 
 
   useEffect(() => {
-    const fetchSpares = async () => {
+    if (!projectname || !PROJECTS[projectname]) {
       setSpares([]);
-      if (!projectname || !PROJECTS[projectname]) {
-        console.log("No project selected or mapping missing:", projectname, PROJECTS[projectname]);
-        return;
-      }
-      setSparesLoading(true);
+      return;
+    }
+    if (!spareSearch) {
+      setSpares([]);
+      return;
+    }
+    setSparesLoading(true);
+
+    // Debounce logic
+    if (spareSearchTimeout) clearTimeout(spareSearchTimeout);
+    const timeout = setTimeout(async () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
-        const apiUrl = `${API_URL}/api/${PROJECTS[projectname]}`;
-        console.log("Fetching spares from:", apiUrl);
+        const apiUrl = `${API_URL}/api/${PROJECTS[projectname]}/search?query=${encodeURIComponent(spareSearch)}`;
         const response = await axios.get(apiUrl, {
           headers: {
             Authorization: user?.token ? `Bearer ${user.token}` : undefined,
             "Content-Type": "application/json",
           },
         });
-        console.log("Spares response:", response.data);
-        const items = Array.isArray(response.data)
-          ? response.data
-          : response.data.data || [];
-        setSpares(items);
+        setSpares(Array.isArray(response.data) ? response.data : response.data.data || []);
       } catch (err) {
-        console.log("Error fetching spares:", err);
         setSpares([]);
       } finally {
         setSparesLoading(false);
       }
-    };
-    fetchSpares();
-  }, [projectname]);
+    }, 400); // 400ms debounce
+
+    setSpareSearchTimeout(timeout);
+
+    // Cleanup
+    return () => clearTimeout(timeout);
+  }, [projectname, spareSearch]);
 
   useEffect(() => {
     const fetchConsumables = async () => {
@@ -380,57 +389,79 @@ User Email: ${user?.email || ""}`;
         <section className="form">
           <div className="form-group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '10px' }}>
             <label htmlFor="spare">Spare Needed</label>
-            {sparesLoading ? (
-              <div>Loading spares...</div>
-            ) : projectname && spares.length > 0 ? (
-              <>
-                <select
-                  className="form-control"
-                  value={spare}
-                  name="Spare Needed"
-                  id="spare"
-                  onChange={(e) => setspare(e.target.value)}
-                  required
-                  style={{ width: '100%' }}
-                >
-                  <option value="" disabled>
-                    Select a spare
-                  </option>
-                  {spares.map((item) => {
-                    const name = findItemNameField(item, PROJECTS[projectname]);
-                    return (
-                      <option key={item._id} value={item._id}>
-                        {name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <label htmlFor="spareQuantity" style={{ marginTop: '8px' }}>Spare Quantity</label>
-                <input
-                  type="number"
-                  id="spareQuantity"
-                  name="spareQuantity"
-                  min="1"
-                  value={spareQuantity}
-                  onChange={e => setSpareQuantity(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="form-control"
-                  style={{ width: '100%' }}
-                  required
-                  placeholder="Enter quantity"
-                />
-              </>
-            ) : (
-              <textarea
+            <div style={{ position: "relative" }}>
+              <input
+                type="text"
                 className="form-control"
-                placeholder="Select a project to see spares"
-                value={spare}
-                name="Spare Needed"
-                id="spare"
-                onChange={(e) => setspare(e.target.value)}
-                style={{ width: "100%", height: "50px", resize: "none" }}
-                disabled
-              ></textarea>
-            )}
+                placeholder="Search for a spare..."
+                value={spareSearch}
+                onChange={e => {
+                  setSpareSearch(e.target.value);
+                  setSpareDropdownOpen(true);
+                }}
+                onFocus={() => setSpareDropdownOpen(true)}
+                ref={spareInputRef}
+                style={{ width: '100%' }}
+                disabled={!projectname}
+                autoComplete="off"
+              />
+              {spareDropdownOpen && projectname && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    zIndex: 1000,
+                    background: "#fff",
+                    border: "1px solid #ccc",
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+                  }}
+                >
+                  {sparesLoading ? (
+                    <div style={{ padding: "8px 12px", color: "#888" }}>Loading spares...</div>
+                  ) : spares.length > 0 ? (
+                    spares.map(item => {
+                      const name = findItemNameField(item, PROJECTS[projectname]);
+                      return (
+                        <div
+                          key={item._id}
+                          style={{
+                            padding: "8px 12px",
+                            cursor: "pointer",
+                            background: spare === item._id ? "#f0f0f0" : "#fff"
+                          }}
+                          onMouseDown={() => {
+                            setspare(item._id);
+                            setSpareSearch(name);
+                            setSpareDropdownOpen(false);
+                          }}
+                        >
+                          {name}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div style={{ padding: "8px 12px", color: "#888" }}>No spares found.</div>
+                  )}
+                </div>
+              )}
+            </div>
+            <label htmlFor="spareQuantity" style={{ marginTop: '8px' }}>Spare Quantity</label>
+            <input
+              type="number"
+              id="spareQuantity"
+              name="spareQuantity"
+              min="1"
+              value={spareQuantity}
+              onChange={e => setSpareQuantity(e.target.value.replace(/[^0-9]/g, ''))}
+              className="form-control"
+              style={{ width: '100%' }}
+              required
+              placeholder="Enter quantity"
+            />
           </div>
         </section>
 

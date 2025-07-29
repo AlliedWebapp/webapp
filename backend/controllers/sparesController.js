@@ -441,24 +441,39 @@ const getUserSpareCounts = async (req, res) => {
 
 // --- SEARCH ENDPOINTS FOR AUTOCOMPLETE ---
 
-// Helper: build regex for case-insensitive partial match
-const buildRegex = (q) => new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+// Helper: build regex for case-insensitive starts-with match
+const buildStartsWithRegex = (q) => new RegExp('^' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 
 // Jogini search
 const searchJogini = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
+        const userId = req.user._id;
         const results = await Jogini.find({
             $or: [
-                { "Spare Discription": buildRegex(q) },
-                { specification: buildRegex(q) },
-                { manufacture: buildRegex(q) },
-                { type: buildRegex(q) },
-                { place: buildRegex(q) }
+                { "Spare Discription": buildStartsWithRegex(q) },
+                { specification: buildStartsWithRegex(q) },
+                { manufacture: buildStartsWithRegex(q) },
+                { type: buildStartsWithRegex(q) },
+                { place: buildStartsWithRegex(q) }
             ]
-        }, { picture: 0 }).limit(50);
-        res.json(results);
+        }, { picture: 0 })
+        .sort({ "Spare Discription": 1 })
+        .limit(50);
+        const userSpareCounts = await UserSpareCount.find({
+            userId,
+            collectionName: 'jogini'
+        });
+        const spareCountMap = userSpareCounts.reduce((map, item) => {
+            map[item.itemId.toString()] = item.spareCount;
+            return map;
+        }, {});
+        const updatedResults = results.map(item => ({
+            ...item.toObject(),
+            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+        }));
+        res.json(updatedResults);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -469,16 +484,31 @@ const searchShong = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
+        const userId = req.user._id;
         const results = await Shong.find({
             $or: [
-                { "Description of Material": buildRegex(q) },
-                { "Code.Specification": buildRegex(q) },
-                { Make: buildRegex(q) },
-                { Vendor: buildRegex(q) },
-                { Place: buildRegex(q) }
+                { "Description of Material": buildStartsWithRegex(q) },
+                { "Code.Specification": buildStartsWithRegex(q) },
+                { Make: buildStartsWithRegex(q) },
+                { Vendor: buildStartsWithRegex(q) },
+                { Place: buildStartsWithRegex(q) }
             ]
-        }, { picture: 0 }).limit(50);
-        res.json(results);
+        }, { picture: 0 })
+        .sort({ "Description of Material": 1 })
+        .limit(50);
+        const userSpareCounts = await UserSpareCount.find({
+            userId,
+            collectionName: 'shong'
+        });
+        const spareCountMap = userSpareCounts.reduce((map, item) => {
+            map[item.itemId.toString()] = item.spareCount;
+            return map;
+        }, {});
+        const updatedResults = results.map(item => ({
+            ...item.toObject(),
+            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+        }));
+        res.json(updatedResults);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -489,16 +519,31 @@ const searchSolding = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
+        const userId = req.user._id;
         const results = await solding.find({
             $or: [
-                { "Description of Material": buildRegex(q) },
-                { "Code.Specification": buildRegex(q) },
-                { Make: buildRegex(q) },
-                { Vendor: buildRegex(q) },
-                { Place: buildRegex(q) }
+                { "Description of Material": buildStartsWithRegex(q) },
+                { "Code.Specification": buildStartsWithRegex(q) },
+                { Make: buildStartsWithRegex(q) },
+                { Vendor: buildStartsWithRegex(q) },
+                { Place: buildStartsWithRegex(q) }
             ]
-        }, { picture: 0 }).limit(50);
-        res.json(results);
+        }, { picture: 0 })
+        .sort({ "Description of Material": 1 })
+        .limit(50);
+        const userSpareCounts = await UserSpareCount.find({
+            userId,
+            collectionName: 'solding'
+        });
+        const spareCountMap = userSpareCounts.reduce((map, item) => {
+            map[item.itemId.toString()] = item.spareCount;
+            return map;
+        }, {});
+        const updatedResults = results.map(item => ({
+            ...item.toObject(),
+            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+        }));
+        res.json(updatedResults);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -509,16 +554,31 @@ const searchSDLLPsalun = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
+        const userId = req.user._id;
         const results = await SDLLPsalun.find({
             $or: [
-                { "NAME OF MATERIALS": buildRegex(q) },
-                { SPECIFICATION: buildRegex(q) },
-                { "MAKE.MANUFACTURE": buildRegex(q) },
-                { vendor: buildRegex(q) },
-                { Place: buildRegex(q) }
+                { "NAME OF MATERIALS": buildStartsWithRegex(q) },
+                { SPECIFICATION: buildStartsWithRegex(q) },
+                { "MAKE.MANUFACTURE": buildStartsWithRegex(q) },
+                { vendor: buildStartsWithRegex(q) },
+                { Place: buildStartsWithRegex(q) }
             ]
-        }, { picture: 0 }).limit(50);
-        res.json(results);
+        }, { picture: 0 })
+        .sort({ "NAME OF MATERIALS": 1 })
+        .limit(50);
+        const userSpareCounts = await UserSpareCount.find({
+            userId,
+            collectionName: 'sdllpsalun'
+        });
+        const spareCountMap = userSpareCounts.reduce((map, item) => {
+            map[item.itemId.toString()] = item.spareCount;
+            return map;
+        }, {});
+        const updatedResults = results.map(item => ({
+            ...item.toObject(),
+            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+        }));
+        res.json(updatedResults);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -529,16 +589,31 @@ const searchKuwarsi = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
+        const userId = req.user._id;
         const results = await Kuwarsi.find({
             $or: [
-                { "NAME OF MATERIALS": buildRegex(q) },
-                { SPECIFICATION: buildRegex(q) },
-                { "MAKE.MANUFACTURE": buildRegex(q) },
-                { vendor: buildRegex(q) },
-                { Place: buildRegex(q) }
+                { "NAME OF MATERIALS": buildStartsWithRegex(q) },
+                { SPECIFICATION: buildStartsWithRegex(q) },
+                { "MAKE.MANUFACTURE": buildStartsWithRegex(q) },
+                { vendor: buildStartsWithRegex(q) },
+                { Place: buildStartsWithRegex(q) }
             ]
-        }, { picture: 0 }).limit(50);
-        res.json(results);
+        }, { picture: 0 })
+        .sort({ "NAME OF MATERIALS": 1 })
+        .limit(50);
+        const userSpareCounts = await UserSpareCount.find({
+            userId,
+            collectionName: 'kuwarsi'
+        });
+        const spareCountMap = userSpareCounts.reduce((map, item) => {
+            map[item.itemId.toString()] = item.spareCount;
+            return map;
+        }, {});
+        const updatedResults = results.map(item => ({
+            ...item.toObject(),
+            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+        }));
+        res.json(updatedResults);
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
