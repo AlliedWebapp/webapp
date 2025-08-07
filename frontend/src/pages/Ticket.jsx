@@ -393,6 +393,15 @@ function Ticket() {
                 {ticket.fuel_consumed !== undefined && ticket.fuel_consumed !== null && ticket.fuel_consumed !== "" ? ticket.fuel_consumed : 'None'}
               </div>
             </div>
+   
+            <div className="detail-item">
+              <div className="detail-label">
+                <span>Total KM Driven</span>
+              </div>
+              <div className="detail-value">
+                {ticket.total_km !== undefined && ticket.total_km !== null && ticket.total_km !== "" ? ticket.total_km : 'None'}
+              </div>
+            </div>
           </div>
         </div>
 

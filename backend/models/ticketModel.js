@@ -41,16 +41,17 @@ const ticketSchema = new mongoose.Schema(
       type: Date,
       required: [true, 'Please select a date']
     },
+    // Optional fields
     spare: {
       type: String,
-      required: [true, 'Please enter spare details']
+      required: false
     },
     spareQuantity: {
       type: Number,
-      required: true,
-      default: 1
+      required: false,
+      default: 0,
+      min: [0, 'Spare quantity must be at least 1']
     },
-
     consumable: {
       type: String,
       required: false
@@ -58,11 +59,18 @@ const ticketSchema = new mongoose.Schema(
     fuel_consumed: {
       type: Number,
       required: false,
-      default: 0
+      default: 0,
+      min: [0, 'Fuel consumed cannot be negative']
+    },
+    total_km: {
+      type: Number,
+      required: false,
+      default: 0,
+      min: [0, 'Total KM cannot be negative']
     },
     rating: {
       type: String,
-      required: [true, 'Please enter DG rating']
+      required: false
     },
     images: [
       {

@@ -95,7 +95,8 @@ const createTicket = asyncHandler(async (req, res) => {
       rating,
       spareQuantity,
       consumable,
-      fuel_consumed
+      fuel_consumed,
+      total_km_driven
     } = req.body
 
     const imageFiles = req.files;
@@ -106,7 +107,7 @@ const createTicket = asyncHandler(async (req, res) => {
 
     const quantity = parseInt(spareQuantity) > 0 ? parseInt(spareQuantity) : 1;
 
-    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date || !spare || !rating || !imageFiles)  {
+    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date)  {
       console.log("Missing required fields", req.body, req.files);
       res.status(400)
       throw new Error('Please provide all required fields')
@@ -127,59 +128,63 @@ const createTicket = asyncHandler(async (req, res) => {
       issue,
       description,
       date,
-      spare, 
-      rating,
       images,
       user: req.user.id,
       createdBy: user.email,
       status: 'new',
-      spareQuantity: quantity,
-      consumable,
-      fuel_consumed: fuel_consumed ? Number(fuel_consumed) : 0
+      ...(spare && { spare }),
+      ...(rating && { rating }),
+      ...(spareQuantity && { spareQuantity: quantity }),
+      ...(consumable && { consumable }),
+      ...(fuel_consumed && { fuel_consumed: Number(fuel_consumed) }),
+      ...(total_km_driven && { total_km: Number(total_km_driven) })
     });
 
     try {
-      const collectionModel = getCollectionModel(projectname);
+      // Only decrement spare if spare is provided
+      if (spare) {
+        const collectionModel = getCollectionModel(projectname);
 
-      
-      const spareDocBefore = await collectionModel.findById(spare);
-      console.log("================ SPARE DECREMENT LOG ================");
-      if (spareDocBefore) {
-        console.log(`SPARE ID: ${spare}`);
-        console.log(`SPARE NAME: ${spareDocBefore.name || 'N/A'}`);
-        console.log(`COUNT BEFORE DECREMENT: ${spareDocBefore.spareCount}`);
-      } else {
-        console.log(`SPARE ID: ${spare}`);
-        console.log("SPARE NOT FOUND BEFORE DECREMENT");
+        
+        const spareDocBefore = await collectionModel.findById(spare);
+        console.log("================ SPARE DECREMENT LOG ================");
+        if (spareDocBefore) {
+          console.log(`SPARE ID: ${spare}`);
+          console.log(`SPARE NAME: ${spareDocBefore.name || 'N/A'}`);
+          console.log(`COUNT BEFORE DECREMENT: ${spareDocBefore.spareCount}`);
+        } else {
+          console.log(`SPARE ID: ${spare}`);
+          console.log("SPARE NOT FOUND BEFORE DECREMENT");
+        }
+        const updateResult = await collectionModel.updateOne(
+          { _id: spare },
+          { $inc: { spareCount: -quantity } }
+        );
+        console.log("Direct $inc update result:", updateResult);
+
+        const spareDocAfter = await collectionModel.findById(spare);
+        if (spareDocAfter) {
+          console.log(`COUNT AFTER DECREMENT: ${spareDocAfter.spareCount}`);
+        } else {
+          console.log("SPARE NOT FOUND AFTER DECREMENT");
+        }
+        console.log("======================================================");
+
+        
+        const UserSpareCount = require('../models/UserSpareCount');
+        const collectionName = collectionModel.collection.collectionName.toLowerCase();
+        await UserSpareCount.findOneAndUpdate(
+          {
+            userId: req.user.id, 
+            collectionName,
+            itemId: spare
+          },
+          { $inc: { spareCount: -quantity } },
+          { upsert: true, new: true }
+        );
+        const userSpare = await UserSpareCount.findOne({ userId: req.user.id, collectionName, itemId: spare });
+        console.log("UserSpareCount after decrement:", userSpare);
       }
-      const updateResult = await collectionModel.updateOne(
-        { _id: spare },
-        { $inc: { spareCount: -quantity } }
-      );
-      console.log("Direct $inc update result:", updateResult);
-
-      const spareDocAfter = await collectionModel.findById(spare);
-      if (spareDocAfter) {
-        console.log(`COUNT AFTER DECREMENT: ${spareDocAfter.spareCount}`);
-      } else {
-        console.log("SPARE NOT FOUND AFTER DECREMENT");
-      }
-      console.log("======================================================");
-
-      
-      const UserSpareCount = require('../models/UserSpareCount');
-      const collectionName = collectionModel.collection.collectionName.toLowerCase();
-      await UserSpareCount.findOneAndUpdate(
-        {
-          userId: req.user.id, 
-          collectionName,
-          itemId: spare
-        },
-        { $inc: { spareCount: -quantity } },
-        { upsert: true, new: true }
-      );
-      const userSpare = await UserSpareCount.findOne({ userId: req.user.id, collectionName, itemId: spare });
-      console.log("UserSpareCount after decrement:", userSpare);
     } catch (err) {
       console.error("Error decrementing spare count:", err);
     }

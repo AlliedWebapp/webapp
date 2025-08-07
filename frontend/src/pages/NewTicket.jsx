@@ -199,6 +199,7 @@ User Email: ${user?.email || ""}`;
   const onSubmit = (e) => {
     e.preventDefault();
     
+    // Check mandatory fields only
     if (
       !projectname ||
       !sitelocation ||
@@ -206,32 +207,37 @@ User Email: ${user?.email || ""}`;
       !fault ||
       !issue ||
       !description ||
-      !date ||
-      !spare ||
-      !rating
+      !date
     ) {
-      toast.error("Please fill in all fields");
+      toast.error("Please fill in all mandatory fields: Project Name, Site Location, Project Location, Fault, Issue, Description, and Date");
       return;
     }
-    if (!spareQuantity || isNaN(spareQuantity) || parseInt(spareQuantity) < 1) {
+
+    // Optional validation for spare quantity if provided
+    if (spareQuantity && (isNaN(spareQuantity) || parseInt(spareQuantity) < 1)) {
       toast.error("Please enter a valid spare quantity (minimum 1)");
       return;
     }
 
-    const spareObj = spares.find(item => item._id === spare);
-    const availableCount = spareObj && typeof spareObj.spareCount === 'string' ? parseInt(spareObj.spareCount) : spareObj?.spareCount;
-    if (spareObj && availableCount !== undefined && parseInt(spareQuantity) > availableCount) {
-      toast.error(`Requested quantity exceeds available stock (${availableCount}).`);
+    // Optional validation for spare availability if spare is selected
+    if (spare && spareQuantity) {
+      const spareObj = spares.find(item => item._id === spare);
+      const availableCount = spareObj && typeof spareObj.spareCount === 'string' ? parseInt(spareObj.spareCount) : spareObj?.spareCount;
+      if (spareObj && availableCount !== undefined && parseInt(spareQuantity) > availableCount) {
+        toast.error(`Requested quantity exceeds available stock (${availableCount}).`);
+        return;
+      }
+    }
+
+    // Optional validation for fuel consumed if provided
+    if (fuel_consumed && (fuel_consumed === "" || isNaN(Number(fuel_consumed)) || Number(fuel_consumed) < 0)) {
+      toast.error("Fuel consumed must be a non-negative number.");
       return;
     }
 
-    if (fuel_consumed === "" || isNaN(Number(fuel_consumed)) || Number(fuel_consumed) < 0) {
-      toast.error("Fuel consumed is required and must be a non-negative number.");
-      return;
-    }
-
-    if (total_km_driven === "" || isNaN(Number(total_km_driven)) || Number(total_km_driven) < 0) {
-      toast.error("Total KM Driven is required and must be a non-negative number.");
+    // Optional validation for total KM driven if provided
+    if (total_km_driven && (total_km_driven === "" || isNaN(Number(total_km_driven)) || Number(total_km_driven) < 0)) {
+      toast.error("Total KM Driven must be a non-negative number.");
       return;
     }
 
@@ -248,13 +254,16 @@ User Email: ${user?.email || ""}`;
     formData.append("issue", issue);
     formData.append("description", description);
     formData.append("date", date);
-    formData.append("spare", spare);
-    formData.append("rating", rating);
-    formData.append("spareQuantity", spareQuantity);
-    formData.append("fuel_consumed", fuel_consumed);
-    formData.append("total_km_driven", total_km_driven);
-    formData.append("consumable", consumable);
+    
+    // Append optional fields only if they have values
+    if (spare) formData.append("spare", spare);
+    if (rating) formData.append("rating", rating);
+    if (spareQuantity) formData.append("spareQuantity", spareQuantity);
+    if (fuel_consumed) formData.append("fuel_consumed", fuel_consumed);
+    if (total_km_driven) formData.append("total_km_driven", total_km_driven);
+    if (consumable) formData.append("consumable", consumable);
   
+    // Append images if any
     images.forEach((image) => {
       formData.append("images", image);
     });
@@ -459,7 +468,6 @@ User Email: ${user?.email || ""}`;
               onChange={e => setSpareQuantity(e.target.value.replace(/[^0-9]/g, ''))}
               className="form-control"
               style={{ width: '100%' }}
-              required
               placeholder="Enter quantity"
             />
           </div>
@@ -478,7 +486,6 @@ User Email: ${user?.email || ""}`;
                   name="Consumable Required"
                   id="consumable"
                   onChange={(e) => setConsumable(e.target.value)}
-                  required
                   style={{ width: '100%' }}
                 >
                   <option value="" disabled>
@@ -501,7 +508,6 @@ User Email: ${user?.email || ""}`;
                   className="form-control"
                   style={{ width: '100%' }}
                   placeholder="Enter fuel consumed"
-                  required
                 />
                 <label htmlFor="total_km_driven" style={{ marginTop: '8px' }}>Total KM Driven</label>
                 <input
@@ -514,7 +520,6 @@ User Email: ${user?.email || ""}`;
                   className="form-control"
                   style={{ width: '100%' }}
                   placeholder="Enter total km driven"
-                  required
                 />
               </>
             ) : (
