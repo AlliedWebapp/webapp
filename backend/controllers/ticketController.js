@@ -99,6 +99,7 @@ const createTicket = asyncHandler(async (req, res) => {
       total_km_driven
     } = req.body
 
+    
     const imageFiles = req.files;
     const images = imageFiles?.map(file => ({
       data: file.buffer,

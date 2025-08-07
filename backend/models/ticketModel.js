@@ -41,7 +41,7 @@ const ticketSchema = new mongoose.Schema(
       type: Date,
       required: [true, 'Please select a date']
     },
-    // Optional fields
+    
     spare: {
       type: String,
       required: false
