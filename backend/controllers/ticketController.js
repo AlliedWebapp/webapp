@@ -142,7 +142,6 @@ const createTicket = asyncHandler(async (req, res) => {
     });
 
     try {
-
       if (spare) {
         const collectionModel = getCollectionModel(projectname);
 

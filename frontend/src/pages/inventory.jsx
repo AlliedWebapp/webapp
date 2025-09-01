@@ -210,10 +210,9 @@ const Inventory = () => {
   const [isImageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState("");
 
-  const [editedCounts, setEditedCounts] = useState({}); // { [id]: value }
+  const [editedCounts, setEditedCounts] = useState({}); 
   const [savingId, setSavingId] = useState(null);
 
-  // Get user role and allowed project from localStorage
   const getUserRole = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));

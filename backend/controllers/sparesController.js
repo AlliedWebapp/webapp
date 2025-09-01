@@ -18,7 +18,6 @@ const getSpareInventory = async (req, res) => {
     }
 };
 
-// Get all Solding data
 const getAllSolding = async (req, res) => {
     console.log("Getting Solding data...");
     try {
@@ -27,7 +26,7 @@ const getAllSolding = async (req, res) => {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
-        // Pagination
+       
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
         const skip = (page - 1) * limit;

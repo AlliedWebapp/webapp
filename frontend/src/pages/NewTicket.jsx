@@ -117,24 +117,24 @@ User Email: ${user?.email || ""}`;
     // Based on the actual model schemas, here are the correct field names:
     const fieldMappings = {
       jogini: [
-        "Spare Discription",  // This is the correct field name from JoginiModel
+        "Spare Discription",  
         "Spare Description",
         "Description"
       ],
       shong: [
-        "Description of Material",  // This is the correct field name from ShongModel
+        "Description of Material",  
         "Description"
       ],
       solding: [
-        "Description of Material",  // This is the correct field name from soldingModel
+        "Description of Material", 
         "Description"
       ],
       sdllpsalun: [
-        "NAME OF MATERIALS",  // This is the correct field name from SDLLPsalunModel
+        "NAME OF MATERIALS",  
         "Name of Materials"
       ],
       kuwarsi: [
-        "NAME OF MATERIALS",  // This is the correct field name from KuwarsiModel
+        "NAME OF MATERIALS",
         "Name of Materials"
       ]
     };

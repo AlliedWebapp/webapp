@@ -35,8 +35,6 @@ router.get("/debug", (req, res) => {
 router.put("/update-spare", protect, inventoryAccess, updatespareCount);
 
 
-
-
 router.get("/jogini", protect, inventoryAccess, getAllJogini);
 router.get("/solding", protect, inventoryAccess, getAllSolding);
 router.get("/shong", protect, inventoryAccess, getAllShong);
