@@ -31,12 +31,12 @@ router.get("/debug", (req, res) => {
     });
 });
 
-// Update spares count (protected route)
+
 router.put("/update-spare", protect, inventoryAccess, updatespareCount);
 
 
 
-// Data routes (protected)
+
 router.get("/jogini", protect, inventoryAccess, getAllJogini);
 router.get("/solding", protect, inventoryAccess, getAllSolding);
 router.get("/shong", protect, inventoryAccess, getAllShong);
@@ -44,7 +44,7 @@ router.get("/sdllpsalun", protect, inventoryAccess, getAllSDLLPsalun);
 router.get("/kuwarsi", protect, inventoryAccess, getAllKuwarsi);
 router.get("/inventory", protect, inventoryAccess, getSpareInventory);
 
-// --- SEARCH ENDPOINTS FOR AUTOCOMPLETE ---
+
 router.get("/jogini/search", protect, inventoryAccess, searchJogini);
 router.get("/shong/search", protect, inventoryAccess, searchShong);
 router.get("/solding/search", protect, inventoryAccess, searchSolding);

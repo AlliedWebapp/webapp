@@ -42,10 +42,10 @@ function NewTicket() {
   const [consumable, setConsumable] = useState("");
   const [fuel_consumed, setFuelConsumed] = useState("");
   const [total_km_driven, setTotalKmDriven] = useState("");
-  const [spareSearch, setSpareSearch] = useState(""); // NEW: search input state
-  const [spareSearchTimeout, setSpareSearchTimeout] = useState(null); // NEW: debounce
-  const [spareDropdownOpen, setSpareDropdownOpen] = useState(false); // NEW: dropdown control
-  const spareInputRef = useRef(null); // NEW: for focus
+  const [spareSearch, setSpareSearch] = useState(""); 
+  const [spareSearchTimeout, setSpareSearchTimeout] = useState(null); 
+  const [spareDropdownOpen, setSpareDropdownOpen] = useState(false); 
+  const spareInputRef = useRef(null); 
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

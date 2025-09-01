@@ -206,7 +206,7 @@ const Inventory = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Modal state for showing a clicked image
+ 
   const [isImageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState("");
 

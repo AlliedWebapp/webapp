@@ -22,7 +22,7 @@ const getSpareInventory = async (req, res) => {
 const getAllSolding = async (req, res) => {
     console.log("Getting Solding data...");
     try {
-        // Restrict access for inventoryOnly users
+        
         if (req.user.role === 'inventoryOnly' && req.user.allowedProject.toLowerCase() !== 'solding') {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }

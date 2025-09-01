@@ -142,7 +142,7 @@ const createTicket = asyncHandler(async (req, res) => {
     });
 
     try {
-      // Only decrement spare if spare is provided
+
       if (spare) {
         const collectionModel = getCollectionModel(projectname);
 
