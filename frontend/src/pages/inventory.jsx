@@ -213,6 +213,22 @@ const Inventory = () => {
   const [editedCounts, setEditedCounts] = useState({}); // { [id]: value }
   const [savingId, setSavingId] = useState(null);
 
+  // Get user role and allowed project from localStorage
+  const getUserRole = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      return {
+        role: user?.role || 'user',
+        allowedProject: user?.allowedProject || ''
+      };
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      return { role: 'user', allowedProject: '' };
+    }
+  };
+
+  const { role, allowedProject } = getUserRole();
+
   useEffect(() => {
     if (selectedCollection) {
       localStorage.setItem("selectedCollection", selectedCollection);
@@ -283,14 +299,14 @@ const Inventory = () => {
         "Description",
         "description"
       ],
-      SDLLPsalun: [
+      sdllpsalun: [
         "NAME OF MATERIALS",
         "name of materials",
         "Name of Materials",
         "Name",
         "name"
       ],
-      Kuwarsi: [
+      kuwarsi: [
         "NAME OF MATERIALS",
         "name of materials",
         "Name of Materials",
@@ -321,7 +337,7 @@ const Inventory = () => {
     return value;
   };
 
-  // Update the checkLowStockAndNotify function to use findItemNameField
+  // Enhanced low stock notification function with automatic notifications and 10-day reminders
   const checkLowStockAndNotify = async (items) => {
     const lowStockThreshold = 10;
     
@@ -350,13 +366,24 @@ const Inventory = () => {
       // Find the item name using our helper function
       const itemName = findItemNameField(item, selectedCollection);
       
+      // Debug logging for SDLLP and Kuwarsi
+      if (selectedCollection.toLowerCase() === 'sdllpsalun' || selectedCollection.toLowerCase() === 'kuwarsi') {
+        console.log(`Processing item in ${selectedCollection}:`, {
+          id: itemId,
+          stock: currentStock,
+          itemName: itemName,
+          hasValidStock: !isNaN(currentStock),
+          isLowStock: currentStock < lowStockThreshold,
+          hasValidName: !!itemName
+        });
+      }
+      
       // Only add to currentState if we have a valid number
       if (!isNaN(currentStock)) {
         currentState[itemId] = currentStock;
         
-        // Only add to lowStockItems if stock is below threshold AND not 0 AND name is present
-        // This is for notifications only
-        if (currentStock > 0 && currentStock < lowStockThreshold && itemName) {
+        // Include items with stock below threshold (including 0) for notifications
+        if (currentStock < lowStockThreshold && itemName) {
           console.log(`Low stock item found in ${selectedCollection}:`, {
             id: itemId,
             name: itemName,
@@ -368,12 +395,17 @@ const Inventory = () => {
             name: itemName,
             stock: currentStock
           });
+        } else if (currentStock < lowStockThreshold && !itemName) {
+          console.log(`Low stock item found but no name in ${selectedCollection}:`, {
+            id: itemId,
+            stock: currentStock,
+            itemName: itemName
+          });
         }
       }
     });
 
     // Update low stock items list for UI display
-    // This will show ALL items below threshold (including 0) in the table
     const filteredItems = items.filter(item => {
       let stock;
       
@@ -403,61 +435,131 @@ const Inventory = () => {
     });
     setLowStockItems(filteredItems);
 
-    // Check if we need to send notification
-    let shouldSendNotification = false;
+    // Check for automatic notifications and reminders
+    await checkAndSendNotifications(currentState, lowStockItems, previousState);
+  };
 
+  // Function to handle automatic notifications only (no reminders)
+  const checkAndSendNotifications = async (currentState, lowStockItems, previousState) => {
+    const lowStockThreshold = 10;
+    
+    let shouldSendNotification = false;
+    
     // Check if this is first load
     if (Object.keys(previousState).length === 0) {
       shouldSendNotification = lowStockItems.length > 0;
       console.log("First load, notification needed:", shouldSendNotification);
     } else {
-      // Check if any stock levels have changed
+      // Check if any stock levels have changed OR if there are new low stock items
       const changedItems = Object.keys(currentState).filter(itemId => 
         currentState[itemId] !== previousState[itemId]
       );
-      shouldSendNotification = changedItems.length > 0 && lowStockItems.length > 0;
-      console.log("Stock changes detected:", {
+      
+      // Send notification if stock changed OR if there are low stock items that weren't there before
+      const previousLowStockIds = Object.keys(previousState).filter(id => 
+        previousState[id] < lowStockThreshold
+      );
+      const currentLowStockIds = Object.keys(currentState).filter(id => 
+        currentState[id] < lowStockThreshold
+      );
+      
+      const newLowStockItems = currentLowStockIds.filter(id => 
+        !previousLowStockIds.includes(id)
+      );
+      
+      shouldSendNotification = (changedItems.length > 0 || newLowStockItems.length > 0) && lowStockItems.length > 0;
+      
+      console.log("Notification analysis:", {
         changedItems,
+        newLowStockItems,
         shouldSendNotification,
         lowStockItemsCount: lowStockItems.length
       });
     }
-
+    
     // Save current state
     localStorage.setItem('inventoryState', JSON.stringify(currentState));
-
+    
     // Send notification if needed
     if (shouldSendNotification && lowStockItems.length > 0) {
-      console.log("Preparing to send notification for:", {
-        collection: selectedCollection,
-        lowStockItems
-      });
+      console.log("=== NOTIFICATION TRIGGERED ===");
+      console.log("Should send notification:", shouldSendNotification);
+      console.log("Low stock items count:", lowStockItems.length);
+      console.log("Selected collection:", selectedCollection);
+      await sendLowStockNotification(selectedCollection, lowStockItems);
+    } else {
+      console.log("=== NOTIFICATION NOT TRIGGERED ===");
+      console.log("Should send notification:", shouldSendNotification);
+      console.log("Low stock items count:", lowStockItems.length);
+      console.log("Selected collection:", selectedCollection);
+    }
+  };
 
+  // Separate function to send low stock notifications with multiple fallback options
+  const sendLowStockNotification = async (collection, lowStockItems) => {
+    console.log("=== SENDING LOW STOCK NOTIFICATION ===");
+    console.log("Collection:", collection);
+    console.log("Low stock items:", lowStockItems);
+    console.log("Items count:", lowStockItems.length);
+    
+    const subject = `Low Stock Alert - ${collection}`;
+    const details = `Low Stock Items in ${collection}:\n\n` +
+      lowStockItems.map(item => 
+        `Item: ${item.name}\nCurrent Stock: ${item.stock}\n`
+      ).join("\n");
+    
+    console.log("Email subject:", subject);
+    console.log("Email details:", details);
+
+    // Primary email service (FormSubmit)
+    try {
       const emailData = new FormData();
-      emailData.append("_subject", `Low Stock Alert - ${selectedCollection}`);
-      
-      const details = `Low Stock Items in ${selectedCollection}:\n\n` +
-        lowStockItems.map(item => 
-          `Item: ${item.name}\nCurrent Stock: ${item.stock}\n`
-        ).join("\n");
-
+      emailData.append("_subject", subject);
       emailData.append("Details", details);
       emailData.append("_captcha", "false");
       emailData.append("_template", "table");
       emailData.append("_autoresponse", "false");
 
-      try {
-        await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
-          method: "POST",
-          body: emailData,
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        console.log("Low stock notification sent successfully");
-      } catch (error) {
-        console.error("Error sending low stock notification:", error);
+      const response = await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+        method: "POST",
+        body: emailData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        console.log("Low stock notification sent successfully via FormSubmit");
+        return;
+      } else {
+        console.warn("FormSubmit failed, trying alternative method");
       }
+    } catch (error) {
+      console.error("Error sending via FormSubmit:", error);
+    }
+
+    // Fallback: Try using your existing email notification system
+    try {
+      const emailData = new FormData();
+      emailData.append("_subject", subject);
+      emailData.append("Ticket Details", details);
+      emailData.append("_captcha", "false");
+
+      const response = await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+        method: "POST",
+        body: emailData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        console.log("Low stock notification sent successfully via fallback method");
+      } else {
+        console.error("All email methods failed");
+      }
+    } catch (error) {
+      console.error("Error sending via fallback method:", error);
     }
   };
 
@@ -500,14 +602,29 @@ const Inventory = () => {
       setInventory([]);
 
       if (err.response && err.response.status === 403) {
-        setError(
-          err.response.data?.message ||
+        // Check if it's because no project is selected
+        if (!selectedCollection) {
+          setError("Please select a project to view inventory.");
+        } else {
+          setError(
+            err.response.data?.message ||
             "Access denied: Not authorized for this project."
-        );
+          );
+        }
       } else if (err.response?.data?.message) {
         setError(err.response.data.message);
-      } else {
+      } else if (err.message && !err.message.includes("Network Error")) {
         setError(err.message || "An error occurred while fetching inventory.");
+      }
+      
+      // Clear inventory if access is denied
+      if (err.response && err.response.status === 403) {
+        setInventory([]);
+        if (!selectedCollection) {
+          // Don't clear selectedCollection if it's already empty
+        } else {
+          setSelectedCollection("");
+        }
       }
     } finally {
       setLoading(false);
@@ -524,9 +641,14 @@ const Inventory = () => {
     const collection = e.target.value;
     setSelectedCollection(collection);
     localStorage.setItem("selectedCollection", collection);
+    
+    // Clear any existing errors when a project is selected
+    if (collection) {
+      setError(null);
+    }
   }, []);
 
-  // New function to update spare count to a specific value
+    // New function to update spare count to a specific value
   const updateSpareCountTo = async (id, newCount) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -534,9 +656,24 @@ const Inventory = () => {
         console.error("No user token found. Please log in.");
         return;
       }
+      
+      // Debug logging
+      console.log("Update request details:", {
+        userRole: role,
+        userAllowedProject: allowedProject,
+        selectedCollection: selectedCollection,
+        isAuthorized: role === 'admin' || (role === 'inventoryOnly' && selectedCollection.toLowerCase() === allowedProject.toLowerCase())
+      });
+      
+      // Check authorization before making the request
+      if (!(role === 'admin' || (role === 'inventoryOnly' && selectedCollection.toLowerCase() === allowedProject.toLowerCase()))) {
+        alert("Access denied: You are not authorized to update spare counts for this project");
+        return;
+      }
+      
       setSavingId(id);
       const response = await axios.put(
-        `${API_URL}/api/update-spare/`,
+        `${API_URL}/api/update-spare`,
         {
           collectionName: selectedCollection,
           id,
@@ -570,8 +707,11 @@ const Inventory = () => {
       console.error("Error updating spares count:", error);
       if (error.response?.status === 401) {
         console.error("Please log in again");
+      } else if (error.response?.status === 403) {
+        alert("Access denied: " + (error.response?.data?.message || "You are not authorized to update spare counts for this project"));
+      } else {
+        alert(error.response?.data?.message || error.message || "Failed to update count");
       }
-      alert(error.response?.data?.message || error.message || "Failed to update count");
     } finally {
       setSavingId(null);
     }
@@ -596,15 +736,25 @@ const Inventory = () => {
       <OrientationAlert />
       <BackButton url="/home" />
       <h2>View Inventory</h2>
+      
+
 
       <label>Select Project: </label>
       <select onChange={handleCollectionChange} value={selectedCollection}>
         <option value="">Select a Project</option>
-        {Object.keys(PROJECTS).map((key) => (
-          <option key={key} value={key}>
-            {PROJECTS[key].name}
-          </option>
-        ))}
+        {Object.keys(PROJECTS)
+          .filter(key => {
+            // Normal users and admins can see all projects
+            if (role === 'user' || role === 'admin') return true;
+            // Inventory-only users can only see their assigned project
+            if (role === 'inventoryOnly') return key.toLowerCase() === allowedProject.toLowerCase();
+            return false;
+          })
+          .map((key) => (
+            <option key={key} value={key}>
+              {PROJECTS[key].name}
+            </option>
+          ))}
       </select>
 
       {selectedCollection && (
@@ -639,7 +789,14 @@ const Inventory = () => {
       )}
 
       {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      {error && (
+        <p style={{ 
+          color: error.includes("Please select a project") ? "#666" : "red",
+          fontStyle: error.includes("Please select a project") ? "italic" : "normal"
+        }}>
+          {error.includes("Please select a project") ? error : `Error: ${error}`}
+        </p>
+      )}
 
       {selectedCollection && !loading && !error && (
         <div>
@@ -653,7 +810,7 @@ const Inventory = () => {
                     {headers.map((header, index) => (
                       <th key={index}>{header}</th>
                     ))}
-                    <th>Adjust count</th>
+                    <th>{role === 'user' ? 'Spare Count' : 'Adjust Count'}</th>
                     <th>Picture</th>
                   </tr>
                 </thead>
@@ -690,45 +847,55 @@ const Inventory = () => {
                         }
                       )}
                       <td className="spares-btn-container">
-                        <input
-                          type="number"
-                          min={0}
-                          style={{ width: 70, padding: "4px 6px", fontSize: 14, borderRadius: 4, border: "1px solid #ccc", marginRight: 8 }}
-                          value={
-                            editedCounts[item._id] !== undefined
-                              ? editedCounts[item._id]
-                              : item.spareCount
-                          }
-                          disabled={savingId === item._id}
-                          onChange={e => {
-                            const val = e.target.value;
-                            if (/^\d*$/.test(val)) {
-                              setEditedCounts(prev => ({ ...prev, [item._id]: val }));
-                            }
-                          }}
-                          onBlur={e => {
-                            if (e.target.value === "") {
-                              setEditedCounts(prev => ({ ...prev, [item._id]: item.spareCount }));
-                            }
-                          }}
-                        />
-                        {(editedCounts[item._id] !== undefined && String(editedCounts[item._id]) !== String(item.spareCount)) && (
-                          <button
-                            onClick={() => updateSpareCountTo(item._id, editedCounts[item._id])}
-                            disabled={savingId === item._id || editedCounts[item._id] === ""}
-                            style={{
-                              padding: "4px 10px",
-                              background: "#4CAF50",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              fontSize: 14,
-                              cursor: savingId === item._id ? "not-allowed" : "pointer",
-                              marginLeft: 2,
-                            }}
-                          >
-                            {savingId === item._id ? "Saving..." : "Save"}
-                          </button>
+                        {/* Show editable input for admin and inventory-only users (for their allowed project) */}
+                        {(role === 'admin' || (role === 'inventoryOnly' && selectedCollection.toLowerCase() === allowedProject.toLowerCase())) ? (
+                          <>
+                            <input
+                              type="number"
+                              min={0}
+                              style={{ width: 70, padding: "4px 6px", fontSize: 14, borderRadius: 4, border: "1px solid #ccc", marginRight: 8 }}
+                              value={
+                                editedCounts[item._id] !== undefined
+                                  ? editedCounts[item._id]
+                                  : item.spareCount
+                              }
+                              disabled={savingId === item._id}
+                              onChange={e => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) {
+                                  setEditedCounts(prev => ({ ...prev, [item._id]: val }));
+                                }
+                              }}
+                              onBlur={e => {
+                                if (e.target.value === "") {
+                                  setEditedCounts(prev => ({ ...prev, [item._id]: item.spareCount }));
+                                }
+                              }}
+                            />
+                            {(editedCounts[item._id] !== undefined && String(editedCounts[item._id]) !== String(item.spareCount)) && (
+                              <button
+                                onClick={() => updateSpareCountTo(item._id, editedCounts[item._id])}
+                                disabled={savingId === item._id || editedCounts[item._id] === ""}
+                                style={{
+                                  padding: "4px 10px",
+                                  background: "#4CAF50",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "4px",
+                                  fontSize: 14,
+                                  cursor: savingId === item._id ? "not-allowed" : "pointer",
+                                  marginLeft: 2,
+                                }}
+                              >
+                                {savingId === item._id ? "Saving..." : "Save"}
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          /* Show read-only spareCount for normal users */
+                          <span style={{ padding: "4px 6px", fontSize: 14 }}>
+                            {item.spareCount || 0}
+                          </span>
                         )}
                       </td>
                       <td>
@@ -770,7 +937,7 @@ const Inventory = () => {
                 {headers.map((header, index) => (
                   <th key={index}>{header}</th>
                 ))}
-                <th>Adjust count</th>
+                <th>{role === 'user' ? 'Spare Count' : 'Adjust Count'}</th>
                 <th>Picture</th>
               </tr>
             </thead>
@@ -805,45 +972,55 @@ const Inventory = () => {
                       }
                     )}
                     <td className="spares-btn-container">
-                      <input
-                        type="number"
-                        min={0}
-                        style={{ width: 70, padding: "4px 6px", fontSize: 14, borderRadius: 4, border: "1px solid #ccc", marginRight: 8 }}
-                        value={
-                          editedCounts[item._id] !== undefined
-                            ? editedCounts[item._id]
-                            : item.spareCount
-                        }
-                        disabled={savingId === item._id}
-                        onChange={e => {
-                          const val = e.target.value;
-                          if (/^\d*$/.test(val)) {
-                            setEditedCounts(prev => ({ ...prev, [item._id]: val }));
-                          }
-                        }}
-                        onBlur={e => {
-                          if (e.target.value === "") {
-                            setEditedCounts(prev => ({ ...prev, [item._id]: item.spareCount }));
-                          }
-                        }}
-                      />
-                      {(editedCounts[item._id] !== undefined && String(editedCounts[item._id]) !== String(item.spareCount)) && (
-                        <button
-                          onClick={() => updateSpareCountTo(item._id, editedCounts[item._id])}
-                          disabled={savingId === item._id || editedCounts[item._id] === ""}
-                          style={{
-                            padding: "4px 10px",
-                            background: "#4CAF50",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            fontSize: 14,
-                            cursor: savingId === item._id ? "not-allowed" : "pointer",
-                            marginLeft: 2,
-                          }}
-                        >
-                          {savingId === item._id ? "Saving..." : "Save"}
-                        </button>
+                      {/* Show editable input for admin and inventory-only users (for their allowed project) */}
+                      {(role === 'admin' || (role === 'inventoryOnly' && selectedCollection.toLowerCase() === allowedProject.toLowerCase())) ? (
+                        <>
+                          <input
+                            type="number"
+                            min={0}
+                            style={{ width: 70, padding: "4px 6px", fontSize: 14, borderRadius: 4, border: "1px solid #ccc", marginRight: 8 }}
+                            value={
+                              editedCounts[item._id] !== undefined
+                                ? editedCounts[item._id]
+                                : item.spareCount
+                            }
+                            disabled={savingId === item._id}
+                            onChange={e => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) {
+                                setEditedCounts(prev => ({ ...prev, [item._id]: val }));
+                              }
+                            }}
+                            onBlur={e => {
+                              if (e.target.value === "") {
+                                setEditedCounts(prev => ({ ...prev, [item._id]: item.spareCount }));
+                              }
+                            }}
+                          />
+                          {(editedCounts[item._id] !== undefined && String(editedCounts[item._id]) !== String(item.spareCount)) && (
+                            <button
+                              onClick={() => updateSpareCountTo(item._id, editedCounts[item._id])}
+                              disabled={savingId === item._id || editedCounts[item._id] === ""}
+                              style={{
+                                padding: "4px 10px",
+                                background: "#4CAF50",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                fontSize: 14,
+                                cursor: savingId === item._id ? "not-allowed" : "pointer",
+                                marginLeft: 2,
+                              }}
+                            >
+                              {savingId === item._id ? "Saving..." : "Save"}
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        /* Show read-only spareCount for normal users */
+                        <span style={{ padding: "4px 6px", fontSize: 14 }}>
+                          {item.spareCount || 0}
+                        </span>
                       )}
                     </td>
                     <td>

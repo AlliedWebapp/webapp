@@ -8,7 +8,6 @@ const {
     getAllSDLLPsalun,
     getAllKuwarsi,
     updatespareCount,
-    getUserSpareCounts,
     searchJogini,
     searchShong,
     searchSolding,
@@ -35,8 +34,7 @@ router.get("/debug", (req, res) => {
 // Update spares count (protected route)
 router.put("/update-spare", protect, inventoryAccess, updatespareCount);
 
-// Get user-specific SpareCounts for a collection (protected route)
-router.get("/spare-counts/:collectionName", protect, inventoryAccess, getUserSpareCounts);
+
 
 // Data routes (protected)
 router.get("/jogini", protect, inventoryAccess, getAllJogini);

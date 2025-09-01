@@ -54,9 +54,36 @@ const sendEmailNotification = async () => {
 
   formData.append("_subject", `New ticket created by project: ${projectname}`);
 
+  console.log("=== EMAIL NOTIFICATION DEBUG ===");
+  console.log("Spare ID:", spare);
+  console.log("Project name:", projectname);
+  console.log("Available spares count:", spares.length);
+  console.log("All spares:", spares);
   
   const spareObj = spares.find(item => item._id === spare);
-  const spareName = spareObj ? findItemNameField(spareObj, projectname) : 'Unknown Spare';
+  let spareName = 'Unknown Spare';
+  
+  if (spareObj) {
+    console.log("Found spare object:", spareObj);
+    console.log("Spare object keys:", Object.keys(spareObj));
+    // Use the same collection name as in the dropdown
+    const collectionName = PROJECTS[projectname];
+    spareName = findItemNameField(spareObj, collectionName);
+    console.log("Collection name:", collectionName);
+    console.log("Extracted spare name:", spareName);
+  } else {
+    console.log("Spare object not found for ID:", spare);
+    console.log("Available spare IDs:", spares.map(s => s._id));
+    const collectionName = PROJECTS[projectname];
+    console.log("Available spares with names:", spares.map(s => ({ 
+      id: s._id, 
+      name: findItemNameField(s, collectionName),
+      keys: Object.keys(s)
+    })));
+  }
+  
+  console.log("Final spare name for email:", spareName);
+  console.log("=== END EMAIL DEBUG ===");
 
   const details = `
     Project Name: ${projectname}
@@ -87,29 +114,89 @@ User Email: ${user?.email || ""}`;
 
 
   const findItemNameField = (item, collection) => {
+    // Based on the actual model schemas, here are the correct field names:
     const fieldMappings = {
       jogini: [
-        "Spare Discription",
+        "Spare Discription",  // This is the correct field name from JoginiModel
+        "Spare Description",
+        "Description"
       ],
       shong: [
-        "Description of Material",
+        "Description of Material",  // This is the correct field name from ShongModel
+        "Description"
       ],
       solding: [
-        "Description of Material",
+        "Description of Material",  // This is the correct field name from soldingModel
+        "Description"
       ],
       sdllpsalun: [
-        "NAME OF MATERIALS",
+        "NAME OF MATERIALS",  // This is the correct field name from SDLLPsalunModel
+        "Name of Materials"
       ],
       kuwarsi: [
-        "NAME OF MATERIALS",
+        "NAME OF MATERIALS",  // This is the correct field name from KuwarsiModel
+        "Name of Materials"
       ]
     };
-    const fieldsToCheck = fieldMappings[collection?.toLowerCase?.()] || ["item_name", "name", "Name"];
-    const existingField = fieldsToCheck.find(field => item[field] !== undefined);
-    if (!existingField) return null;
-    const value = item[existingField];
-    if (value === null || value === undefined || value === "") return "Unnamed";
-    return value;
+    
+    const fieldsToCheck = fieldMappings[collection?.toLowerCase?.()] || ["Description", "name", "Name"];
+    
+    console.log("Looking for spare name in collection:", collection);
+    console.log("Available fields in item:", Object.keys(item));
+    console.log("Fields to check:", fieldsToCheck);
+    
+    // First try exact field matches
+    let existingField = fieldsToCheck.find(field => 
+      item[field] !== undefined && 
+      item[field] !== null && 
+      item[field] !== "" && 
+      item[field] !== "null"
+    );
+    
+    if (existingField) {
+      const value = item[existingField];
+      console.log("Found exact field match:", existingField, "with value:", value);
+      return value || "Unnamed";
+    }
+    
+    // If no exact match, try case-insensitive search
+    const itemKeys = Object.keys(item);
+    for (const field of fieldsToCheck) {
+      const matchingKey = itemKeys.find(key => 
+        key.toLowerCase() === field.toLowerCase() && 
+        item[key] !== undefined && 
+        item[key] !== null && 
+        item[key] !== "" && 
+        item[key] !== "null"
+      );
+      if (matchingKey) {
+        const value = item[matchingKey];
+        console.log("Found case-insensitive match:", matchingKey, "with value:", value);
+        return value || "Unnamed";
+      }
+    }
+    
+    // Fallback: look for any field that might contain a name/description
+    const nameFields = itemKeys.filter(key => 
+      (key.toLowerCase().includes('name') || 
+       key.toLowerCase().includes('description') || 
+       key.toLowerCase().includes('material') ||
+       key.toLowerCase().includes('discription')) &&
+      item[key] !== undefined && 
+      item[key] !== null && 
+      item[key] !== "" && 
+      item[key] !== "null"
+    );
+    
+    if (nameFields.length > 0) {
+      const value = item[nameFields[0]];
+      console.log("Found fallback field:", nameFields[0], "with value:", value);
+      return value || "Unnamed";
+    }
+    
+    console.log("No suitable field found, returning 'Unnamed'");
+    console.log("Item object:", item);
+    return "Unnamed";
   };
 
 

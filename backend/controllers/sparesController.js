@@ -3,7 +3,6 @@ const Shong = require("../models/ShongModel");
 const solding = require("../models/soldingModel");
 const SDLLPsalun = require("../models/SDLLPsalunModel");
 const Kuwarsi = require("../models/KuwarsiModel");
-const UserSpareCount = require("../models/UserSpareCount");
 const mongoose = require("mongoose");
 const getSpareInventory = async (req, res) => {
     try {
@@ -24,11 +23,10 @@ const getAllSolding = async (req, res) => {
     console.log("Getting Solding data...");
     try {
         // Restrict access for inventoryOnly users
-        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'solding') {
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject.toLowerCase() !== 'solding') {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
-        const userId = req.user._id;
         // Pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
@@ -40,22 +38,10 @@ const getAllSolding = async (req, res) => {
             solding.countDocuments()
         ]);
         
-        // Get user-specific spare counts
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'solding'
-        });
-
-        // Create a map of itemId to spareCount
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
-
-        // Update spareCount in data with user-specific counts
+        // Use the spareCount directly from the inventory item (no user-specific lookup)
         const updatedData = data.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] || 0
+            spareCount: item.spareCount || 0
         }));
 
         console.log("Solding Data Found:", updatedData.length);
@@ -84,12 +70,11 @@ const getAllSolding = async (req, res) => {
 const getAllShong = async (req, res) => {
     console.log("Getting Shong data...");
     try {
-// Restrict access for inventoryOnly users
-        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'Shong') {
+        // Restrict access for inventoryOnly users
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject.toLowerCase() !== 'shong') {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
-        const userId = req.user._id;
         // Pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
@@ -100,22 +85,10 @@ const getAllShong = async (req, res) => {
             Shong.countDocuments()
         ]);
         
-        // Get user-specific spare counts
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'shong'
-        });
-
-        // Create a map of itemId to spareCount
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
-
-        // Update spareCount in data with user-specific counts
+        // Use the spareCount directly from the inventory item (no user-specific lookup)
         const updatedData = data.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] || 0
+            spareCount: item.spareCount || 0
         }));
 
         console.log("Shong Data Found:", updatedData.length);
@@ -145,11 +118,16 @@ const getAllJogini = async (req, res) => {
     console.log("🔍 Fetching Jogini data...");
     try {
          // Restrict access for inventoryOnly users
-        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'Jogini') {
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject.toLowerCase() !== 'jogini') {
+            console.log(`Access denied for inventory-only user in Jogini:`, {
+                userAllowedProject: req.user.allowedProject,
+                userAllowedProjectLower: req.user.allowedProject.toLowerCase(),
+                expected: 'jogini',
+                match: req.user.allowedProject.toLowerCase() === 'jogini'
+            });
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
-        const userId = req.user._id;
         // Pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
@@ -160,22 +138,10 @@ const getAllJogini = async (req, res) => {
             Jogini.countDocuments()
         ]);
         
-        // Get user-specific spare counts
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'jogini'
-        });
-
-        // Create a map of itemId to spareCount
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
-
-        // Update spareCount in data with user-specific counts
+        // Use the spareCount directly from the inventory item (no user-specific lookup)
         const updatedData = data.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] || 0
+            spareCount: item.spareCount || 0
         }));
 
         if (!updatedData.length) {
@@ -207,11 +173,10 @@ const getAllSDLLPsalun = async (req, res) => {
     console.log("Getting SDLLPsalun data...");
     try {
         // Restrict access for inventoryOnly users
-        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'SDLLPsalun') {
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject.toLowerCase() !== 'sdllpsalun') {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
-        const userId = req.user._id;
         // Pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
@@ -222,22 +187,10 @@ const getAllSDLLPsalun = async (req, res) => {
             SDLLPsalun.countDocuments()
         ]);
         
-        // Get user-specific spare counts
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'sdllpsalun'
-        });
-
-        // Create a map of itemId to spareCount
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
-
-        // Update spareCount in data with user-specific counts
+        // Use the spareCount directly from the inventory item (no user-specific lookup)
         const updatedData = data.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] || 0
+            spareCount: item.spareCount || 0
         }));
 
         console.log("SDLLPsalun Data Found:", updatedData.length);
@@ -267,11 +220,10 @@ const getAllKuwarsi = async (req, res) => {
     console.log("Getting Kuwarsi data...");
     try {
         // Restrict access for inventoryOnly users
-        if (req.user.role === 'inventoryOnly' && req.user.allowedProject !== 'Kuwarsi') {
+        if (req.user.role === 'inventoryOnly' && req.user.allowedProject.toLowerCase() !== 'kuwarsi') {
             return res.status(403).json({ message: 'Access denied: Not authorized for this project.' });
         }
 
-        const userId = req.user._id;
         // Pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 100;
@@ -282,22 +234,10 @@ const getAllKuwarsi = async (req, res) => {
             Kuwarsi.countDocuments()
         ]);
         
-        // Get user-specific spare counts
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'kuwarsi'
-        });
-
-        // Create a map of itemId to spareCount
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
-
-        // Update spareCount in data with user-specific counts
+        // Use the spareCount directly from the inventory item (no user-specific lookup)
         const updatedData = data.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] || 0
+            spareCount: item.spareCount || 0
         }));
 
         console.log("Kuwarsi Data Found:", updatedData.length);
@@ -326,59 +266,130 @@ const getAllKuwarsi = async (req, res) => {
 const updatespareCount = async (req, res) => {
     try {
         const { collectionName, id, increment } = req.body;
-        const userId = req.user._id; // Get user ID from authenticated request
         const userName = req.user.name; // Get user name
         const userEmail = req.user.email; // Get user email
+        const userRole = req.user.role; // Get user role
+        const userAllowedProject = req.user.allowedProject; // Get user's allowed project
+
+        // Debug logging for request body
+        console.log("Request body:", {
+            collectionName,
+            id,
+            increment,
+            collectionNameType: typeof collectionName,
+            idType: typeof id,
+            incrementType: typeof increment
+        });
 
         // Debug logging
         console.log("User details from request:", {
-            userId,
+            userId: req.user._id,
             userName,
             userEmail,
+            userRole,
+            userAllowedProject,
             user: req.user
         });
 
-        // Convert collectionName to lowercase for consistency
-        const normalizedCollectionName = collectionName.toLowerCase();
-        console.log(`Updating spare count for user ${userName} (${userEmail}) in collection ${normalizedCollectionName} for item ${id}`);
-
-        // Find or create user-specific SpareCount
-        let userSpareCount = await UserSpareCount.findOne({
-            userId,
-            collectionName: normalizedCollectionName,
-            itemId: id
-        });
-
-        if (!userSpareCount) {
-            console.log(`Creating new user-specific spare count for user ${userName} (${userEmail})`);
-            // Create new user-specific SpareCount starting at 0
-            userSpareCount = await UserSpareCount.create({
-                userId,
-                userName,
-                userEmail,
-                collectionName: normalizedCollectionName,
-                itemId: id,
-                spareCount: 0
+        // Authorization check
+        if (userRole === 'user') {
+            return res.status(403).json({ 
+                message: 'Access denied: Normal users cannot update spare counts' 
             });
-            console.log("Created new spare count:", userSpareCount);
-        } else {
-            // Update user info in case it has changed
-            userSpareCount.userName = userName;
-            userSpareCount.userEmail = userEmail;
-            await userSpareCount.save(); // Save the updated user info
-            console.log("Updated existing spare count:", userSpareCount);
         }
 
-        // Update the spareCount
-        const oldCount = userSpareCount.spareCount;
-        userSpareCount.spareCount = Math.max(0, userSpareCount.spareCount + increment);
-        await userSpareCount.save();
+        // Convert collectionName to lowercase for consistency
+        const normalizedCollectionName = collectionName.toLowerCase();
+        
+        // Check if inventoryOnly user is trying to update a different project
+        if (userRole === 'inventoryOnly' && userAllowedProject.toLowerCase() !== normalizedCollectionName) {
+            console.log(`Access denied for inventory-only user:`, {
+                userAllowedProject: userAllowedProject,
+                userAllowedProjectLower: userAllowedProject.toLowerCase(),
+                normalizedCollectionName: normalizedCollectionName,
+                match: userAllowedProject.toLowerCase() === normalizedCollectionName
+            });
+            return res.status(403).json({ 
+                message: `Access denied: Inventory-only users can only update spare counts for their assigned project (${userAllowedProject})` 
+            });
+        }
 
-        console.log(`Updated spare count for user ${userName} (${userEmail}): ${oldCount} -> ${userSpareCount.spareCount}`);
-        console.log("Final spare count document:", userSpareCount);
+        console.log(`Updating spare count for user ${userName} (${userEmail}) in collection ${normalizedCollectionName} for item ${id}`);
+
+        // Find the inventory item to update its spareCount directly
+        let inventoryItem;
+        let Model;
+        
+        console.log(`Looking for model for collection: ${normalizedCollectionName}`);
+        
+        // Create a model mapping for more robust selection
+        const modelMap = {
+            'jogini': Jogini,
+            'shong': Shong,
+            'solding': solding,
+            'sdllpsalun': SDLLPsalun,
+            'kuwarsi': Kuwarsi
+        };
+        
+        Model = modelMap[normalizedCollectionName];
+        
+        if (!Model) {
+            console.log(`Invalid collection name: ${normalizedCollectionName}`);
+            console.log(`Available models:`, Object.keys(modelMap));
+            return res.status(400).json({ message: `Invalid collection name: ${normalizedCollectionName}` });
+        }
+        
+        console.log(`Selected model: ${Model.modelName} for collection: ${normalizedCollectionName}`);
+
+        if (!Model) {
+            console.error(`Model is undefined for collection: ${normalizedCollectionName}`);
+            return res.status(500).json({ message: `Model not found for collection: ${normalizedCollectionName}` });
+        }
+
+        console.log(`Attempting to find item with ID: ${id} in model: ${Model.modelName}`);
+        
+        try {
+            inventoryItem = await Model.findById(id);
+            console.log(`FindById result:`, inventoryItem ? 'Item found' : 'Item not found');
+        } catch (findError) {
+            console.error(`Error finding item:`, findError);
+            return res.status(500).json({ message: `Database error: ${findError.message}` });
+        }
+        
+        if (!inventoryItem) {
+            return res.status(404).json({ message: 'Inventory item not found' });
+        }
+
+        // Update the spareCount directly in the inventory item using updateOne to avoid validation issues
+        const oldCount = inventoryItem.spareCount || 0;
+        const newCount = Math.max(0, oldCount + increment);
+        console.log(`Updating spareCount: ${oldCount} + ${increment} = ${newCount}`);
+        
+        try {
+            // Use updateOne to avoid triggering validation on other fields
+            const updateResult = await Model.updateOne(
+                { _id: id },
+                { $set: { spareCount: newCount } }
+            );
+            
+            if (updateResult.modifiedCount === 1) {
+                console.log(`Successfully updated spareCount to: ${newCount}`);
+                // Update the local object for response
+                inventoryItem.spareCount = newCount;
+            } else {
+                console.error(`Update failed: modifiedCount = ${updateResult.modifiedCount}`);
+                return res.status(500).json({ message: 'Failed to update spareCount - no documents were modified' });
+            }
+        } catch (updateError) {
+            console.error(`Error updating spareCount:`, updateError);
+            return res.status(500).json({ message: `Failed to update spareCount: ${updateError.message}` });
+        }
+
+        console.log(`Updated spare count for user ${userName} (${userEmail}): ${oldCount} -> ${inventoryItem.spareCount}`);
+        console.log("Final inventory item:", inventoryItem);
 
         
-        const updatedAt = new Date(userSpareCount.updatedAt);
+        const updatedAt = new Date(inventoryItem.updatedAt);
         const formattedDate = updatedAt.toLocaleString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -391,10 +402,10 @@ const updatespareCount = async (req, res) => {
 
         res.json({ 
             success: true, 
-            spareCount: userSpareCount.spareCount,
+            spareCount: inventoryItem.spareCount,
             userDetails: {
-                name: userSpareCount.userName,
-                email: userSpareCount.userEmail
+                name: userName,
+                email: userEmail
             },
             updatedAt: formattedDate
         });
@@ -404,40 +415,7 @@ const updatespareCount = async (req, res) => {
     }
 };
 
-// Function to get user-specific SpareCounts for a collection
-const getUserSpareCounts = async (req, res) => {
-    try {
-        const { collectionName } = req.params;
-        const userId = req.user._id;
 
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: collectionName.toLowerCase()
-        });
-
-        // Convert to a map for easier lookup
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = {
-                spareCount: item.spareCount,
-                userName: item.userName,
-                userEmail: item.userEmail
-            };
-            return map;
-        }, {});
-
-        res.json({ 
-            success: true, 
-            spareCounts: spareCountMap,
-            userDetails: {
-                name: req.user.name,
-                email: req.user.email
-            }
-        });
-    } catch (error) {
-        console.error("Error fetching user SpareCounts:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-};
 
 // --- SEARCH ENDPOINTS FOR AUTOCOMPLETE ---
 
@@ -449,7 +427,6 @@ const searchJogini = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
-        const userId = req.user._id;
         const results = await Jogini.find({
             $or: [
                 { "Spare Discription": buildStartsWithRegex(q) },
@@ -461,17 +438,11 @@ const searchJogini = async (req, res) => {
         }, { picture: 0 })
         .sort({ "Spare Discription": 1 })
         .limit(50);
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'jogini'
-        });
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
+        
+        // Use spareCount directly from inventory items
         const updatedResults = results.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+            spareCount: item.spareCount || 0
         }));
         res.json(updatedResults);
     } catch (e) {
@@ -484,7 +455,7 @@ const searchShong = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
-        const userId = req.user._id;
+        
         const results = await Shong.find({
             $or: [
                 { "Description of Material": buildStartsWithRegex(q) },
@@ -496,17 +467,11 @@ const searchShong = async (req, res) => {
         }, { picture: 0 })
         .sort({ "Description of Material": 1 })
         .limit(50);
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'shong'
-        });
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
+        
+        // Use spareCount directly from inventory items
         const updatedResults = results.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+            spareCount: item.spareCount || 0
         }));
         res.json(updatedResults);
     } catch (e) {
@@ -519,7 +484,7 @@ const searchSolding = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
-        const userId = req.user._id;
+        
         const results = await solding.find({
             $or: [
                 { "Description of Material": buildStartsWithRegex(q) },
@@ -531,17 +496,11 @@ const searchSolding = async (req, res) => {
         }, { picture: 0 })
         .sort({ "Description of Material": 1 })
         .limit(50);
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'solding'
-        });
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
+        
+        // Use spareCount directly from inventory items
         const updatedResults = results.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+            spareCount: item.spareCount || 0
         }));
         res.json(updatedResults);
     } catch (e) {
@@ -554,7 +513,7 @@ const searchSDLLPsalun = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
-        const userId = req.user._id;
+        
         const results = await SDLLPsalun.find({
             $or: [
                 { "NAME OF MATERIALS": buildStartsWithRegex(q) },
@@ -566,17 +525,11 @@ const searchSDLLPsalun = async (req, res) => {
         }, { picture: 0 })
         .sort({ "NAME OF MATERIALS": 1 })
         .limit(50);
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'sdllpsalun'
-        });
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
+        
+        // Use spareCount directly from inventory items
         const updatedResults = results.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+            spareCount: item.spareCount || 0
         }));
         res.json(updatedResults);
     } catch (e) {
@@ -589,7 +542,7 @@ const searchKuwarsi = async (req, res) => {
     try {
         const q = req.query.query || '';
         if (!q) return res.json([]);
-        const userId = req.user._id;
+        
         const results = await Kuwarsi.find({
             $or: [
                 { "NAME OF MATERIALS": buildStartsWithRegex(q) },
@@ -601,17 +554,11 @@ const searchKuwarsi = async (req, res) => {
         }, { picture: 0 })
         .sort({ "NAME OF MATERIALS": 1 })
         .limit(50);
-        const userSpareCounts = await UserSpareCount.find({
-            userId,
-            collectionName: 'kuwarsi'
-        });
-        const spareCountMap = userSpareCounts.reduce((map, item) => {
-            map[item.itemId.toString()] = item.spareCount;
-            return map;
-        }, {});
+        
+        // Use spareCount directly from inventory items
         const updatedResults = results.map(item => ({
             ...item.toObject(),
-            spareCount: spareCountMap[item._id.toString()] ?? item.spareCount ?? 0
+            spareCount: item.spareCount || 0
         }));
         res.json(updatedResults);
     } catch (e) {
@@ -627,7 +574,6 @@ module.exports = {
     getAllSDLLPsalun,
     getAllKuwarsi,
     updatespareCount,
-    getUserSpareCounts,
     searchJogini,
     searchShong,
     searchSolding,
