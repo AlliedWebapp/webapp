@@ -27,7 +27,9 @@ function Header() {
 
       <ul>
         {user ? (
-          <li>
+          <li style={{ display: 'flex', alignItems: 'center' }}>
+            <FaUser style={{ marginRight: '0.5rem' }} />
+            <span style={{ marginRight: '1rem' }}>{user.email}</span>
             <button className="btn" onClick={onLogout}>
               <FaSignOutAlt />
               Logout
