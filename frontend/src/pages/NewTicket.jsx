@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { createTicket, reset } from "../features/tickets/ticketSlice";
+import { saveTicketDraft, updateTicketDraft, deleteTicketDraft } from "../features/drafts/draftsSlice";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
 import axios from "axios";
@@ -22,6 +23,10 @@ function NewTicket() {
   const { isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.tickets
   );
+  const { tickets: ticketDrafts } = useSelector((state) => state.drafts);
+
+  const [searchParams] = useSearchParams();
+  const [draftId, setDraftId] = useState(null);
 
   const [projectname, setprojectname] = useState("");
   const [sitelocation, setsitelocation] = useState("");
@@ -261,6 +266,31 @@ User Email: ${user?.email || ""}`;
   }, []);
 
   useEffect(() => {
+    const draftIdParam = searchParams.get("draftId");
+    if (draftIdParam) {
+      const draft = ticketDrafts.find((d) => d.id === parseInt(draftIdParam));
+      if (draft) {
+        setDraftId(draft.id);
+        setprojectname(draft.projectname || "");
+        setsitelocation(draft.sitelocation || "");
+        setprojectlocation(draft.projectlocation || "");
+        setfault(draft.fault || "");
+        setissue(draft.issue || "");
+        setdescription(draft.description || "");
+        setdate(draft.date || "");
+        setspare(draft.spare || "");
+        setrating(draft.rating || "");
+        setImages(draft.images || []);
+        setSpareQuantity(draft.spareQuantity || 1);
+        setConsumable(draft.consumable || "");
+        setFuelConsumed(draft.fuel_consumed || "");
+        setTotalKmDriven(draft.total_km_driven || "");
+        setSpareSearch(draft.spareSearch || "");
+      }
+    }
+  }, [searchParams, ticketDrafts]);
+
+  useEffect(() => {
     if (isError) {
       toast.error(message);
   
@@ -273,7 +303,13 @@ User Email: ${user?.email || ""}`;
     }
 
     if (isSuccess) {
-    sendEmailNotification();
+      if (draftId) {
+        dispatch(deleteTicketDraft({ id: draftId }));
+        toast.success("Draft submitted and removed successfully!");
+      } else {
+        toast.success("Ticket submitted successfully!");
+      }
+      sendEmailNotification();
       dispatch(reset());
  
     setTimeout(() => {
@@ -356,6 +392,37 @@ User Email: ${user?.email || ""}`;
     });
 
     dispatch(createTicket(formData));
+  };
+
+  const handleSaveDraft = () => {
+    const draft = {
+      id: draftId || Date.now(),
+      projectname,
+      sitelocation,
+      projectlocation,
+      fault,
+      issue,
+      description,
+      date,
+      spare,
+      rating,
+      images,
+      spareQuantity,
+      consumable,
+      fuel_consumed,
+      total_km_driven,
+      spareSearch,
+    };
+    console.log("Saving ticket draft:", draft);
+
+    if (draftId) {
+      dispatch(updateTicketDraft(draft));
+      toast.success("Draft updated successfully");
+    } else {
+      dispatch(saveTicketDraft(draft));
+      toast.success("Ticket saved as draft");
+    }
+    navigate("/drafts");
   };
 
   if (isLoading) return <Spinner />;
@@ -659,8 +726,11 @@ User Email: ${user?.email || ""}`;
             </section>
 
         <div className="form-group">
-          <button className="btn btn-block submit-btn" disabled={isSubmitting}>
+          <button type="submit" className="btn btn-block submit-btn" disabled={isSubmitting}>
             {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+          <button type="button" className="btn btn-block" onClick={handleSaveDraft}>
+            Save as Draft
           </button>
         </div>
       </form>

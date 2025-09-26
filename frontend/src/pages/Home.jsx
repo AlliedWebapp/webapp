@@ -52,6 +52,10 @@ function Home() {
         <Link to="/qa/list" className="home-btn">
           <FaList/> View all problems
         </Link>
+
+        <Link to="/drafts" className="home-btn">
+          <FaClipboard /> Saved as drafts
+        </Link>
       </div>
     </>
   );

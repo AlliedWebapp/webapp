@@ -1,10 +1,11 @@
 //fomrat of form of service report form//
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import "../index.css"; // Global styles
 import BackButton from "../components/BackButton";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { saveFsrDraft, updateFsrDraft, deleteFsrDraft } from "../features/drafts/draftsSlice";
 import { toast } from "react-toastify";
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
@@ -12,6 +13,11 @@ const API_URL = process.env.REACT_APP_API_BASE_URL;
 const GeneratorServiceReport = () => {
   const { ticketId } = useParams();
   const { user } = useSelector((state) => state.auth);
+  const { fsrs: fsrDrafts } = useSelector((state) => state.drafts);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [draftId, setDraftId] = useState(null);
   console.log("User state:", user);
 
   const [formData, setFormData] = useState({
@@ -40,6 +46,18 @@ const GeneratorServiceReport = () => {
     engineerSignature: null,
     workPhotos: []
   });
+
+  useEffect(() => {
+    const draftIdParam = searchParams.get("draftId");
+    if (draftIdParam) {
+      const draft = fsrDrafts.find((d) => d.id === parseInt(draftIdParam));
+      if (draft) {
+        const { ticketId, ...draftData } = draft;
+        setDraftId(draft.id);
+        setFormData(draftData);
+      }
+    }
+  }, [searchParams, fsrDrafts]);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +71,24 @@ const GeneratorServiceReport = () => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: files[0] }));
     }
+  };
+
+  const handleSaveDraft = () => {
+    const draft = {
+      id: draftId || Date.now(),
+      ticketId,
+      ...formData,
+    };
+    console.log("Saving FSR draft:", draft);
+
+    if (draftId) {
+      dispatch(updateFsrDraft(draft));
+      toast.success("Draft updated successfully");
+    } else {
+      dispatch(saveFsrDraft(draft));
+      toast.success("FSR saved as draft");
+    }
+    navigate("/drafts");
   };
 
   const handleSubmit = async (e) => {
@@ -160,7 +196,12 @@ Created By: ${user.email}`;
         // Continue with success flow even if email fails
       }
 
-      toast.success(`Report submitted successfully! FSR ID: ${data.fsrId}`);
+      if (draftId) {
+        dispatch(deleteFsrDraft({ id: draftId }));
+        toast.success("Draft submitted and removed successfully!");
+      } else {
+        toast.success(`Report submitted successfully! FSR ID: ${data.fsrId}`);
+      }
       
       // Add a small delay before redirect to ensure user sees the success message
       setTimeout(() => {
@@ -297,7 +338,8 @@ Created By: ${user.email}`;
     </div>
   </div>
 
-  <button type="submit" className="submit-btn">Submit Report</button>
+  <button type="submit" className="btn btn-block submit-btn">Submit Report</button>
+  <button type="button" className="btn btn-block" onClick={handleSaveDraft}>Save as Draft</button>
 </form>
 
     </div>

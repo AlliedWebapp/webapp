@@ -27,6 +27,7 @@ import QASubmit from './pages/QASubmit';
 import QAList from './pages/QAList';
 import InventoryManager from './pages/InventoryManager';
 import Consumables from './pages/consumables';
+import Drafts from './pages/Drafts';
 
 import SlowNetworkAlert from './components/SlowNetworkAlert';
 import { checkNetworkSpeed } from './utils/networkCheck';
@@ -82,6 +83,7 @@ function App() {
               <Route path="/qa/list" element={<QAList />} />
               <Route path="/inventory-manager" element={<InventoryManager />} />
               <Route path="/consumables" element={<Consumables />} />
+              <Route path="/drafts" element={<Drafts />} />
             </Route>
           </Routes>
         </div>

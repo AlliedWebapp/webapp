@@ -2,17 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import { store } from './app/store';
-
+import { store, persistor } from './app/store';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      {/* Add a global axios interceptor to handle 401 errors (token expired) */}
-      <App />
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+      </PersistGate>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
