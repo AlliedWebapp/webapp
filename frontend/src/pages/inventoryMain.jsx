@@ -2,7 +2,6 @@ import { FaBoxOpen, FaEdit, FaClipboardList } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import "../index.css";
-
 function InventoryMain() {
   return (
     <>

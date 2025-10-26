@@ -42,7 +42,6 @@ function App() {
     const cleanup = checkNetworkSpeed((isSlow) => {
       setIsSlowNetwork(isSlow);
     });
-
     return () => {
       if (cleanup) cleanup();
     };

@@ -14,11 +14,7 @@ function Login() {
 
   const { email, password } = formData; // destructuring
 
-  /**
-   * useDispatch() returns a reference to the dispatch function
-   * from the Redux store. You may use it to dispatch actions
-   * as needed.
-   */
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

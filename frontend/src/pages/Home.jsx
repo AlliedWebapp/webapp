@@ -10,7 +10,6 @@ function Home() {
         <p>Please choose a service below</p>
       </section>
 
-
       <div className="home-grid">
         
         <Link to="/new-ticket" className="home-btn">
