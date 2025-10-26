@@ -12,17 +12,13 @@ function Login() {
     password: "",
   });
 
-  const { email, password } = formData; // destructuring
+  const { email, password } = formData; 
 
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  /**
-   * useSelector() allows you to extract data from the Redux store state,
-   * using a selector function.
-   */
-
+ 
   const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
   );
