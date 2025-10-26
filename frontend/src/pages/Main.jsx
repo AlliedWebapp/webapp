@@ -21,10 +21,15 @@ function Main() {
         <Link to="/home" className="main-btn main-btn-black">
           <FaTicketAlt /> TICKET MANAGEMENT SYSTEM (TMS)
         </Link>
-
-        <Link to="/main-page" className="main-btn main-btn-green">
+        
+        <a
+          href="https://attendance-liart-delta.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="main-btn main-btn-green"
+        >
           <FaClipboardCheck /> ATTENDANCE
-        </Link>
+        </a>
 
    
         <Link to="/inventory-main" className="main-btn main-btn-blue">
