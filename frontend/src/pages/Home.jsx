@@ -1,14 +1,18 @@
-import { FaBoxOpen, FaList, FaQuestion, FaCalendarAlt, FaClipboard, FaEdit, FaClipboardCheck, FaClipboardList, FaDownload, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt, FaWarehouse } from "react-icons/fa";
+import {  FaList, FaQuestion, FaCalendarAlt, FaClipboard, FaDownload, FaFileAlt, FaFolderOpen, FaQuestionCircle, FaTicketAlt} from "react-icons/fa";
 import { Link } from "react-router-dom";
+import BackButton from "../components/BackButton";
 function Home() {
   return (
     <>
       <section className="heading">
+                <BackButton url="/main-page" className="back-button" />    
         <h1>Service Management System </h1>
         <p>Please choose a service below</p>
       </section>
 
+
       <div className="home-grid">
+        
         <Link to="/new-ticket" className="home-btn">
           <FaQuestionCircle /> Create New Ticket
         </Link>
@@ -19,18 +23,6 @@ function Home() {
 
         <Link to="/FSR" className="home-btn">
           <FaFileAlt /> View FSR
-        </Link>
-
-        <Link to="/inventory" className="home-btn">
-          <FaClipboardList /> View Inventory
-        </Link>
-
-        <Link to="/inventory-manager" className="home-btn">
-          <FaEdit />  Manage Inventory
-        </Link>
-
-        <Link to="/consumables" className="home-btn">
-          <FaBoxOpen />  Consumable Inventory
         </Link>
 
         <Link to="/monthly" className="home-btn">

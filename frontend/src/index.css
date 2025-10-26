@@ -1,14 +1,14 @@
-/* Import Google Fonts - Poppins for modern look */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Reset default styles */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Global styles and typography */
+
 body {
   font-family: 'Poppins', sans-serif;
   height: 100vh;
@@ -38,7 +38,7 @@ h3 {
   margin-bottom: 10px;
 }
 
-/* Main container and layout */
+
 .container {
   width: 100%;
   max-width: 960px;
@@ -47,7 +47,7 @@ h3 {
   text-align: center;
 }
 
-/* Header navigation styles */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -91,7 +91,7 @@ h3 {
   color: #828282;
 }
 
-/* Dashboard boxes layout */
+
 .boxes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -116,7 +116,7 @@ h3 {
   color: #777;
 }
 
-/* Form elements and inputs */
+
 .form {
   width: 70%;
   margin: 0 auto;
@@ -143,7 +143,7 @@ h3 {
   margin: 0 0 5px 3px;
 }
 
-/* Button styles */
+
 .btn {
   padding: 10px 20px;
   border: 1px solid #000;
@@ -193,7 +193,7 @@ h3 {
   transform: scale(0.98);
 }
 
-/* Ticket creation confirmation styles */
+
 .ticket-created {
   border: 1px solid #e6e6e6;
   border-radius: 5px;
@@ -217,7 +217,7 @@ h3 {
   font-size: 1.3rem;
 }
 
-/* Ticket list and grid layout */
+
 .ticket,
 .ticket-headings {
   display: grid;
@@ -236,7 +236,7 @@ h3 {
   font-weight: 700;
 }
 
-/* Status indicators for tickets */
+
 .status {
   background-color: #922626;
   color: #fff;
@@ -248,7 +248,7 @@ h3 {
   text-align: center;
 }
 
-/* Different status colors */
+
 .status-new {
   background-color: green;
   color: #fff;
@@ -262,14 +262,14 @@ h3 {
   border-radius: 10px;
 }
 
-/* Individual ticket page styles - Main container */
+
 .ticket-page {
   position: relative;
   text-align: left;
   padding: 20px;
 }
 
-/* Ticket header section with title and status */
+
 .ticket-header {
   background: #ffffff;
   padding: 25px 30px;
@@ -290,7 +290,6 @@ h3 {
   align-items: center;
 }
 
-/* Ticket information section */
 .ticket-info {
   background: #ffffff;
   padding: 25px;
@@ -299,7 +298,7 @@ h3 {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
-/* Info row styling for ticket details */
+
 .info-row {
   display: flex;
   justify-content: space-between;
@@ -333,7 +332,7 @@ h3 {
   font-weight: 600;
 }
 
-/* Ticket description section */
+
 .ticket-desc {
   margin: 20px 0;
   font-size: 17px;
@@ -343,7 +342,7 @@ h3 {
   border-radius: 5px;
 }
 
-/* Notes section styling */
+
 .note {
   border: 1px solid #e6e6e6;
   border-radius: 5px;
@@ -378,7 +377,7 @@ h3 {
   right: 20px;
 }
 
-/* Status badges styling */
+
 .status {
   display: inline-block;
   padding: 8px 16px;
@@ -402,7 +401,7 @@ h3 {
   box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
 }
 
-/* Close and action buttons */
+
 .btn-close {
   background: none;
   border: none;
@@ -419,7 +418,7 @@ h3 {
   transform: scale(0.98);
 }
 
-/* Responsive adjustments for ticket page */
+
 @media (max-width: 768px) {
   .ticket-page {
     padding: 15px;
@@ -463,7 +462,7 @@ h3 {
   }
 }
 
-/* General styles for the inventory page */
+
 .inventory-page {
   font-family: 'Poppins', sans-serif;
   padding: 20px;
@@ -481,7 +480,7 @@ label {
   margin-right: 12px;
 }
 
-/* Select dropdown style */
+
 select {
   padding: 11px;
   border: 1px solid #e6e6e6;
@@ -495,7 +494,6 @@ select:focus {
   border-color: #000408;
 }
 
-/* Loading and error message styles */
 .loading {
   text-align: center;
   font-size: 1.5rem;
@@ -509,7 +507,7 @@ select:focus {
   margin-top: 20px;
 }
 
-/* Table container to handle horizontal scrolling */
+
 .table-container {
   width: 80%;
   margin: 0 auto;
@@ -518,7 +516,7 @@ select:focus {
   overflow-x: hidden;
 }
 
-/* Table styles */
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -553,7 +551,7 @@ td {
   vertical-align: middle;
 }
 
-/* Specific styles for shong and solding tables */
+
 .table-container.shong-table,
 .table-container.solding-table {
   width: 80%;
@@ -576,7 +574,7 @@ td {
   line-height: 1.3;
 }
 
-/* Responsive styles for mobile devices */
+
 @media (max-width: 768px) {
   .table-container {
     width: 100%;
@@ -594,26 +592,26 @@ td {
   }
 }
 
-/* Styling for the Plus and Minus Buttons */
+
 .spares-btn {
-  font-size: 10px; /* Adjust icon size */
+  font-size: 10px; 
   font-weight: bold;
-  width: 30px; /* Button width */
-  height: 30px; /* Button height */
+  width: 30px; 
+  height: 30px; 
   border: none;
   background-color: #eeeded; 
   color: white;
-  border-radius: 5px; /* Rounded corners */
+  border-radius: 5px; 
   cursor: pointer;
   transition: 0.3s ease-in-out;
-  margin: 5px; /* Space between buttons */
+  margin: 5px; 
 }
 
 .spares-btn:hover {
-  background-color: #69abf1; /* Darker blue on hover */
+  background-color: #69abf1;
 }
 
-/* Minus Button Specific Styling */
+
 .spares-btn.minus {
   background-color: #eeeded; 
 }
@@ -621,7 +619,7 @@ td {
   background-color: #ee5060; 
 }
 
-/* Responsive design adjustments */
+
 @media (max-width: 600px) {
   .ticket {
     grid-template-columns: repeat(3, 1fr);
@@ -649,14 +647,14 @@ td {
   }
 }
 
-/* Remove the recently added button spacing styles */
+
 .btn-ticket-action,
 .btn-ticket-action:last-child,
 .ticket-actions {
   display: none;
 }
 
-/* Generator Service Report Form Styles */
+
 .generator-service-report {
   max-width: 1200px;
   margin: 0 auto;
@@ -756,7 +754,7 @@ td {
   text-align: center;
 }
 
-/* Mobile responsive adjustments */
+
 @media (max-width: 768px) {
   .generator-service-report {
     padding: 10px;
@@ -777,13 +775,7 @@ td {
 
 
 
-/* ------------------------------
-   Styles for OtherReports Page
------------------------------- */
 
-/* ------------------------------
-   Styles for OtherReports Page
------------------------------- */
 
 .other-reports-header {
   text-align: center;
@@ -805,7 +797,7 @@ td {
   margin-bottom: 30px;
 }
 
-/* Reusing subheading style for view reports section */
+
 .view-reports-subheading {
   font-size: 1.5rem;
   font-weight: 600;
@@ -815,7 +807,7 @@ td {
   margin-bottom: 30px;
 }
 
-/* Button Layout */
+
 .button-wrapper {
   display: flex;
   flex-direction: column;
@@ -824,11 +816,11 @@ td {
   margin-top: 20px;
 }
 
-/* Button Styles */
+
 .report-button {
   padding: 16px 28px;
-  background: linear-gradient(135deg, #e3e6ea 0%, #cfd4da 100%); /* Deeper grey gradient */
-  color: #2d3748; /* Deep grey text */
+  background: linear-gradient(135deg, #e3e6ea 0%, #cfd4da 100%); 
+  color: #2d3748; 
   text-decoration: none;
   font-weight: 600;
   font-size: 15px;
@@ -838,7 +830,7 @@ td {
   max-width: 500px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1.5px solid #b0b8c1;
-  box-shadow: 0 4px 18px 0 rgba(30, 64, 175, 0.10), 0 1.5px 4px rgba(0, 0, 0, 0.10); /* Blue-tinted shadow */
+  box-shadow: 0 4px 18px 0 rgba(30, 64, 175, 0.10), 0 1.5px 4px rgba(0, 0, 0, 0.10); 
   position: relative;
   overflow: hidden;
   letter-spacing: 0.5px;
@@ -851,15 +843,15 @@ td {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(30, 64, 175, 0.10), transparent); /* Blue shimmer */
+  background: linear-gradient(90deg, transparent, rgba(30, 64, 175, 0.10), transparent); 
   transition: left 0.6s ease;
 }
 
 .report-button:hover {
-  background: linear-gradient(135deg, #dbeafe 0%, #c7d2fe 100%); /* Blueish gradient on hover */
+  background: linear-gradient(135deg, #dbeafe 0%, #c7d2fe 100%); 
   color: #1e293b;
-  border-color: #2563eb; /* Blue border */
-  box-shadow: 0 8px 32px 0 rgba(37, 99, 235, 0.18), 0 4px 12px rgba(0, 0, 0, 0.12); /* Stronger blue shadow */
+  border-color: #2563eb; 
+  box-shadow: 0 8px 32px 0 rgba(37, 99, 235, 0.18), 0 4px 12px rgba(0, 0, 0, 0.12); 
   transform: translateY(-3px) scale(1.025);
 }
 
@@ -873,9 +865,6 @@ td {
 }
 
 
-/* ------------------------------
-   Styles for Improvement Report
------------------------------- */
 
 .improvement-report {
   max-width: 1200px;
@@ -966,9 +955,6 @@ td {
   background: #555;
 }
 
-/* -------------------------------
-   Styles for Maintenance Report
-------------------------------- */
 
 .maintenance-report {
   max-width: 1200px;
@@ -1059,7 +1045,7 @@ td {
   background: #555;
 }
 
-/* FSR Details Page Styles - One Page Layout */
+
 .fsr-details {
   padding: 2rem;
   max-width: 1200px;
@@ -1162,7 +1148,7 @@ td {
   transform: scale(1.05);
 }
 
-/* Image Preview Modal */
+
 .image-modal {
   position: fixed;
   top: 0;
@@ -1202,7 +1188,7 @@ td {
   padding: 0.5rem;
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 768px) {
   .fsr-details {
     padding: 1rem;
@@ -1229,7 +1215,7 @@ td {
   }
 }
 
-/* Error Message */
+
 .error {
   color: #e53e3e;
   text-align: center;
@@ -1240,7 +1226,7 @@ td {
   max-width: 600px;
 }
 
-/* FSR Details Table Styles */
+
 .fsr-details {
   padding: 2rem;
   max-width: 1000px;
@@ -1289,7 +1275,7 @@ td {
   min-width: 120px;
 }
 
-/* Image Styles */
+
 .signature-image {
   max-width: 200px;
   max-height: 100px;
@@ -1328,7 +1314,6 @@ td {
   transform: scale(1.05);
 }
 
-/* Image Preview Modal */
 .image-modal {
   position: fixed;
   top: 0;
@@ -1368,7 +1353,7 @@ td {
   padding: 0.5rem;
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 768px) {
   .fsr-details {
     padding: 1rem;
@@ -1395,7 +1380,7 @@ td {
   }
 }
 
-/* Error Message */
+
 .error {
   color: #e53e3e;
   text-align: center;
@@ -1457,7 +1442,7 @@ td {
   transform: scale(1.03);
 }
 
-/* FSR Details Table Styles */
+
 .fsr-table {
   width: 100%;
   border-collapse: collapse;
@@ -1478,7 +1463,7 @@ td {
   min-width: 150px;
 }
 
-/* Signatures and Photos Section */
+
 .signatures-container {
   display: flex;
   gap: 2rem;
@@ -1527,7 +1512,6 @@ td {
   transform: scale(1.05);
 }
 
-/* Image Preview Modal */
 .image-modal {
   position: fixed;
   top: 0;
@@ -1563,7 +1547,7 @@ td {
   padding: 0.5rem;
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 768px) {
   .fsr-table td {
     font-size: 0.8rem;
@@ -1659,7 +1643,7 @@ td {
   }
 }
 
-/* Status styles for improvement reports */
+
 .status {
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -1694,7 +1678,7 @@ td {
   color: #3730a3;
 }
 
-/* Improvement Reports Table Styles */
+
 .improvement-reports {
   max-width: 1200px;
   margin: 0 auto;
@@ -1767,7 +1751,7 @@ td {
   }
 }
 
-/* Improvement Report Details Styles */
+
 .improvement-details {
   max-width: 1200px;
   margin: 0 auto;
@@ -1856,7 +1840,7 @@ td {
   }
 }
 
-/* Improvement Reports List Styles */
+
 .improvement-reports {
   max-width: 1200px;
   margin: 0 auto;
@@ -1949,7 +1933,6 @@ td {
   }
 }
 
-/* Common Report Styles */
 .report-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -1978,7 +1961,7 @@ td {
   font-weight: 500;
 }
 
-/* Report Details Styles */
+
 .report-details {
   max-width: 1200px;
   margin: 0 auto;
@@ -2008,7 +1991,6 @@ td {
   font-weight: 600;
 }
 
-/* Table Styles for Reports */
 .report-table {
   width: 100%;
   border-collapse: collapse;
@@ -2035,7 +2017,7 @@ td {
   padding: 0.75rem;
 }
 
-/* Form Styles */
+
 .report-form {
   background: #fff;
   padding: 30px;
@@ -2074,7 +2056,7 @@ td {
   resize: none;
 }
 
-/* Button Styles */
+
 .submit-btn, .view-btn, .back-button {
   background: #333;
   color: white;
@@ -2093,7 +2075,6 @@ td {
   background: #555;
 }
 
-/* Signature Styles */
 .signature-image {
   max-width: 200px;
   max-height: 100px;
@@ -2103,7 +2084,7 @@ td {
   margin-top: 0.5rem;
 }
 
-/* Responsive Styles */
+
 @media (max-width: 768px) {
   .report-container,
   .report-details {
@@ -2114,58 +2095,57 @@ td {
     padding: 1rem;
   }
 
-  /* Mobile styles for generic report tables */
   .report-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px; /* Add vertical spacing between rows */
+    border-spacing: 0 10px; 
   }
 
   .report-table tr {
-    display: block; /* Each row is a block (card) */
-    margin-bottom: 10px; /* Additional space between rows */
-    background: #f8fafc; /* Background for row */
-    padding: 15px; /* Padding around row content */
-    border-radius: 8px; /* Rounded corners for rows */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
+    display: block;
+    margin-bottom: 10px; 
+    background: #f8fafc; 
+    padding: 15px; 
+    border-radius: 8px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
   }
 
   .report-table td {
-    display: block; /* Each cell is a block */
-    width: 100%; /* Full width */
-    padding: 5px 0; /* Vertical padding */
-    border: none; /* Remove borders between cells */
-    margin-bottom: 4px; /* Space between cells */
+    display: block; 
+    width: 100%;
+    padding: 5px 0; 
+    border: none; 
+    margin-bottom: 4px; 
   }
 
   .report-table td:last-child {
-      margin-bottom: 0; /* No bottom margin for the last td in a row */
+      margin-bottom: 0; 
   }
 
   .report-table .report-label {
     font-weight: 600;
     color: #333;
     font-size: 14px;
-    /* Display inline or inline-block to be next to value */
+
     display: inline-block;
-    margin-right: 8px; /* Space between label and value */
+    margin-right: 8px;
     min-width: unset;
-    width: auto; /* Allow label to take natural width */
-    vertical-align: top; /* Align label to the top */
+    width: auto; 
+    vertical-align: top; 
   }
 
   .report-table .report-value {
     font-size: 15px;
     color: #2d3748;
     padding: 0;
-    /* Display inline-block to be next to label and take remaining width */
+    
     display: inline-block;
-    width: calc(100% - 100px); /* Adjust width to fit next to label, approx 100px for label min-width consideration */
-    word-break: break-word; /* Prevent overflow */
-    vertical-align: top; /* Align value to the top */
+    width: calc(100% - 100px); 
+    word-break: break-word; 
+    vertical-align: top; 
   }
 
-  /* Mobile styles for FSR details */
+
   .fsr-details {
     padding: 1rem;
   }
@@ -2180,70 +2160,68 @@ td {
   }
 
   .fsr-grid {
-    grid-template-columns: 1fr; /* Stack sections vertically */
-    gap: 1rem; /* Add space between sections */
+    grid-template-columns: 1fr; 
+    gap: 1rem; 
   }
 
   .fsr-field {
-    /* Make each field a block element */
+
     display: block;
-    padding: 0.8rem; /* Add padding around each field */
-    background: #f7fafc; /* Light background for clarity */
-    border-radius: 4px; /* Rounded corners */
-    border: 1px solid #e2e8f0; /* Subtle border */
-    gap: 0; /* Remove gap from flex-direction column */
-    flex-direction: row; /* Reset flex direction if it was column */
-    align-items: flex-start; /* Align items to the start */
+    padding: 0.8rem; 
+    background: #f7fafc; 
+    border-radius: 4px; 
+    border: 1px solid #e2e8f0; 
+    gap: 0; 
+    flex-direction: row; 
+    align-items: flex-start; 
   }
 
   .fsr-field label {
     font-weight: 600;
     color: #4a5568;
-    font-size: 0.9rem; /* Adjust label font size */
-    margin-bottom: 0; /* Remove default margin-bottom */
-    /* Display inline or inline-block */
+    font-size: 0.9rem;
+    margin-bottom: 0; 
     display: inline-block;
-    margin-right: 8px; /* Space between label and value */
-    width: auto; /* Allow label to take natural width */
-    vertical-align: top; /* Align label to the top */
+    margin-right: 8px;
+    width: auto; 
+    vertical-align: top; 
   }
 
   .fsr-field span {
     color: #2d3748;
-    padding: 0; /* Remove default padding */
-    background: none; /* Remove background */
-    border-radius: 0; /* Remove border-radius */
-    min-height: unset; /* Remove min-height */
-    /* Display inline-block to be next to label */
+    padding: 0; 
+    background: none; 
+    border-radius: 0;
+    min-height: unset; 
+    
     display: inline-block;
-    width: calc(100% - 100px); /* Adjust width to fit next to label, approx 100px for label min-width consideration */
-    word-break: break-word; /* Prevent overflow */
-    vertical-align: top; /* Align value to the top */
+    width: calc(100% - 100px); 
+    word-break: break-word; 
+    vertical-align: top; 
   }
 
-  /* Styles for table-based reports within fsr-details if they exist */
-  /* This might be redundant if fsr-details only uses fsr-grid, but included for completeness */
+
    .fsr-details .fsr-table {
     width: 100%;
-    border-collapse: separate; /* Use separate to allow spacing */
-    border-spacing: 0 10px; /* Add vertical spacing between rows */
+    border-collapse: separate; 
+    border-spacing: 0 10px; 
   }
 
   .fsr-details .fsr-table tr {
     display: block;
-    margin-bottom: 10px; /* Additional space between rows */
-    background: #f8fafc; /* Background for row */
-    padding: 15px; /* Padding around row content */
-    border-radius: 8px; /* Rounded corners for rows */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
+    margin-bottom: 10px; 
+    background: #f8fafc; 
+    padding: 15px; 
+    border-radius: 8px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
   }
 
   .fsr-details .fsr-table td {
-    display: block; /* Make each cell a block */
-    width: 100%; /* Full width */
-    padding: 8px 0; /* Vertical padding */
-    border: none; /* Remove borders between cells */
-    margin-bottom: 4px; /* Space between cells */
+    display: block; 
+    width: 100%; 
+    padding: 8px 0;
+    border: none; 
+    margin-bottom: 4px; 
   }
 
    .fsr-details .fsr-table .fsr-label {
@@ -2251,10 +2229,10 @@ td {
     color: #333;
     font-size: 14px;
     margin-bottom: 4px;
-    display: inline-block; /* Make label inline-block */
+    display: inline-block; 
     width: auto;
     min-width: unset;
-    margin-right: 8px; /* Space between label and value */
+    margin-right: 8px;
     vertical-align: top;
   }
 
@@ -2262,8 +2240,8 @@ td {
     font-size: 15px;
     color: #2d3748;
     padding: 0;
-    display: inline-block; /* Make value inline-block */
-    width: calc(100% - 100px); /* Adjust width */
+    display: inline-block;
+    width: calc(100% - 100px);
     word-break: break-word;
     vertical-align: top;
   }
@@ -2271,18 +2249,18 @@ td {
   .signature-image {
     max-width: 120px;
     max-height: 60px;
-    margin: 8px auto; /* Center image and add vertical margin */
-    display: block; /* Ensure image is block */
+    margin: 8px auto;
+    display: block; 
   }
 
   .work-photos {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjust photo grid */
-    gap: 8px; /* Adjust photo gap */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+    gap: 8px; 
     margin-top: 8px;
   }
 
   .work-photo {
-    height: 100px; /* Adjust photo height */
+    height: 100px; 
   }
 
   .download-btn {
@@ -2310,7 +2288,6 @@ td {
   }
 }
 
-/* Low stock section */
 
 .low-stock-section {
   margin-top: 2rem;
@@ -2344,10 +2321,10 @@ td {
   color: #79031d;
 }
 .low-stock td {
-  background-color: #febbc0; /* Light red background to indicate urgency */
+  background-color: #febbc0;
 }
 
-/* MONTHLY SUMMARY */
+
 
 .monthly-summary {
   max-width: 1000px;
@@ -2426,7 +2403,7 @@ td {
   font-weight: bold;
 }
 
-/* Mobile-specific styles */
+
 @media (max-width: 768px) {
   .container {
     width: 100%;
@@ -2489,7 +2466,7 @@ td {
   }
 }
 
-/* Additional breakpoint for very small screens */
+
 @media (max-width: 480px) {
   .work-photos, .ticket-images {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -2506,7 +2483,6 @@ td {
   }
 }
 
-/* OHOME Report Details Styles */
 .ohome-details {
   padding: 1.5rem;
   background: #fff;
@@ -2564,7 +2540,7 @@ td {
   align-items: center;
 }
 
-/* Mobile styles for OHOME reports */
+
 @media (max-width: 768px) {
   .ohome-details,
   .ohome-details-container {
@@ -2624,9 +2600,9 @@ td {
   }
 }
 
-/* Mobile styles for improvement and maintenance reports */
+
 @media (max-width: 768px) {
-  /* Improvement Reports List */
+
   .improvement-reports .ticket,
   .maintenance-reports .ticket {
     display: block;
@@ -2658,7 +2634,7 @@ td {
     margin-right: 8px;
   }
 
-  /* Report Details */
+
   .improvement-details,
   .maintenance-details {
     padding: 1rem;
@@ -2714,7 +2690,7 @@ td {
     vertical-align: top;
   }
 
-  /* Signature Images */
+
   .signature-image {
     max-width: 120px;
     max-height: 60px;
@@ -2722,7 +2698,7 @@ td {
     display: block;
   }
 
-  /* Download Button */
+
   .download-btn {
     position: fixed;
     bottom: 20px;
@@ -2748,7 +2724,7 @@ td {
   }
 }
 
-/* Download Button Styles */
+
 .download-btn {
   background: #333;
   color: white;
@@ -2803,24 +2779,24 @@ td {
   }
 }
 
-/* 1. Thick black border on the search box (keeps your existing width/height) */
+
 .search-input {
-  /* preserve whatever width/height you already have */
-  border: 2px solid #000;    /* thick black border */
+
+  border: 2px solid #000;    
   box-sizing: border-box;
   width: 150px;
   height: 30px;
 }
 
-/* 2. Light-yellow highlights */
+
 mark {
-  background-color: #ffff99; /* pale yellow */
-  padding: 0 0.1em;          /* optional horizontal padding */
+  background-color: #ffff99; 
+  padding: 0 0.1em;        
 }
 
 .search-controls {
   position: absolute;
-  z-index: 1000;                /* sit above page content */
+  z-index: 1000;               
   background: rgba(255,255,255,0.9);
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -2829,19 +2805,17 @@ mark {
   align-items: center;
   gap: 0.25rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  pointer-events: auto;         /* ensure buttons stay clickable */
+  pointer-events: auto;         
   transition: top 0.1s, left 0.1s;
 }
 
-/* (Optional) Tweak the nav buttons' spacing so they're easy to hit */
 .nav-button {
   margin: 0 0.5rem;
   cursor: pointer;
 }
 
-/* (Optional) If you want the "active" match highlighted differently: */
 mark.active-match {
-  background-color: hsl(57, 40%, 52%); /* a bit brighter for the current one */
+  background-color: hsl(57, 40%, 52%); 
 }
  .search-input-wrapper {
   position: absolute;
@@ -2851,7 +2825,7 @@ mark.active-match {
 }
 
 @media (max-width: 768px) {
-  /* 1) Pin the search bar full-width at the top */
+
   .search-input-wrapper {
     position: relative !important;
     top: 130px   !important;
@@ -2861,14 +2835,13 @@ mark.active-match {
     margin: 90px    !important;
 }
 
-  /* 2) Make the input fill its container */
   .search-input {
     width: 100% !important;
   height: 40px;
     padding: 0 2.5rem 0 0.75rem;
 }
 
-  /* 3) Tuck the clear "×" inside properly */
+  
   .clear-search {
     position: relative !important;
     right: 1rem !important;
@@ -2876,7 +2849,7 @@ mark.active-match {
     transform: translateY(-50%) !important;
 }
 
-  /* 4) Drop "No matches found" below the bar */
+ 
   .no-matches-inline {
     position: static !important;
     display: block;
@@ -2886,7 +2859,7 @@ mark.active-match {
     font-size: 1rem;
 }
 
-  /* 5) Float the nav arrows fixed atthe bottom center */
+
   .search-controls {
     position: fixed !important;
     left: 60%      !important;
@@ -2900,15 +2873,15 @@ mark.active-match {
     z-index: 1002;
 }
 
-  /* 6) Slightly enlarge touch targets on mobile */
+
   .nav-button {
     padding: 0.4rem 0.6rem;
 }
 }
 
-/* Consumables.css */
 
-/* Table styles for desktop/laptop */
+
+
 .records-table {
   width: 100%;
   border-collapse: collapse;
@@ -2929,12 +2902,12 @@ mark.active-match {
   background-color: #f1f1f1;
 }
 
-/* Hide mobile cards on desktop */
+
 .mobile-records-list {
   display: none;
 }
 
-/* Responsive styles for mobile */
+
 @media (max-width: 900px) {
   .records-table {
     display: none;
@@ -3027,7 +3000,7 @@ mark.active-match {
   }
 } 
 
-/* Simple and Clean Ticket Page Styles */
+
 .ticket-page {
   background: #f8f9fa;
   min-height: 100vh;
@@ -3035,7 +3008,7 @@ mark.active-match {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Header Section */
+
 .ticket-header {
   background: white;
   border-radius: 8px;
@@ -3123,7 +3096,7 @@ mark.active-match {
   border: 1px solid #f5c6cb;
 }
 
-/* Main Content */
+
 .ticket-content {
   display: flex;
   flex-direction: column;
@@ -3132,7 +3105,7 @@ mark.active-match {
   margin: 0 auto;
 }
 
-/* Card Styles */
+
 .ticket-overview-card,
 .ticket-details-card,
 .ticket-images-card,
@@ -3171,7 +3144,7 @@ mark.active-match {
   font-size: 1.125rem;
 }
 
-/* Overview Grid */
+
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -3202,7 +3175,7 @@ mark.active-match {
   word-break: break-word;
 }
 
-/* Details Grid */
+
 .details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -3242,7 +3215,7 @@ mark.active-match {
   line-height: 1.6;
 }
 
-/* Images Section */
+
 .image-count {
   background: #6c757d;
   color: white;
@@ -3304,7 +3277,7 @@ mark.active-match {
   letter-spacing: 0.5px;
 }
 
-/* Notes Section */
+
 .notes-list {
   padding: 0 20px 20px;
 }
@@ -3326,7 +3299,7 @@ mark.active-match {
   margin-bottom: 16px;
 }
 
-/* Actions Section */
+
 .actions-grid {
   display: flex;
   gap: 16px;
@@ -3370,7 +3343,6 @@ mark.active-match {
   border-color: #bd2130;
 }
 
-/* Modal Styles */
 .modal-content {
   background: white;
   border-radius: 8px;
@@ -3452,7 +3424,7 @@ mark.active-match {
   justify-content: flex-end;
 }
 
-/* Image Preview Modal */
+
 .image-preview-overlay {
   position: fixed;
   top: 0;
@@ -3506,7 +3478,7 @@ mark.active-match {
   display: block;
 }
 
-/* Error Container */
+
 .error-container {
   display: flex;
   align-items: center;
@@ -3537,7 +3509,7 @@ mark.active-match {
   font-size: 1.125rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .ticket-page {
     padding: 16px;
@@ -3615,7 +3587,6 @@ mark.active-match {
   }
 }
 
-/* Home screen grid and button styles - match screenshot */
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3675,7 +3646,6 @@ mark.active-match {
   }
 }
 
-/* Make home-btn cards more rectangular by reducing height */
 .home-btn {
   padding: 16px 32px;
 }
@@ -3686,7 +3656,7 @@ mark.active-match {
   }
 }
 
-/* Hide arrows for number input in all browsers */
+
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -3694,4 +3664,168 @@ input[type=number]::-webkit-outer-spin-button {
 }
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+
+
+@media (max-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .main-btn {
+    min-height: 100px;
+    font-size: 16px;
+  }
+}
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  justify-items: center;
+  align-items: center;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+
+.main-btn {
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 30px 20px;
+  border-radius: 10px;
+  width: 100%;
+  min-height: 120px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(80, 140, 112, 0.1);
+}
+
+.main-btn svg {
+  font-size: 2rem;
+}
+
+
+.main-btn-black {
+  background-color: #2a2b2b;
+}
+
+.main-btn-black:hover {
+  background-color: #434444;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+
+.main-btn-green {
+  background-color: #1e8449;
+}
+
+.main-btn-green:hover {
+  background-color: #27ae60;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+}
+
+
+.main-btn-blue {
+  background-color: #0078d7;
+}
+
+.main-btn-blue:hover {
+  background-color: #005fa3;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 120, 215, 0.3);
+}
+
+
+@media (max-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .main-btn {
+    min-height: 100px;
+    font-size: 16px;
+  }
+}
+
+.inventory-heading {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.inventory-heading h1 {
+  font-size: 2.3rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.inventory-heading p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+ 
+.inventory-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+
+.inventory-btn {
+  text-decoration: none;
+  background-color: #2a2b2b;
+  color: white;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 25px 20px;
+  border-radius: 10px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(50, 50, 50, 0.2);
+}
+
+.inventory-btn:hover {
+  background-color: #434444;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.inventory-btn svg {
+  font-size: 1.8rem;
+}
+
+
+@media (max-width: 600px) {
+  .inventory-container {
+    width: 100%;
+    padding: 15px;
+  }
+  .inventory-btn {
+    font-size: 16px;
+    padding: 20px 15px;
+  }
 }

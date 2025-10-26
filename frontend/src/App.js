@@ -28,6 +28,8 @@ import QAList from './pages/QAList';
 import InventoryManager from './pages/InventoryManager';
 import Consumables from './pages/consumables';
 import Drafts from './pages/Drafts';
+import Main from './pages/Main';
+import InventoryMain from './pages/inventoryMain';
 
 import SlowNetworkAlert from './components/SlowNetworkAlert';
 import { checkNetworkSpeed } from './utils/networkCheck';
@@ -84,6 +86,8 @@ function App() {
               <Route path="/inventory-manager" element={<InventoryManager />} />
               <Route path="/consumables" element={<Consumables />} />
               <Route path="/drafts" element={<Drafts />} />
+              <Route path="/main-page" element={<Main />} />
+              <Route path="/inventory-main" element={<InventoryMain />} />
             </Route>
           </Routes>
         </div>

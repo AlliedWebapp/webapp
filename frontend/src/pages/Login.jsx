@@ -39,7 +39,7 @@ function Login() {
     // Redirect when logged in
     if (isSuccess || user) {
       toast.success("Login successful!");
-      navigate("/home");
+      navigate("/main-page");
     }
 
     dispatch(reset());
