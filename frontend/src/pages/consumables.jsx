@@ -284,7 +284,7 @@ const deleteButtonStyle = {
 
   return (
     <div style={{ maxWidth: 1500, margin: "40px auto", padding: 24 }}>
-      <BackButton url="/home" />
+      <BackButton url="/inventory-main" />
       
       <div style={{ 
         display: 'flex', 
