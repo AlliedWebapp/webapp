@@ -31,7 +31,7 @@ const getAllSolding = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      solding.find({}, { picture: 0 }).skip(skip).limit(limit),
+      solding.find({}).skip(skip).limit(limit),
       solding.countDocuments()
     ]);
 
@@ -74,7 +74,7 @@ const getAllShong = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      Shong.find({}, { picture: 0 }).skip(skip).limit(limit),
+      Shong.find({}).skip(skip).limit(limit),
       Shong.countDocuments()
     ]);
 
@@ -123,7 +123,7 @@ const getAllJogini = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      Jogini.find({}, { picture: 0 }).skip(skip).limit(limit),
+      Jogini.find({}).skip(skip).limit(limit),
       Jogini.countDocuments()
     ]);
 
@@ -168,7 +168,7 @@ const getAllSDLLPsalun = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      SDLLPsalun.find({}, { picture: 0 }).skip(skip).limit(limit),
+      SDLLPsalun.find({}).skip(skip).limit(limit),
       SDLLPsalun.countDocuments()
     ]);
 
@@ -211,7 +211,7 @@ const getAllKuwarsi = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      Kuwarsi.find({}, { picture: 0 }).skip(skip).limit(limit),
+      Kuwarsi.find({}).skip(skip).limit(limit),
       Kuwarsi.countDocuments()
     ]);
 
