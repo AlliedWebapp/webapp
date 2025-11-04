@@ -78,6 +78,14 @@ const ticketSchema = new mongoose.Schema(
         contentType: String
       }
     ],
+    attachments: [
+      {
+        data: Buffer,
+        contentType: String,
+        originalName: String,
+        size: Number
+      }
+    ],
     status: {
       type: String,
       required: true,

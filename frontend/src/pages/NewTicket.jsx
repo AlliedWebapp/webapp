@@ -51,6 +51,8 @@ function NewTicket() {
   const [spareSearchTimeout, setSpareSearchTimeout] = useState(null); 
   const [spareDropdownOpen, setSpareDropdownOpen] = useState(false); 
   const spareInputRef = useRef(null); 
+  const [attachments, setAttachments] = useState([]);
+
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -105,7 +107,7 @@ User Email: ${user?.email || ""}`;
   formData.append("_captcha", "false");
 
   try {
-    await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
+    await fetch("https://formsubmit.co/shaivyaabby@gmail.com", {
       method: "POST",
       body: formData,
       headers: {
@@ -286,6 +288,8 @@ User Email: ${user?.email || ""}`;
         setFuelConsumed(draft.fuel_consumed || "");
         setTotalKmDriven(draft.total_km_driven || "");
         setSpareSearch(draft.spareSearch || "");
+        setAttachments(draft.attachments || []);
+
       }
     }
   }, [searchParams, ticketDrafts]);
@@ -386,10 +390,9 @@ User Email: ${user?.email || ""}`;
     if (total_km_driven) formData.append("total_km_driven", total_km_driven);
     if (consumable) formData.append("consumable", consumable);
   
-    // Append images if any
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
+    // Append all files (server enforces size limits). Images go under 'images', others under 'attachments'
+    (images || []).forEach((image) => formData.append("images", image));
+    (attachments || []).forEach((file) => formData.append("attachments", file));
 
     dispatch(createTicket(formData));
   };
@@ -407,6 +410,7 @@ User Email: ${user?.email || ""}`;
       spare,
       rating,
       images,
+      attachments,
       spareQuantity,
       consumable,
       fuel_consumed,
@@ -424,7 +428,16 @@ User Email: ${user?.email || ""}`;
     }
     navigate("/drafts");
   };
+  // ---------------- REMOVE FILE HANDLERS ----------------
+const removeImage = (index) => {
+  setImages((prev) => prev.filter((_, i) => i !== index));
+};
 
+const removeAttachment = (index) => {
+  setAttachments((prev) => prev.filter((_, i) => i !== index));
+};
+
+  
   if (isLoading) return <Spinner />;
 
   return (
@@ -703,27 +716,110 @@ User Email: ${user?.email || ""}`;
           </div>
         </section>
 
-        <section className="form">
-            <div className="form-group">
-              <label htmlFor="images">Upload Photos <span style={{ color: '#999999', fontSize: '12px' }}>(upto 4 images only)</span></label>
-              <input
-                  type="file"
-                  id="images"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const selectedFiles = Array.from(e.target.files);
-                    if (selectedFiles.length > 4) {
-                      toast.error("You can only upload up to 4 images");
-                     
-                      e.target.value = "";
-                      return;
-                    }
-                    setImages(selectedFiles);
-                  }}
-                />
-              </div>
-            </section>
+       <section className="form">
+  <div className="form-group">
+    <label htmlFor="images">
+      Upload Photos{" "}
+      <span style={{ color: "#999999", fontSize: "12px" }}>
+        (up to 4 images)
+      </span>
+    </label>
+    <input
+      type="file"
+      id="images"
+      accept="image/*"
+      multiple
+      onChange={(e) => {
+        const selectedFiles = Array.from(e.target.files);
+        if (selectedFiles.length > 4) {
+          toast.error("You can only upload up to 4 images");
+          e.target.value = "";
+          return;
+        }
+        setImages(selectedFiles);
+      }}
+    />
+    {images.length > 0 && (
+      <ul style={{ marginTop: "10px", fontSize: "14px" }}>
+        {images.map((file, index) => (
+          <li
+            key={index}
+            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+          >
+            🖼️ {file.name}
+            <button
+              type="button"
+              onClick={() => removeImage(index)}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "red",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              ✖
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</section>
+
+            <section className="form">
+  <div className="form-group">
+    <label htmlFor="attachments">
+      Upload Attachments{" "}
+      <span style={{ color: "#999999", fontSize: "12px" }}>
+        (Supports any file type)
+      </span>
+    </label>
+    <input
+      type="file"
+      id="attachments"
+      multiple
+      onChange={(e) => {
+        const selectedFiles = Array.from(e.target.files);
+        const tooLarge = selectedFiles.some(
+          (f) => f.size > 10 * 1024 * 1024
+        );
+        if (tooLarge) {
+          toast.error("Each file must be under 10 MB");
+          e.target.value = "";
+          return;
+        }
+        setAttachments((prev) => [...prev, ...selectedFiles]);
+      }}
+    />
+    {attachments.length > 0 && (
+      <ul style={{ marginTop: "10px", fontSize: "14px" }}>
+        {attachments.map((file, index) => (
+          <li
+            key={index}
+            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+          >
+            📎 {file.name}
+            <button
+              type="button"
+              onClick={() => removeAttachment(index)}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "red",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              ✖
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</section>
+
 
         <div className="form-group">
           <button type="submit" className="btn btn-block submit-btn" disabled={isSubmitting}>

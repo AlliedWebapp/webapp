@@ -100,11 +100,25 @@ const createTicket = asyncHandler(async (req, res) => {
     } = req.body
 
     
-    const imageFiles = req.files;
-    const images = imageFiles?.map(file => ({
-      data: file.buffer,
-      contentType: file.mimetype,
-    })) || [];
+    // Multer fields
+    const imageFiles = (req.files && (req.files.images || req.files)) || [];
+    const attachmentFiles = (req.files && req.files.attachments) || [];
+
+    // Accept all file types; size limits handled by multer
+    const images = [];
+    const attachments = [];
+
+    if (Array.isArray(imageFiles)) {
+      imageFiles.forEach((file) => {
+        images.push({ data: file.buffer, contentType: file.mimetype, originalName: file.originalname, size: file.size });
+      });
+    }
+
+    if (Array.isArray(attachmentFiles)) {
+      attachmentFiles.forEach((file) => {
+        attachments.push({ data: file.buffer, contentType: file.mimetype, originalName: file.originalname, size: file.size });
+      });
+    }
 
     const quantity = parseInt(spareQuantity) > 0 ? parseInt(spareQuantity) : 1;
 
@@ -130,6 +144,7 @@ const createTicket = asyncHandler(async (req, res) => {
       description,
       date,
       images,
+      ...(attachments.length ? { attachments } : {}),
       user: req.user.id,
       createdBy: user.email,
       status: 'new',
@@ -209,7 +224,13 @@ const createTicket = asyncHandler(async (req, res) => {
     }
 
 
-    res.status(201).json(ticket)
+    res.status(201).json({
+      ...ticket.toObject(),
+      uploadReport: {
+        images: { saved: images.length, skipped: [] },
+        attachments: { saved: attachments.length, skipped: [] }
+      }
+    })
   } catch (error) {
     console.error('[TICKET] Error creating ticket:', error);
     res.status(500).json({

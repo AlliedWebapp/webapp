@@ -24,7 +24,7 @@ import {
   FaCheckCircle,
   FaExclamationTriangle
 } from "react-icons/fa";
-
+import "../index.css";
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 const customStyles = {
@@ -438,6 +438,107 @@ function Ticket() {
                     <div className="image-overlay">
                       <span>View</span>
                     </div>
+                    
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {ticket.attachments && ticket.attachments.length > 0 && (
+          <div className="ticket-attachments-card">
+            <div className="card-header">
+              <h2><FaClipboardList /> Attachments</h2>
+              <span className="attachment-count">
+                {ticket.attachments.length} attachment{ticket.attachments.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            <div className="attachments-grid">
+              {ticket.attachments.map((attachment, index) => {
+                const downloadAttachment = async () => {
+                  try {
+                    const token = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : '';
+                    if (!token) { return; }
+                    const response = await fetch(
+                      `${API_URL}/api/tickets/${ticket._id}/attachments/${index}`,
+                      { headers: { 'Authorization': `Bearer ${token}` } }
+                    );
+                    if (!response.ok) throw new Error("Failed to download attachment");
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = attachment.originalName || `attachment-${index+1}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                  } catch (error) {
+                    console.error(error);
+                  }
+                };
+
+                const previewAttachment = async () => {
+                  try {
+                    const token = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : '';
+                    if (!token) { return; }
+                    const response = await fetch(
+                      `${API_URL}/api/tickets/${ticket._id}/attachments/${index}`,
+                      { headers: { 'Authorization': `Bearer ${token}` } }
+                    );
+                    if (!response.ok) throw new Error('Failed to preview attachment');
+
+                    const contentType = response.headers.get('Content-Type') || (attachment.contentType || 'application/octet-stream');
+                    const blob = await response.blob();
+                    const objectUrl = window.URL.createObjectURL(blob);
+
+                    const openViewer = (html) => {
+                      const blobHtml = new Blob([html], { type: 'text/html' });
+                      const htmlUrl = URL.createObjectURL(blobHtml);
+                      window.open(htmlUrl, '_blank');
+                      setTimeout(() => {
+                        URL.revokeObjectURL(htmlUrl);
+                        URL.revokeObjectURL(objectUrl);
+                      }, 60 * 1000);
+                    };
+
+                    if (contentType.startsWith('image/')) {
+                      // Image preview
+                      openViewer(`<!doctype html><html><head><meta charset="utf-8"><title>${displayName}</title><style>body{margin:0;background:#111;display:flex;align-items:center;justify-content:center;height:100vh}</style></head><body><img src="${objectUrl}" style="max-width:100%;max-height:100%" /></body></html>`);
+                      return;
+                    }
+                    if (contentType === 'application/pdf') {
+                      // PDF preview via iframe
+                      openViewer(`<!doctype html><html><head><meta charset="utf-8"><title>${displayName}</title><style>html,body{height:100%;margin:0}</style></head><body><iframe src="${objectUrl}" style="border:0;width:100%;height:100%"></iframe></body></html>`);
+                      return;
+                    }
+                    if (contentType.startsWith('text/')) {
+                      // Text preview
+                      const text = await blob.text();
+                      openViewer(`<!doctype html><html><head><meta charset="utf-8"><title>${displayName}</title><style>pre{white-space:pre-wrap;word-wrap:break-word;font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;padding:16px}</style></head><body><pre>${text.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</pre></body></html>`);
+                      return;
+                    }
+
+                    // Fallback: show interstitial with a link (prevents auto-download behavior)
+                    openViewer(`<!doctype html><html><head><meta charset="utf-8"><title>${displayName}</title><style>body{font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif;padding:24px}</style></head><body><h3>Preview not available for this file type.</h3><p>Click the link below to view or download:</p><p><a href="${objectUrl}" target="_blank" rel="noopener">Open file</a></p></body></html>`);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                };
+
+                const displayName = attachment.originalName || `attachment-${index+1}`;
+                const shortName = displayName.length > 24 ? `${displayName.slice(0, 21)}...` : displayName;
+
+                return (
+                  <div key={index} className="attachment-box">
+                    <span className="attachment-name" title={displayName}>
+                      {shortName}
+                    </span>
+                    <div className="attachment-actions">
+                      <button onClick={previewAttachment} className="preview-btn">Preview</button>
+                      <button onClick={downloadAttachment} className="download-btn">Download</button>
+                    </div>
                   </div>
                 );
               })}
@@ -533,8 +634,8 @@ function Ticket() {
                 try {
                   const response = await fetch(previewImage, {
                     headers: {
-                      'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                    }
+                              'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
+                            }
                   });
                   const blob = await response.blob();
                   e.target.src = URL.createObjectURL(blob);
@@ -543,6 +644,8 @@ function Ticket() {
                   e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMDAgMTAwSDMwMFYyMDBIMTAwVjEwMFoiIGZpbGw9IiNFNUU3RUIiLz4KPHBhdGggZD0iTTEyNSAxMjVIMTc1VjE3NUgxMjVWMTI1WiIgZmlsbD0iI0M3Q0E5QyIvPgo8cGF0aCBkPSJNMTAwIDIyNUwxNTAgMTc1SDI1MEwyMDAgMjI1SDMwMFYxMDBIMTAwVjIyNVoiIGZpbGw9IiNDN0NBOUMiLz4KPC9zdmc+Cg==';
                 }
               }}
+
+              
             />
           </div>
         </div>

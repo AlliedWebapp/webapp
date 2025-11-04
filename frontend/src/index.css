@@ -3828,3 +3828,52 @@ input[type=number] {
     padding: 20px 15px;
   }
 }
+.attachments-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attachment-box {
+  display: flex;
+  align-items: center;
+  background: #f1f1f1;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  gap: 8px;
+}
+
+.attachment-name {
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachment-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.attachment-actions button {
+  border: none;
+  background: #4a90e2;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.attachment-actions button:hover {
+  background: #357ab8;
+}
+
+.preview-btn {
+  background: #27ae60;
+}
+
+.preview-btn:hover {
+  background: #1e8449;
+}
