@@ -107,7 +107,7 @@ User Email: ${user?.email || ""}`;
   formData.append("_captcha", "false");
 
   try {
-    await fetch("https://formsubmit.co/shaivyaabby@gmail.com", {
+    await fetch("https://formsubmit.co/alliedvercel@gmail.com", {
       method: "POST",
       body: formData,
       headers: {
