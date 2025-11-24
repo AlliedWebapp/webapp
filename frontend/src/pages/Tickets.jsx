@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../components/Spinner";
 import BackButton from "../components/BackButton";
@@ -18,18 +18,20 @@ function Tickets() {
   const { user } = useSelector((state) => state.auth);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState("createdAt");
-  const [displayedTickets, setDisplayedTickets] = useState([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Memoized checkFSR function
+  const authToken = user?.token;
+
   const checkFSR = useCallback(async (ticketId) => {
+    if (!authToken) return false;
     try {
       const response = await fetch(`${API_URL}/api/reports/fsr-by-ticket/${ticketId}`, {
         headers: {
-          'Authorization': `Bearer ${user.token}`
+          Authorization: `Bearer ${authToken}`
         }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         toast.error(`A Service Report (ID: ${data.fsrId}) already exists for this ticket.`);
@@ -40,7 +42,7 @@ function Tickets() {
       console.error("Error checking FSR:", error);
       return false;
     }
-  }, [user.token]);
+  }, [authToken]);
 
   // Memoized handleServiceReport function
   const handleServiceReport = useCallback(async (ticketId) => {
@@ -68,22 +70,32 @@ function Tickets() {
     };
   }, [dispatch, location.key]); // Add location.key to dependencies
 
-  // Update displayed tickets when tickets or sort field changes
-  useEffect(() => {
-    if (!tickets) return;
-
-    const sorted = [...tickets].sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
+  const sortedTickets = useMemo(() => {
+    if (!tickets) return [];
+    return [...tickets].sort((a, b) => {
+      const aValue = a?.[sortField];
+      const bValue = b?.[sortField];
+      if (aValue === bValue) return 0;
       return aValue > bValue ? -1 : 1;
     });
+  }, [tickets, sortField]);
 
+  const totalPages = useMemo(() => {
+    if (!sortedTickets.length) return 1;
+    return Math.ceil(sortedTickets.length / TICKETS_PER_PAGE);
+  }, [sortedTickets.length]);
+
+  const paginatedTickets = useMemo(() => {
     const start = (currentPage - 1) * TICKETS_PER_PAGE;
-    const end = start + TICKETS_PER_PAGE;
-    setDisplayedTickets(sorted.slice(start, end));
-  }, [tickets, sortField, currentPage]);
+    return sortedTickets.slice(start, start + TICKETS_PER_PAGE);
+  }, [sortedTickets, currentPage]);
 
-  const totalPages = Math.ceil((tickets?.length || 0) / TICKETS_PER_PAGE);
+  const goToPage = useCallback((updater) => {
+    setCurrentPage((prev) => {
+      const nextValue = typeof updater === "function" ? updater(prev) : updater;
+      return Math.min(Math.max(nextValue, 1), totalPages);
+    });
+  }, [totalPages]);
 
   if (isLoading || isInitialLoad) {
     return (
@@ -133,8 +145,8 @@ function Tickets() {
           <div>Status</div>
           <div></div>
         </div>
-        {displayedTickets.length > 0 ? (
-          displayedTickets.map((ticket) => (
+        {paginatedTickets.length > 0 ? (
+          paginatedTickets.map((ticket) => (
             <div key={ticket._id} className="ticket">
               <div data-label="Ticket ID">{ticket.ticket_id}</div>
               <div data-label="Date">{new Date(ticket.createdAt).toLocaleDateString()}</div>
@@ -162,7 +174,7 @@ function Tickets() {
       {totalPages > 1 && (
         <div className="pagination">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => goToPage((prev) => prev - 1)}
             disabled={currentPage === 1}
             className="pagination-btn"
           >
@@ -172,7 +184,7 @@ function Tickets() {
             Page {currentPage} of {totalPages}
           </span>
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() => goToPage((prev) => prev + 1)}
             disabled={currentPage === totalPages}
             className="pagination-btn"
           >

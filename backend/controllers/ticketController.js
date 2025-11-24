@@ -3,305 +3,273 @@ const mongoose = require('mongoose')
 const User = require('../models/userModel')
 const Ticket = require('../models/ticketModel')
 
+const adminEmailSet = new Set(["bhaskarudit02@gmail.com", "ss@gmail.com"].map((e) => e.toLowerCase()));
 
-const adminEmails = ["bhaskarudit02@gmail.com", "ss@gmail.com"].map(e => e.toLowerCase());
+const toLower = (value = '') => value.toLowerCase();
 
-function getCollectionModel(projectname) {
-  console.log("getCollectionModel called with:", projectname);
+const httpError = (statusCode, message) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
+const requireUser = async (req) => {
+  const user = await User.findById(req.user.id).lean();
+  if (!user) {
+    throw httpError(401, 'User not found');
+  }
+  return user;
+};
+
+const requireTicket = async (ticketId, { lean = false, select } = {}) => {
+  let query = Ticket.findById(ticketId);
+  if (select) {
+    query = query.select(select);
+  }
+  if (lean) {
+    query = query.lean();
+  }
+  const ticket = await query;
+  if (!ticket) {
+    throw httpError(404, 'Ticket not found');
+  }
+  return ticket;
+};
+
+const isAdminRequest = (req) => adminEmailSet.has(toLower(req.user.email));
+
+const assertAuthorized = (ticketUser, req) => {
+  if (!isAdminRequest(req) && !isTicketOwner(ticketUser, req.user.id)) {
+    throw httpError(401, 'Not authorized');
+  }
+};
+
+function getCollectionModel(projectname = '') {
   switch (projectname.toLowerCase()) {
-    case "jogini-ii":
-    case "jogini":
-      return require("../models/JoginiModel");
-    case "shong":
-      return require("../models/ShongModel");
-    case "solding":
-      return require("../models/soldingModel");
-    case "sdllp salun":
-    case "sdllpsalun":
-      return require("../models/SDLLPsalunModel");
-    case "jhp kuwarsi-ii":
-      return require("../models/KuwarsiModel");
+    case 'jogini-ii':
+    case 'jogini':
+      return require('../models/JoginiModel');
+    case 'shong':
+      return require('../models/ShongModel');
+    case 'solding':
+      return require('../models/soldingModel');
+    case 'sdllp salun':
+    case 'sdllpsalun':
+      return require('../models/SDLLPsalunModel');
+    case 'jhp kuwarsi-ii':
+      return require('../models/KuwarsiModel');
     default:
-      throw new Error("Unknown project/collection: " + projectname);
+      throw new Error(`Unknown project/collection: ${projectname}`);
   }
 }
 
+const isTicketOwner = (ticketUser, reqUserId) => ticketUser.toString() === reqUserId.toString();
 
-function isTicketOwner(ticketUser, reqUserId) {
-  return ticketUser.toString() === reqUserId.toString();
-}
+const parsePositiveInt = (value, fallback = 1) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+};
 
+const parseOptionalNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const normalizeImageFiles = (files) => {
+  if (!files) return [];
+  if (Array.isArray(files)) return files;
+  if (Array.isArray(files.images)) return files.images;
+  return [];
+};
+
+const normalizeAttachmentFiles = (files) => (Array.isArray(files?.attachments) ? files.attachments : []);
+
+const mapFilesToPayload = (files = []) =>
+  files.map(({ buffer, mimetype, originalname, size }) => ({
+    data: buffer,
+    contentType: mimetype,
+    originalName: originalname,
+    size,
+  }));
+
+const decrementSpareCount = async (projectname, spareId, quantity) => {
+  if (!spareId) return;
+  try {
+    const collectionModel = getCollectionModel(projectname);
+    await collectionModel.updateOne({ _id: spareId }, { $inc: { spareCount: -quantity } });
+  } catch (err) {
+    console.error('Error decrementing spare count:', err);
+  }
+};
+
+const updateConsumableUsage = async (consumableId, fuelConsumed, distanceDriven) => {
+  if (!consumableId || !Number.isFinite(fuelConsumed)) return;
+  try {
+    const Consumable = require('../models/ConsumableModel');
+    const consumableDoc = await Consumable.findById(consumableId);
+    if (!consumableDoc) {
+      console.warn('[CONSUMABLE] Consumable not found for ID', consumableId);
+      return;
+    }
+
+    const storageBefore = Number(consumableDoc.fuel_storage);
+    if (!Number.isFinite(storageBefore)) {
+      console.warn('[CONSUMABLE] fuel_storage is not a number');
+      return;
+    }
+
+    const newStorage = storageBefore - fuelConsumed;
+    const prevConsumed = Number(consumableDoc.fuel_consumed) || 0;
+    const prevKm = Number(consumableDoc.total_km_driven) || 0;
+    const kmToAdd = Number(distanceDriven) || 0;
+
+    consumableDoc.fuel_storage = newStorage.toString();
+    consumableDoc.fuel_consumed = prevConsumed + fuelConsumed;
+    consumableDoc.total_km_driven = prevKm + kmToAdd;
+
+    if (consumableDoc.total_km_driven > 0 && consumableDoc.fuel_consumed > 0) {
+      consumableDoc.avg = (consumableDoc.total_km_driven / consumableDoc.fuel_consumed).toFixed(2);
+    }
+
+    await consumableDoc.save();
+  } catch (err) {
+    console.error('Error updating consumable usage:', err);
+  }
+};
+
+const stripFilePayload = (records = []) =>
+  records.map(({ contentType, originalName, size }) => ({
+    contentType,
+    originalName,
+    size,
+  }));
+
+const sanitizeTicket = (ticketDoc) => {
+  if (!ticketDoc) return ticketDoc;
+  const ticket = ticketDoc.toObject ? ticketDoc.toObject() : { ...ticketDoc };
+  ticket.ticket_id = ticket.ticket_id || ticket._id;
+  if (Array.isArray(ticket.images)) {
+    ticket.images = stripFilePayload(ticket.images);
+  }
+  if (Array.isArray(ticket.attachments)) {
+    ticket.attachments = stripFilePayload(ticket.attachments);
+  }
+  return ticket;
+};
 
 const getTickets = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    res.status(401);
-    throw new Error('User not found');
-  }
+  await requireUser(req);
+  const query = isAdminRequest(req)
+    ? {}
+    : { user: new mongoose.Types.ObjectId(req.user.id) };
 
-  const userEmail = (req.user.email || "").toLowerCase();
+  const tickets = await Ticket.find(query)
+    .sort({ createdAt: -1 })
+    .select('ticket_id projectname status createdAt user')
+    .lean();
 
-  let tickets;
-  if (adminEmails.includes(userEmail)) {
-    tickets = await Ticket.find({});
-  } else {
-    tickets = await Ticket.find({ user: new mongoose.Types.ObjectId(req.user.id) });
-  }
-
-  res.status(200).json(tickets);
+  res.status(200).json(tickets.map(sanitizeTicket));
 });
-
 
 const getTicket = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    res.status(401);
-    throw new Error('User not found');
-  }
-
-  const ticket = await Ticket.findById(req.params.id);
-  if (!ticket) {
-    res.status(404);
-    throw new Error('Ticket not found');
-  }
-
-  const userEmail = (req.user.email || "").toLowerCase();
-
- 
-  if (
-    !adminEmails.includes(userEmail) &&
-    !isTicketOwner(ticket.user, req.user.id)
-  ) {
-    res.status(401);
-    throw new Error('Not authorized');
-  }
-
-  res.status(200).json(ticket);
+  await requireUser(req);
+  const ticket = await requireTicket(req.params.id, {
+    lean: true,
+    select: '-images.data -attachments.data',
+  });
+  assertAuthorized(ticket.user, req);
+  res.status(200).json(sanitizeTicket(ticket));
 });
-
 
 const createTicket = asyncHandler(async (req, res) => {
-  console.log("[TICKET] Ticket creation attempt received at", new Date().toISOString());
-  try {
-    const { 
-      projectname, 
-      sitelocation, 
-      projectlocation, 
-      fault, 
-      issue, 
-      description, 
-      date, 
-      spare, 
-      rating,
-      spareQuantity,
-      consumable,
-      fuel_consumed,
-      total_km_driven
-    } = req.body
+  const {
+    projectname,
+    sitelocation,
+    projectlocation,
+    fault,
+    issue,
+    description,
+    date,
+    spare,
+    rating,
+    spareQuantity,
+    consumable,
+    fuel_consumed,
+    total_km_driven,
+  } = req.body;
 
-    
-    // Multer fields
-    const imageFiles = (req.files && (req.files.images || req.files)) || [];
-    const attachmentFiles = (req.files && req.files.attachments) || [];
-
-    // Accept all file types; size limits handled by multer
-    const images = [];
-    const attachments = [];
-
-    if (Array.isArray(imageFiles)) {
-      imageFiles.forEach((file) => {
-        images.push({ data: file.buffer, contentType: file.mimetype, originalName: file.originalname, size: file.size });
-      });
-    }
-
-    if (Array.isArray(attachmentFiles)) {
-      attachmentFiles.forEach((file) => {
-        attachments.push({ data: file.buffer, contentType: file.mimetype, originalName: file.originalname, size: file.size });
-      });
-    }
-
-    const quantity = parseInt(spareQuantity) > 0 ? parseInt(spareQuantity) : 1;
-
-    if (!projectname || !sitelocation || !projectlocation || !fault || !issue || !description || !date)  {
-      console.log("Missing required fields", req.body, req.files);
-      res.status(400)
-      throw new Error('Please provide all required fields')
-    }
-
-    const user = await User.findById(req.user.id)
-    if (!user) {
-      console.log("User not found", req.user.id);
-      res.status(401)
-      throw new Error('User not found')
-    }
-
-    const ticket = await Ticket.create({
-      projectname,
-      sitelocation,
-      projectlocation,
-      fault,
-      issue,
-      description,
-      date,
-      images,
-      ...(attachments.length ? { attachments } : {}),
-      user: req.user.id,
-      createdBy: user.email,
-      status: 'new',
-      ...(spare && { spare }),
-      ...(rating && { rating }),
-      ...(spareQuantity && { spareQuantity: quantity }),
-      ...(consumable && { consumable }),
-      ...(fuel_consumed && { fuel_consumed: Number(fuel_consumed) }),
-      ...(total_km_driven && { total_km: Number(total_km_driven) })
-    });
-
-    try {
-      if (spare) {
-        const collectionModel = getCollectionModel(projectname);
-
-        
-        const spareDocBefore = await collectionModel.findById(spare);
-        console.log("================ SPARE DECREMENT LOG ================");
-        if (spareDocBefore) {
-          console.log(`SPARE ID: ${spare}`);
-          console.log(`SPARE NAME: ${spareDocBefore.name || 'N/A'}`);
-          console.log(`COUNT BEFORE DECREMENT: ${spareDocBefore.spareCount}`);
-        } else {
-          console.log(`SPARE ID: ${spare}`);
-          console.log("SPARE NOT FOUND BEFORE DECREMENT");
-        }
-        const updateResult = await collectionModel.updateOne(
-          { _id: spare },
-          { $inc: { spareCount: -quantity } }
-        );
-        console.log("Direct $inc update result:", updateResult);
-
-        const spareDocAfter = await collectionModel.findById(spare);
-        if (spareDocAfter) {
-          console.log(`COUNT AFTER DECREMENT: ${spareDocAfter.spareCount}`);
-        } else {
-          console.log("SPARE NOT FOUND AFTER DECREMENT");
-        }
-        console.log("======================================================");
-      }
-    } catch (err) {
-      console.error("Error decrementing spare count:", err);
-    }
-
-    try {
-      if (consumable && fuel_consumed) {
-        const Consumable = require('../models/ConsumableModel');
-        const consumableDoc = await Consumable.findById(consumable);
-        if (consumableDoc) {
-          let currentStorage = Number(consumableDoc.fuel_storage);
-          let toSubtract = Number(fuel_consumed);
-          let prevConsumed = Number(consumableDoc.fuel_consumed) || 0;
-          let prevKm = Number(consumableDoc.total_km_driven) || 0;
-          let addKm = Number(req.body.total_km_driven) || 0;
-          if (!isNaN(currentStorage) && !isNaN(toSubtract)) {
-            const newStorage = currentStorage - toSubtract;
-            console.log(`[CONSUMABLE] Fuel storage before: ${currentStorage}, to subtract: ${toSubtract}, after: ${newStorage}`);
-            consumableDoc.fuel_storage = newStorage.toString();
-            // Increment total fuel_consumed
-            consumableDoc.fuel_consumed = prevConsumed + toSubtract;
-            // Increment total_km_driven
-            consumableDoc.total_km_driven = prevKm + addKm;
-            // Update avg
-            if ((prevKm + addKm) > 0 && (prevConsumed + toSubtract) > 0) {
-              consumableDoc.avg = ((prevKm + addKm) / (prevConsumed + toSubtract)).toFixed(2);
-            }
-            await consumableDoc.save();
-          } else {
-            console.warn('[CONSUMABLE] fuel_storage or fuel_consumed is not a number');
-          }
-        } else {
-          console.warn('[CONSUMABLE] Consumable not found for ID', consumable);
-        }
-      }
-    } catch (err) {
-      console.error('Error decrementing consumable fuel_storage:', err);
-    }
-
-
-    res.status(201).json({
-      ...ticket.toObject(),
-      uploadReport: {
-        images: { saved: images.length, skipped: [] },
-        attachments: { saved: attachments.length, skipped: [] }
-      }
-    })
-  } catch (error) {
-    console.error('[TICKET] Error creating ticket:', error);
-    res.status(500).json({
-      message: 'Error creating ticket',
-      error: error.message
-    });
+  const missingField = [projectname, sitelocation, projectlocation, fault, issue, description, date].some(
+    (field) => !field
+  );
+  if (missingField) {
+    throw httpError(400, 'Please provide all required fields');
   }
+
+  const user = await requireUser(req);
+
+  const imageFiles = normalizeImageFiles(req.files);
+  const attachmentFiles = normalizeAttachmentFiles(req.files);
+  const images = mapFilesToPayload(imageFiles);
+  const attachments = mapFilesToPayload(attachmentFiles);
+
+  const quantity = parsePositiveInt(spareQuantity);
+  const fuelConsumed = parseOptionalNumber(fuel_consumed);
+  const totalKm = parseOptionalNumber(total_km_driven);
+
+  const ticketPayload = {
+    projectname,
+    sitelocation,
+    projectlocation,
+    fault,
+    issue,
+    description,
+    date,
+    images,
+    user: req.user.id,
+    createdBy: user.email,
+    status: 'new',
+    ...(attachments.length ? { attachments } : {}),
+    ...(spare && { spare, spareQuantity: quantity }),
+    ...(rating && { rating }),
+    ...(consumable && { consumable }),
+    ...(Number.isFinite(fuelConsumed) && { fuel_consumed: fuelConsumed }),
+    ...(Number.isFinite(totalKm) && { total_km: totalKm }),
+  };
+
+  const ticket = await Ticket.create(ticketPayload);
+
+  await decrementSpareCount(projectname, spare, quantity);
+  await updateConsumableUsage(consumable, fuelConsumed, totalKm);
+
+  const serializedTicket = sanitizeTicket(ticket);
+  res.status(201).json({
+    ...serializedTicket,
+    uploadReport: {
+      images: { saved: images.length, skipped: [] },
+      attachments: { saved: attachments.length, skipped: [] },
+    },
+  });
 });
 
-
-
-
-
 const deleteTicket = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    res.status(401);
-    throw new Error('User not found');
-  }
-
-  const ticket = await Ticket.findById(req.params.id);
-  if (!ticket) {
-    res.status(404);
-    throw new Error('Ticket not found');
-  }
-
-  const userEmail = (req.user.email || "").toLowerCase();
-
-  if (
-    !adminEmails.includes(userEmail) &&
-    !isTicketOwner(ticket.user, req.user.id)
-  ) {
-    res.status(401);
-    throw new Error('Not authorized');
-  }
-
-  await ticket.remove();
-
+  await requireUser(req);
+  const ticket = await requireTicket(req.params.id);
+  assertAuthorized(ticket.user, req);
+  await ticket.deleteOne();
   res.status(200).json({ success: true });
 });
 
 const updateTicket = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    res.status(401);
-    throw new Error('User not found');
-  }
+  await requireUser(req);
+  const ticket = await requireTicket(req.params.id);
+  assertAuthorized(ticket.user, req);
 
-  const ticket = await Ticket.findById(req.params.id);
-  if (!ticket) {
-    res.status(404);
-    throw new Error('Ticket not found');
-  }
+  const updatedTicket = await Ticket.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  }).lean();
 
-  const userEmail = (req.user.email || "").toLowerCase();
-
-  if (
-    !adminEmails.includes(userEmail) &&
-    !isTicketOwner(ticket.user, req.user.id)
-  ) {
-    res.status(401);
-    throw new Error('Not authorized');
-  }
-
-  const updatedTicket = await Ticket.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true }
-  );
-
-  res.status(200).json(updatedTicket);
+  res.status(200).json(sanitizeTicket(updatedTicket));
 });
 
 module.exports = {

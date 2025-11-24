@@ -10,7 +10,7 @@ import {
 } from "../features/notes/noteSlice";
 import Spinner from "../components/Spinner";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import NoteItem from "../components/NoteItem";
 import Modal from "react-modal";
@@ -76,19 +76,44 @@ function Ticket() {
   const { notes, isLoading: notesIsLoading, isError: notesIsError, message: notesMessage } = useSelector(
     (state) => state.notes
   );
+  const { user } = useSelector((state) => state.auth);
 
   const { ticketId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const checkFSR = async () => {
+  const authToken = useMemo(() => {
+    if (user?.token) return user.token;
     try {
-      const response = await fetch(`${API_URL}/api/reports/fsr-by-ticket/${ticketId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-        }
-      });
-      
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) return null;
+      const parsed = JSON.parse(storedUser);
+      return parsed?.token || null;
+    } catch (error) {
+      console.error("Unable to parse stored user", error);
+      return null;
+    }
+  }, [user]);
+
+  const authorizedFetch = useCallback(
+    (url, options = {}) => {
+      const headers = {
+        ...(options.headers || {}),
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      };
+      return fetch(url, { ...options, headers });
+    },
+    [authToken]
+  );
+
+  const checkFSR = useCallback(async () => {
+    if (!authToken) {
+      setHasFSR(false);
+      return false;
+    }
+    try {
+      const response = await authorizedFetch(`${API_URL}/api/reports/fsr-by-ticket/${ticketId}`);
+
       if (response.ok) {
         const data = await response.json();
         setHasFSR(true);
@@ -102,32 +127,39 @@ function Ticket() {
       console.error("Error checking FSR:", error);
       return false;
     }
-  };
+  }, [authorizedFetch, ticketId, authToken]);
 
-  const handleCreateFSR = async () => {
+  const handleCreateFSR = useCallback(async () => {
     const fsrExists = await checkFSR();
     if (!fsrExists) {
       navigate(`/generator-service-report/${ticketId}`);
     }
-  };
+  }, [checkFSR, navigate, ticketId]);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
-        await dispatch(getTicket(ticketId));
-        await dispatch(getNotes(ticketId));
+        await Promise.all([
+          dispatch(getTicket(ticketId)).unwrap(),
+          dispatch(getNotes(ticketId)).unwrap(),
+        ]);
         await checkFSR();
       } catch (error) {
+        console.error("Error loading ticket data:", error);
       } finally {
-        setIsCheckingFSR(false);
+        if (isMounted) {
+          setIsCheckingFSR(false);
+        }
       }
     };
 
     fetchData();
     return () => {
+      isMounted = false;
       dispatch(notesReset());
     };
-  }, [ticketId, dispatch]);
+  }, [ticketId, dispatch, checkFSR]);
 
   useEffect(() => {
     const fetchSpareName = async () => {
@@ -135,11 +167,9 @@ function Ticket() {
       const projectKey = PROJECTS[ticket.projectname];
       if (!projectKey) return;
       try {
-        const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
         const apiUrl = `${API_URL}/api/${projectKey}`;
-        const response = await fetch(apiUrl, {
+        const response = await authorizedFetch(apiUrl, {
           headers: {
-            Authorization: user?.token ? `Bearer ${user.token}` : undefined,
             "Content-Type": "application/json",
           },
         });
@@ -167,17 +197,15 @@ function Ticket() {
       }
     };
     fetchSpareName();
-  }, [ticket]);
+  }, [ticket, authorizedFetch]);
 
   useEffect(() => {
     const fetchConsumableName = async () => {
       if (!ticket || !ticket.consumable) return;
       try {
-        const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
         const apiUrl = `${API_URL}/api/consumables`;
-        const response = await fetch(apiUrl, {
+        const response = await authorizedFetch(apiUrl, {
           headers: {
-            Authorization: user?.token ? `Bearer ${user.token}` : undefined,
             "Content-Type": "application/json",
           },
         });
@@ -190,7 +218,7 @@ function Ticket() {
       }
     };
     fetchConsumableName();
-  }, [ticket]);
+  }, [ticket, authorizedFetch]);
 
   if (isLoading || notesIsLoading || isCheckingFSR) return <Spinner />;
 
@@ -422,11 +450,7 @@ function Ticket() {
                       onError={async (e) => {
                         e.target.onerror = null;
                         try {
-                          const response = await fetch(imageUrl, {
-                            headers: {
-                              'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                            }
-                          });
+                          const response = await authorizedFetch(imageUrl);
                           const blob = await response.blob();
                           e.target.src = URL.createObjectURL(blob);
                         } catch (err) {
@@ -456,20 +480,24 @@ function Ticket() {
 
             <div className="attachments-grid">
               {ticket.attachments.map((attachment, index) => {
+                const displayName = attachment.originalName || `attachment-${index+1}`;
+                const shortName = displayName.length > 24 ? `${displayName.slice(0, 21)}...` : displayName;
+
                 const downloadAttachment = async () => {
                   try {
-                    const token = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : '';
-                    if (!token) { return; }
-                    const response = await fetch(
-                      `${API_URL}/api/tickets/${ticket._id}/attachments/${index}`,
-                      { headers: { 'Authorization': `Bearer ${token}` } }
+                    if (!authToken) { 
+                      toast.error("Authentication required to download attachments");
+                      return; 
+                    }
+                    const response = await authorizedFetch(
+                      `${API_URL}/api/tickets/${ticket._id}/attachments/${index}`
                     );
                     if (!response.ok) throw new Error("Failed to download attachment");
                     const blob = await response.blob();
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement("a");
                     a.href = url;
-                    a.download = attachment.originalName || `attachment-${index+1}`;
+                    a.download = displayName;
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
@@ -481,11 +509,17 @@ function Ticket() {
 
                 const previewAttachment = async () => {
                   try {
-                    const token = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : '';
-                    if (!token) { return; }
-                    const response = await fetch(
-                      `${API_URL}/api/tickets/${ticket._id}/attachments/${index}`,
-                      { headers: { 'Authorization': `Bearer ${token}` } }
+                    if (!authToken) {
+                      toast.error("Authentication required to preview attachments");
+                      return;
+                    }
+                    const previewWindow = window.open('', '_blank');
+                    if (!previewWindow) {
+                      await downloadAttachment();
+                      return;
+                    }
+                    const response = await authorizedFetch(
+                      `${API_URL}/api/tickets/${ticket._id}/attachments/${index}`
                     );
                     if (!response.ok) throw new Error('Failed to preview attachment');
 
@@ -496,7 +530,7 @@ function Ticket() {
                     const openViewer = (html) => {
                       const blobHtml = new Blob([html], { type: 'text/html' });
                       const htmlUrl = URL.createObjectURL(blobHtml);
-                      window.open(htmlUrl, '_blank');
+                      previewWindow.location.href = htmlUrl;
                       setTimeout(() => {
                         URL.revokeObjectURL(htmlUrl);
                         URL.revokeObjectURL(objectUrl);
@@ -526,9 +560,6 @@ function Ticket() {
                     console.error(err);
                   }
                 };
-
-                const displayName = attachment.originalName || `attachment-${index+1}`;
-                const shortName = displayName.length > 24 ? `${displayName.slice(0, 21)}...` : displayName;
 
                 return (
                   <div key={index} className="attachment-box">
@@ -632,11 +663,7 @@ function Ticket() {
               onError={async (e) => {
                 e.target.onerror = null;
                 try {
-                  const response = await fetch(previewImage, {
-                    headers: {
-                              'Authorization': `Bearer ${localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : ''}`
-                            }
-                  });
+                  const response = await authorizedFetch(previewImage);
                   const blob = await response.blob();
                   e.target.src = URL.createObjectURL(blob);
                 } catch (err) {
