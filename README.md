@@ -12,6 +12,3 @@ Allied WebApp is a full-stack web application built with **React.js** for the fr
 - ☁️ **Heroku Ready** – Auto-build and deploy configuration  
 - 🔒 **Environment Separation** – Organized `frontend` and `backend` structure for scalability  
 
----
-
-
