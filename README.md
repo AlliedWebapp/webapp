@@ -4,7 +4,7 @@ Allied WebApp is a full-stack web application built with **React.js** for the fr
 
 ---
 
-## 🚀 Features
+# 🚀 Features
 
 - ⚛️ **React Frontend** – Modern, responsive, and interactive user interface  
 - 🧩 **Node.js / Express Backend** – RESTful API powering dynamic data exchange  
